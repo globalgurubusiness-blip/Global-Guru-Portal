@@ -3,1427 +3,978 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Global Guru | Mentorship Academy & Creative Agency</title>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <title>Global Guru • Ecosystem Portal</title>
+  <meta name="theme-color" content="#4A0E17">
+  
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons 6 -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            ggBurgundy: '#4A0E17',
-            ggBurgundyDark: '#360B11',
-            ggBurgundyLight: '#651723',
-            ggGold: '#D4AF37',
-            ggGoldLight: '#F59E0B',
-            ggGoldMuted: '#FDE68A',
-            ggSurface: '#FBF9F9',
-            ggCharcoal: '#181A1E'
-          },
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace']
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <style>
+    :root {
+      --primary: #4A0E17;
+      --primary-light: #681522;
+      --gold: #D4AF37;
+      --gold-light: #FFF9E6;
+      --emerald: #0D6E48;
+      --emerald-bg: #EAF7EE;
+      --rose: #A31D1D;
+      --rose-bg: #FDF2F2;
+      --bg: #F7F5F0;
+      --card: #FFFFFF;
+      --text: #1C1917;
+      --muted: #6B7280;
+      --border: #E8E5DD;
+      --shadow-sm: 0 2px 4px rgba(74, 14, 23, 0.04);
+      --shadow-md: 0 4px 12px rgba(74, 14, 23, 0.08);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
-      touch-action: pan-y;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      background: #0f1216;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .screen-view {
+    .app-viewport {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0,0,0,0.12);
+    }
+
+    /* Header Bar */
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand-box { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      border: 2px solid var(--gold);
+    }
+    .brand-text h1 { font-size: 14px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+    .brand-text span { font-size: 10px; color: #E8D5B5; display: block; font-weight: 500; }
+    
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; }
+
+    /* Sub-header / Swiper guide */
+    .view-indicator {
+      background: #EDEAE1;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Screen Container */
+    .screen-slider {
+      flex: 1;
+      display: flex;
+      transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.4, 1);
+      will-change: transform;
+    }
+    .screen-panel {
+      min-width: 100%;
+      max-width: 100%;
+      padding: 16px 14px 90px;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+    }
+
+    /* Cards & Components */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Friendly Welcome Hero */
+    .welcome-hero {
+      background: linear-gradient(135deg, #FFF9F2 0%, #FFFFFF 100%);
+      border: 1px solid #F3E5D8;
+      border-left: 4px solid var(--gold);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .welcome-hero h2 { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .welcome-hero p { font-size: 12px; color: #57534E; line-height: 1.5; margin-bottom: 12px; }
+    .welcome-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .welcome-chip {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #FFF1E6;
+      color: var(--primary);
+      border: 1px solid #FCE4D6;
+    }
+
+    /* Interactive Input & Search */
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .input-field {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #D1D5DB;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.15s ease;
+      background: #FAFAFA;
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(74, 14, 23, 0.08);
+    }
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:active { background: var(--primary-light); transform: scale(0.98); }
+    .btn-emerald { background: var(--emerald); color: #fff; }
+    .btn-emerald:active { opacity: 0.9; transform: scale(0.98); }
+    .btn-gold { background: var(--gold); color: #1C1917; }
+    .btn-outline { background: #fff; border: 1px solid #D1D5DB; color: #374151; }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 4px 12px;
+      border-top: 1px solid var(--border);
+      z-index: 60;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      color: #9CA3AF;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 16.66%;
+      transition: all 0.15s ease;
+    }
+    .nav-btn i { font-size: 16px; }
+    .nav-btn.active { color: var(--primary); font-weight: 800; transform: translateY(-1px); }
+
+    /* Chatbot Modal */
+    .chat-modal {
       display: none;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .chat-card {
+      width: 100%;
+      max-width: 480px;
+      background: #FFF;
+      border-radius: 20px 20px 0 0;
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+    }
+    .chat-header {
+      background: var(--primary);
+      color: #FFF;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--gold);
+    }
+    .chat-body {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #FAF8F5;
+    }
+    .chat-msg {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      max-width: 85%;
+    }
+    .msg-bot { background: #FFF; border: 1px solid var(--border); color: #1C1917; align-self: flex-start; }
+    .msg-user { background: var(--primary); color: #FFF; align-self: flex-end; }
+    .chat-footer {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      background: #FFF;
+      display: flex;
+      gap: 8px;
     }
 
-    .screen-view.active {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
+    /* Switchboard & Security */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
     }
+    .toggle-info h4 { font-size: 12px; font-weight: 700; }
+    .toggle-info p { font-size: 10px; color: var(--muted); }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: #D1D5DB; transition: .2s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px;
+      left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--emerald); }
+    input:checked + .slider:before { transform: translateX(20px); }
 
-    /* Toggle Switch Physics */
-    .switch-checkbox:checked + .switch-track {
-      background-color: #10b981;
+    /* Badges & Tables */
+    .badge {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
     }
-    .switch-checkbox:checked + .switch-track .switch-thumb {
-      transform: translateX(18px);
-    }
+    .badge-active { background: var(--emerald-bg); color: var(--emerald); }
+    .badge-grace { background: #FEF3C7; color: #B45309; }
+    .badge-locked { background: var(--rose-bg); color: var(--rose); }
 
-    ::-webkit-scrollbar {
-      display: none;
+    .social-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
-
-    .glass-nav {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
+    .social-btn:hover { background: #F3F4F6; }
   </style>
 </head>
-<body class="antialiased font-sans text-slate-800">
+<body>
 
-  <!-- Mobile Frame Container (Max-Width for authentic native feel) -->
-  <div id="appContainer" class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative flex flex-col overflow-x-hidden border-x border-slate-200/50">
+<div class="app-viewport">
+  <!-- Top Global Header -->
+  <header>
+    <div class="brand-box">
+      <div class="brand-logo">GG</div>
+      <div class="brand-text">
+        <h1>Global Guru</h1>
+        <span>Academy & Creative Studio</span>
+      </div>
+    </div>
+    <div id="cloudStatus" class="status-badge">
+      <div class="status-dot" id="cloudDot"></div>
+      <span id="cloudText">CLOUD LIVE</span>
+    </div>
+  </header>
 
-    <!-- Top Sticky Header -->
-    <header class="bg-gradient-to-r from-ggBurgundyDark via-ggBurgundy to-ggBurgundyDark text-white px-4 py-3 sticky top-0 z-40 shadow-lg border-b border-ggGold/30">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2.5">
-          <!-- Circular GG Crest -->
-          <div class="w-10 h-10 rounded-full bg-white p-0.5 border-2 border-ggGold shadow-md flex items-center justify-center flex-shrink-0">
-            <div class="w-full h-full rounded-full bg-ggBurgundy flex items-center justify-center">
-              <span class="text-ggGold font-black text-sm tracking-tighter">GG</span>
-            </div>
-          </div>
-          <div>
-            <div class="flex items-center space-x-1.5">
-              <h1 class="text-xs font-black tracking-wider text-white">GLOBAL GURU</h1>
-              <span class="text-[9px] bg-ggGold/20 text-ggGoldMuted font-mono px-1.5 py-0.2 rounded border border-ggGold/40 font-bold">ECOSYSTEM</span>
-            </div>
-            <p class="text-[10px] text-amber-200/90 font-medium">Academy & Creative Agency</p>
-          </div>
-        </div>
+  <!-- Navigation View Indicator -->
+  <div class="view-indicator">
+    <span id="viewTitle"><i class="fa-solid fa-house"></i> Home Gateway</span>
+    <span><i class="fa-solid fa-arrows-left-right"></i> Swipe Navigation</span>
+  </div>
 
-        <div class="flex items-center space-x-2">
-          <!-- Operational Status Pill -->
-          <div class="bg-black/35 border border-white/10 px-2 py-1 rounded-lg text-right">
-            <span class="text-[9px] font-mono font-bold text-amber-300 block leading-none">● READY</span>
-            <span id="headerLiveDate" class="text-[8px] text-slate-300 font-medium leading-none">09 Oct</span>
-          </div>
-          <!-- Quick Admin Screen Direct Jump -->
-          <button onclick="window.switchScreen(4)" title="Admin ERP" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-xs text-ggGold border border-ggGold/30 transition shadow-inner">
-            <i class="fa-solid fa-shield-halved"></i>
-          </button>
+  <!-- Screens Container -->
+  <div class="screen-slider" id="screenSlider">
+    
+    <!-- SCREEN 0: Home -->
+    <div class="screen-panel" id="screen-0">
+      <div class="welcome-hero">
+        <h2>👋 Welcome to Global Guru</h2>
+        <p>Aapki career growth aur business expansion ka one-stop digital hub. Yahan hum practical live mentorship aur high-impact creative commercials deliver karte hain.</p>
+        <div class="welcome-badges">
+          <span class="welcome-chip"><i class="fa-solid fa-check"></i> Live Cohorts</span>
+          <span class="welcome-chip"><i class="fa-solid fa-video"></i> Studio Ads</span>
+          <span class="welcome-chip"><i class="fa-solid fa-shield-halved"></i> 24/7 Verified</span>
         </div>
       </div>
-    </header>
 
-    <!-- Sub-Header Gesture Breadcrumb -->
-    <div class="bg-slate-50 border-b border-slate-200/80 px-4 py-1.5 flex justify-between items-center text-[10px] text-slate-500 font-medium">
-      <span id="activeScreenBreadcrumb" class="font-semibold text-ggBurgundy flex items-center">
-        <i class="fa-solid fa-house mr-1.5 text-ggBurgundy"></i> Home Gateway
-      </span>
-      <span class="flex items-center text-slate-400">
-        <i class="fa-solid fa-arrows-left-right text-[9px] mr-1"></i> Swipe Horizontal
-      </span>
+      <div class="card" onclick="goToScreen(1)" style="cursor: pointer;">
+        <div class="card-title">
+          <span><i class="fa-solid fa-graduation-cap" style="color:var(--primary);"></i> Mentorship Academy</span>
+          <i class="fa-solid fa-chevron-right" style="color:var(--muted); font-size:12px;"></i>
+        </div>
+        <p style="font-size:12px; color:var(--muted); line-height:1.4;">Live AI & E-Commerce Cohorts. Structured Rs. 5,000/month installment plans.</p>
+      </div>
+
+      <div class="card" onclick="goToScreen(2)" style="cursor: pointer;">
+        <div class="card-title">
+          <span><i class="fa-solid fa-clapperboard" style="color:var(--primary);"></i> Creative Agency Studio</span>
+          <i class="fa-solid fa-chevron-right" style="color:var(--muted); font-size:12px;"></i>
+        </div>
+        <p style="font-size:12px; color:var(--muted); line-height:1.4;">Tier 1 Fast Hooks & Tier 2 High-End CGI Commercial TVCs.</p>
+      </div>
+
+      <div class="card" onclick="goToScreen(5)" style="cursor: pointer;">
+        <div class="card-title">
+          <span><i class="fa-solid fa-book-bookmark" style="color:var(--gold);"></i> DigiBook Hub & Support</span>
+          <i class="fa-solid fa-chevron-right" style="color:var(--muted); font-size:12px;"></i>
+        </div>
+        <p style="font-size:12px; color:var(--muted); line-height:1.4;">Interactive Chatbot, Direct WhatsApp escalation, aur system backups.</p>
+      </div>
     </div>
 
-    <!-- Main Content Area with Touch Listeners -->
-    <main id="touchSwipeZone" class="flex-1 pb-24">
+    <!-- SCREEN 1: Mentorship -->
+    <div class="screen-panel" id="screen-1">
+      <div class="card">
+        <div class="card-title">Live Mentorship Batches</div>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Batch timings: Daily 5:30 PM - 7:00 PM PKT.</p>
+        <div style="background:#FAF8F5; padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <strong style="font-size:12px;">Cohort AI-01</strong>
+            <span class="badge badge-active">Active</span>
+          </div>
+          <span style="font-size:11px; color:var(--muted);">Mon / Wed / Fri • 48 Students Registered</span>
+        </div>
+        <div style="background:#FAF8F5; padding:12px; border-radius:8px; border:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <strong style="font-size:12px;">Cohort ECOM-04</strong>
+            <span class="badge badge-active">Active</span>
+          </div>
+          <span style="font-size:11px; color:var(--muted);">Tue / Thu / Sat • 36 Students Registered</span>
+        </div>
+      </div>
+    </div>
 
-      <!-- ================= SCREEN 0: HOME GATEWAY ================= -->
-      <section id="screen-0" class="screen-view active p-4 space-y-4">
+    <!-- SCREEN 2: Studio -->
+    <div class="screen-panel" id="screen-2">
+      <div class="card">
+        <div class="card-title">Production Pipelines</div>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Active commercial shoots & CGI asset queue.</p>
+        <div style="border-left:3px solid var(--emerald); padding-left:10px; margin-bottom:12px;">
+          <h4 style="font-size:12px;">Tier 1 Commercials</h4>
+          <p style="font-size:11px; color:var(--muted);">Fast UGC Hooks & Product unboxing ads (Turnaround: 48h).</p>
+        </div>
+        <div style="border-left:3px solid var(--gold); padding-left:10px;">
+          <h4 style="font-size:12px;">Tier 2 3D / VFX Production</h4>
+          <p style="font-size:11px; color:var(--muted);">Cinematic lighting & VFX rendering for brand launches.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: Khata (Student Fee Search) -->
+    <div class="screen-panel" id="screen-3">
+      <div class="card">
+        <div class="card-title">Mera Khata (Live Verification)</div>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Apna registered WhatsApp number enter karein aur <strong>Enter</strong> press karein:</p>
         
-        <!-- Friendly Warm Greeting Box -->
-        <div class="bg-gradient-to-br from-amber-50/70 to-rose-50/50 border border-amber-200/80 rounded-2xl p-4 shadow-sm space-y-2">
-          <div class="flex items-center space-x-2">
-            <span class="text-lg">👋</span>
-            <h2 class="text-sm font-extrabold text-ggBurgundy">Welcome to Global Guru</h2>
-          </div>
-          <p class="text-xs text-slate-700 leading-relaxed">
-            Aapki career growth aur business expansion ka one-stop digital hub. Yahan hum practical live mentorship aur high-impact creative commercials deliver karte hain.
-          </p>
-          <div class="pt-1 flex items-center space-x-3 text-[10px] text-slate-500 font-medium">
-            <span><i class="fa-solid fa-check text-emerald-600 mr-1"></i> Live Mentorship</span>
-            <span><i class="fa-solid fa-check text-emerald-600 mr-1"></i> Studio Ads</span>
-            <span><i class="fa-solid fa-check text-emerald-600 mr-1"></i> Fast Support</span>
-          </div>
-        </div>
+        <!-- Form allows Enter key submission directly -->
+        <form onsubmit="event.preventDefault(); runKhataSearch();" class="search-box">
+          <input type="text" id="khataInput" class="input-field" placeholder="e.g. 03001112233 or 03004445566" autocomplete="off">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </form>
 
-        <!-- 3 Clean Quick-Action Hub Cards -->
-        <div class="space-y-2.5">
-          <!-- Card 1: Mentorship -->
-          <div onclick="window.switchScreen(1)" class="p-3.5 rounded-2xl border border-rose-100 bg-white hover:bg-rose-50/30 active:scale-[0.99] flex items-center justify-between cursor-pointer transition shadow-sm">
-            <div class="flex items-center space-x-3.5">
-              <div class="w-10 h-10 rounded-xl bg-ggBurgundy text-white flex items-center justify-center text-sm shadow">
-                <i class="fa-solid fa-graduation-cap"></i>
-              </div>
-              <div>
-                <h3 class="text-xs font-bold text-ggBurgundy">Mentorship Academy</h3>
-                <p class="text-[11px] text-slate-500">Live AI & E-Commerce Cohorts • Rs. 5k/Month</p>
-              </div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-ggBurgundy"></i>
-          </div>
+        <div id="khataResultArea" style="margin-top:14px;"></div>
+      </div>
+    </div>
 
-          <!-- Card 2: Studio -->
-          <div onclick="window.switchScreen(2)" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.99] flex items-center justify-between cursor-pointer transition shadow-sm">
-            <div class="flex items-center space-x-3.5">
-              <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center text-sm shadow">
-                <i class="fa-solid fa-clapperboard"></i>
-              </div>
-              <div>
-                <h3 class="text-xs font-bold text-slate-800">Agency Creative Studio</h3>
-                <p class="text-[11px] text-slate-500">Tier 1 Fast Hooks & Tier 2 CGI Cinematic TVCs</p>
-              </div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-slate-400"></i>
-          </div>
-
-          <!-- Card 3: Support & Settings -->
-          <div onclick="window.switchScreen(5)" class="p-3.5 rounded-2xl border border-amber-200 bg-white hover:bg-amber-50/40 active:scale-[0.99] flex items-center justify-between cursor-pointer transition shadow-sm">
-            <div class="flex items-center space-x-3.5">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-500 text-white flex items-center justify-center text-sm shadow">
-                <i class="fa-solid fa-headset"></i>
-              </div>
-              <div>
-                <h3 class="text-xs font-bold text-amber-950">Settings & Official Hub</h3>
-                <p class="text-[11px] text-slate-500">Instant Chatbot, WhatsApp & Backups</p>
-              </div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-amber-600"></i>
-          </div>
-        </div>
-
-        <!-- Active Cohort Quick Schedule -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2.5">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div class="flex items-center space-x-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <h4 class="text-xs font-bold text-slate-800">Active Live Schedule</h4>
-            </div>
-            <span class="text-[10px] text-ggBurgundy font-mono font-bold">Daily 5:30 - 7:00 PM</span>
-          </div>
-
-          <div class="space-y-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-rose-50/60 border border-rose-100 flex justify-between items-center">
-              <div>
-                <p class="font-bold text-ggBurgundy">Cohort AI-01 (Mon, Wed, Fri)</p>
-                <p class="text-[10px] text-slate-500">AI Automation & Digital Marketing</p>
-              </div>
-              <span class="text-[10px] font-mono font-bold text-slate-700 bg-white px-2 py-1 rounded-lg border border-slate-200">1.5h Live</span>
-            </div>
-
-            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
-              <div>
-                <p class="font-bold text-slate-800">Cohort EC-01 (Tue, Thu, Sat)</p>
-                <p class="text-[10px] text-slate-500">E-Commerce & eBay Global Selling</p>
-              </div>
-              <span class="text-[10px] font-mono font-bold text-slate-700 bg-white px-2 py-1 rounded-lg border border-slate-200">1.5h Live</span>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ================= SCREEN 1: MENTORSHIP & CLASS PORTAL ================= -->
-      <section id="screen-1" class="screen-view p-4 space-y-4">
+    <!-- SCREEN 4: Admin & Switchboard -->
+    <div class="screen-panel" id="screen-4">
+      <div id="adminLockScreen" class="card">
+        <div class="card-title"><i class="fa-solid fa-lock"></i> Admin Portal Login</div>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Owner (PIN: 7860) ya Admin 2 (PIN: 3344) enter karein:</p>
         
-        <div class="flex items-center justify-between">
+        <!-- Enter key enabled for Admin PIN -->
+        <form onsubmit="event.preventDefault(); verifyAdminPin();" class="search-box">
+          <input type="password" id="adminPinInput" class="input-field" placeholder="Enter 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+          <button type="submit" class="btn btn-primary">Unlock</button>
+        </form>
+        <span id="pinError" style="font-size:11px; color:var(--rose); display:none;">Ghalat PIN code, dobara koshish karein.</span>
+      </div>
+
+      <div id="adminDashboard" style="display:none;">
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <h2 class="text-sm font-extrabold text-ggBurgundy">Mentorship Hub</h2>
-            <p class="text-[11px] text-slate-500">3-Month Professional Cohorts</p>
+            <h3 id="currentRoleTitle" style="font-size:14px; font-weight:800; color:var(--primary);">Session Active</h3>
+            <span id="currentRoleSub" style="font-size:11px; color:var(--muted);">Full Access Mode</span>
           </div>
-          <span class="text-[10px] bg-rose-100 text-ggBurgundy font-bold px-2 py-0.5 rounded-full border border-rose-200">Rule of 10 Engine</span>
+          <button onclick="lockAdmin()" class="btn btn-outline" style="padding:6px 12px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Lock</button>
         </div>
 
-        <!-- Google Meet Class Card -->
-        <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-2xl p-4 shadow-lg border border-slate-800 space-y-3">
-          <div class="flex justify-between items-start">
-            <div class="space-y-1">
-              <span class="inline-flex items-center text-[9px] uppercase font-bold text-emerald-400 bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/30">
-                <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Google One 5 TB Cloud Rec
-              </span>
-              <h3 class="text-xs font-bold text-white">Daily Interactive Live Class</h3>
-              <p class="text-[11px] text-slate-300">5:30 PM - 7:00 PM PKT (Direct Google Meet)</p>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-rose-900/40 border border-rose-500/30 flex items-center justify-center text-rose-300 text-base">
-              <i class="fa-solid fa-video"></i>
-            </div>
-          </div>
-
-          <div class="pt-2 border-t border-slate-800 flex flex-col gap-2">
-            <a href="https://meet.google.com" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold py-2.5 px-3 rounded-xl flex items-center justify-center text-xs space-x-2 shadow transition">
-              <i class="fa-solid fa-video text-sm"></i>
-              <span>Enter Live Class (Google Meet)</span>
-            </a>
-            <p class="text-[10px] text-center text-slate-400">Har month ki 10 tareekh ko unpaid students ka access auto-lock hota hai.</p>
-          </div>
-        </div>
-
-        <!-- Registration & Admission Form -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-          <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-            <h3 class="text-xs font-black uppercase text-slate-800">Student Admission Portal</h3>
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Admissions Open</span>
-          </div>
-
-          <form id="mentorAdmissionForm" onsubmit="window.handleStudentRegistration(event)" class="space-y-3">
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Full Legal Name</label>
-              <input type="text" id="reg_name" required placeholder="Ali Raza" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">WhatsApp Mobile Number</label>
-              <input type="tel" id="reg_phone" required placeholder="03001234567" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Select Cohort Track</label>
-              <select id="reg_track" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-                <option value="Cohort AI-01">Cohort AI-01: AI Automation & Digital Marketing (MWF)</option>
-                <option value="Cohort EC-01">Cohort EC-01: E-Commerce & eBay Global Selling (TTS)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Tuition Payment Plan</label>
-              <select id="reg_plan" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-                <option value="Monthly 5k">Rs. 5,000 / Month (Total Rs. 50,000 Cohort Plan)</option>
-                <option value="Upfront Full">Rs. 35,000 Upfront Full Clearance (Save Rs. 15,000)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Payment Reference / TRX ID</label>
-              <input type="text" id="reg_trx" required placeholder="JazzCash / Easypaisa / Bank Ref ID" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-            </div>
-
-            <button type="submit" class="w-full bg-ggBurgundy hover:bg-ggBurgundyDark text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-[0.99]">
-              Submit Admission & Verify Slip
-            </button>
-          </form>
-        </div>
-
-      </section>
-
-      <!-- ================= SCREEN 2: CREATIVE STUDIO SERVICES ================= -->
-      <section id="screen-2" class="screen-view p-4 space-y-4">
-        
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-extrabold text-slate-900">Creative Agency Studio</h2>
-            <p class="text-[11px] text-slate-500">Commercial Production & Viral Hooks</p>
-          </div>
-          <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded-full">Turnaround 24h - 4d</span>
-        </div>
-
-        <!-- Tier Selection Cards -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <div onclick="window.selectStudioTier('tier1')" id="tier1Card" class="p-3.5 border-2 border-ggBurgundy bg-rose-50/50 rounded-2xl cursor-pointer transition shadow-sm">
-            <span class="text-[9px] font-black text-ggBurgundy uppercase tracking-wider">Tier 1: Fast Cash</span>
-            <h4 class="text-xs font-bold text-slate-900 mt-0.5">Quick Hook Ads</h4>
-            <p class="text-[12px] text-emerald-700 font-black mt-1 font-mono">Rs. 2,000 - 5,000</p>
-            <p class="text-[9px] text-slate-500 mt-1">15s - 30s High Retention Hooks (24h Delivery)</p>
-          </div>
-
-          <div onclick="window.selectStudioTier('tier2')" id="tier2Card" class="p-3.5 border border-slate-200 bg-white rounded-2xl cursor-pointer transition shadow-sm">
-            <span class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Tier 2: Signature</span>
-            <h4 class="text-xs font-bold text-slate-900 mt-0.5">CGI Cinematic TVC</h4>
-            <p class="text-[12px] text-emerald-700 font-black mt-1 font-mono">Rs. 18,000 - 40,000</p>
-            <p class="text-[9px] text-slate-500 mt-1">Real Estate 3D, CGI Products & Broadcast TVCs</p>
-          </div>
-        </div>
-
-        <!-- Project Brief Form -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-          <h3 class="text-xs font-black uppercase text-slate-800 pb-2 border-b border-slate-100">Submit Production Brief</h3>
-
-          <form id="studioBriefForm" onsubmit="window.handleStudioBriefSubmission(event)" class="space-y-3">
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Brand or Business Name</label>
-              <input type="text" id="sb_brand" required placeholder="Multan Developers / Velocity Store" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">WhatsApp Contact</label>
-              <input type="tel" id="sb_phone" required placeholder="03009876543" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Creative Ad Format</label>
-              <select id="sb_scope" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-                <option value="Tier 1: 15s Fast Reel Hook (Rs. 2,500)">Tier 1: 15s Fast Reel Hook (Rs. 2,500)</option>
-                <option value="Tier 1: 30s Brand Promo (Rs. 4,500)">Tier 1: 30s Brand Promo (Rs. 4,500)</option>
-                <option value="Tier 2: 30s 3D/CGI Cinematic Ad (Rs. 22,000)">Tier 2: 30s 3D/CGI Cinematic Ad (Rs. 22,000)</option>
-                <option value="Tier 2: 60s Full Broadcast TVC (Rs. 38,000)">Tier 2: 60s Full Broadcast TVC (Rs. 38,000)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Google Drive Asset Folder Link</label>
-              <input type="url" id="sb_drive" placeholder="https://drive.google.com/drive/folders/..." class="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-ggBurgundy outline-none transition">
-              <p class="text-[9px] text-slate-400 mt-1">Zero-upload: Share logos, product footage, or reference videos.</p>
-            </div>
-
-            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-[0.99]">
-              Book Studio Order
-            </button>
-          </form>
-        </div>
-
-      </section>
-
-      <!-- ================= SCREEN 3: STUDENT & CLIENT KHATA ================= -->
-      <section id="screen-3" class="screen-view p-4 space-y-4">
-        
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-extrabold text-emerald-950">Mera Khata (Ledger)</h2>
-            <p class="text-[11px] text-slate-500">Live Fee & Payment Verification</p>
-          </div>
-          <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Rule of 10</span>
-        </div>
-
-        <!-- Phone Lookup Card -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2.5">
-          <p class="text-[11px] text-slate-600">Apna registered WhatsApp number enter karein balance aur Rule of 10 status check karne ke liye:</p>
-          <div class="flex space-x-2">
-            <input type="tel" id="khataPhoneInput" placeholder="03001112233" class="flex-1 text-xs p-2.5 border border-slate-200 bg-slate-50 rounded-xl outline-none focus:ring-1 focus:ring-emerald-700 font-mono">
-            <button onclick="window.executeKhataLookup()" class="bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white px-4 rounded-xl text-xs font-bold transition shadow-sm">
-              Search
-            </button>
-          </div>
-          <div class="text-[10px] text-slate-400 font-mono flex gap-2">
-            <span>Test Active: <strong>03001112233</strong></span>
-            <span>Test Overdue: <strong>03004445566</strong></span>
-          </div>
-        </div>
-
-        <!-- Dynamic User Statement Result Card -->
-        <div id="khataStatementCard" class="hidden bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3.5 shadow-sm">
-          <div class="flex justify-between items-start pb-2.5 border-b border-slate-200">
-            <div>
-              <h3 id="ks_name" class="text-xs font-bold text-slate-900"></h3>
-              <p id="ks_track" class="text-[10px] text-slate-500 font-mono mt-0.5"></p>
-            </div>
-            <span id="ks_statusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold"></span>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2 text-center">
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Total Fee</span>
-              <p id="ks_total" class="text-xs font-black text-slate-800 font-mono mt-0.5"></p>
-            </div>
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Received</span>
-              <p id="ks_paid" class="text-xs font-black text-emerald-600 font-mono mt-0.5"></p>
-            </div>
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Remaining</span>
-              <p id="ks_balance" class="text-xs font-black text-rose-600 font-mono mt-0.5"></p>
-            </div>
-          </div>
-
-          <div id="ks_ruleNotice" class="text-[11px] p-3 rounded-xl font-medium leading-relaxed"></div>
-
-          <button onclick="window.openDirectWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 shadow transition">
-            <i class="fa-brands fa-whatsapp text-sm"></i>
-            <span>Submit Payment Slip (+92 311 6246000)</span>
-          </button>
-        </div>
-
-      </section>
-
-      <!-- ================= SCREEN 4: SUPER ADMIN ERP ================= -->
-      <section id="screen-4" class="screen-view p-4 space-y-4">
-        
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-extrabold text-ggBurgundy">Super Admin ERP</h2>
-            <p class="text-[11px] text-slate-500">Tiered Administrative Operations</p>
-          </div>
-          <span id="adminSessionRoleBadge" class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">Locked</span>
-        </div>
-
-        <!-- Lock Screen / PIN Authorization Entry -->
-        <div id="adminLockScreen" class="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm space-y-3">
-          <div class="w-12 h-12 bg-rose-50 text-ggBurgundy rounded-2xl mx-auto flex items-center justify-center text-lg border border-rose-100">
-            <i class="fa-solid fa-lock"></i>
-          </div>
-          <div>
-            <h3 class="text-xs font-bold text-slate-800">Dual Super Admin Verification</h3>
-            <p class="text-[11px] text-slate-500 mt-1">Master Owner PIN (7860) or Operations PIN (3344)</p>
-          </div>
-          <div class="flex justify-center items-center space-x-2 max-w-xs mx-auto">
-            <input type="password" id="adminPinInput" maxlength="6" placeholder="PIN" class="text-center w-36 text-xs p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-1 focus:ring-ggBurgundy bg-slate-50 font-mono font-bold tracking-widest">
-            <button onclick="window.authenticateAdminSession()" class="bg-ggBurgundy hover:bg-ggBurgundyDark text-white text-xs px-4 py-2.5 rounded-xl font-bold transition shadow">
-              Login
-            </button>
-          </div>
-          <div class="pt-2 text-[10px] text-slate-400 font-mono border-t border-slate-100 flex justify-center gap-4">
-            <span>Owner PIN: <strong class="text-slate-700">7860</strong></span>
-            <span>Sis PIN: <strong class="text-slate-700">3344</strong></span>
-          </div>
-        </div>
-
-        <!-- Authenticated Admin Main Panel -->
-        <div id="adminMainContent" class="hidden space-y-4">
+        <!-- Master Owner Switchboard (Only visible to Owner PIN 7860) -->
+        <div id="ownerControls" class="card" style="display:none; border-left:4px solid var(--gold);">
+          <div class="card-title"><i class="fa-solid fa-sliders"></i> Master Owner Switchboard</div>
+          <p style="font-size:11px; color:var(--muted); margin-bottom:8px;">Admin 2 ke liye sensitive financial data on/off karein:</p>
           
-          <!-- Active Admin Header Ribbon -->
-          <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-md border border-slate-800">
-            <div class="flex items-center space-x-2.5">
-              <div id="adminAvatar" class="w-9 h-9 rounded-xl bg-ggGold text-slate-950 font-black text-xs flex items-center justify-center shadow">
-                GG
-              </div>
-              <div>
-                <h4 id="adminActiveTitle" class="text-xs font-bold leading-tight">Master Admin (Creative & Tech)</h4>
-                <p id="adminActiveSubtitle" class="text-[9px] text-amber-200">Full System Owner & Controller</p>
-              </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Bank Balances Access</h4>
+              <p>Meezan, Easypaisa, JazzCash view</p>
             </div>
-            <button onclick="window.logoutAdminSession()" class="text-[10px] bg-white/10 hover:bg-white/20 active:scale-95 text-white px-2.5 py-1.5 rounded-lg font-semibold transition border border-white/10">
-              <i class="fa-solid fa-lock mr-1"></i> Lock
-            </button>
+            <label class="switch">
+              <input type="checkbox" id="perm_bank" onchange="updateSwitchPermission('perm_bank', this.checked)">
+              <span class="slider"></span>
+            </label>
           </div>
 
-          <!-- MASTER OWNER PERMISSION SWITCHBOARD (Visible ONLY to Owner 7860) -->
-          <div id="ownerSwitchboardBox" class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-4 shadow-sm space-y-3">
-            <div class="flex items-center justify-between pb-2 border-b border-amber-200">
-              <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-sliders text-amber-800 text-sm"></i>
-                <h4 class="text-xs font-black text-amber-950 uppercase tracking-tight">Master Permissions Switchboard</h4>
-              </div>
-              <span class="text-[9px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full border border-amber-300">Owner Only</span>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Galla (Cash Vault) Access</h4>
+              <p>Physical vault drawer balance</p>
             </div>
-            <p class="text-[10px] text-amber-800 leading-relaxed">
-              Admin 2 (Sis - Operations Desk) ke liye live feature visibility & action controls:
-            </p>
-
-            <div class="space-y-2 text-xs">
-              <!-- Switch 1: Bank & Galla Vault -->
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-800 block">1. Multi-Bank & Galla Vault</span>
-                  <span class="text-[9px] text-slate-400">Cash in hand, Meezan Bank, wallets</span>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="toggle_bankVault" onchange="window.updatePermission('bankVault', this.checked)" class="sr-only switch-checkbox">
-                  <div class="w-9 h-5 bg-slate-300 rounded-full switch-track transition p-0.5">
-                    <div class="w-4 h-4 bg-white rounded-full shadow switch-thumb transition"></div>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Switch 2: Net Profit & Analytics -->
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-800 block">2. Net Profit & P&L Analytics</span>
-                  <span class="text-[9px] text-slate-400">Net retained cash and total revenue</span>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="toggle_netProfit" onchange="window.updatePermission('netProfit', this.checked)" class="sr-only switch-checkbox">
-                  <div class="w-9 h-5 bg-slate-300 rounded-full switch-track transition p-0.5">
-                    <div class="w-4 h-4 bg-white rounded-full shadow switch-thumb transition"></div>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Switch 3: Fee Approvals -->
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-800 block">3. Fee Slip Approvals</span>
-                  <span class="text-[9px] text-slate-400">1-click approve Rs. 5k installments</span>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="toggle_feeApprove" onchange="window.updatePermission('feeApprove', this.checked)" class="sr-only switch-checkbox">
-                  <div class="w-9 h-5 bg-slate-300 rounded-full switch-track transition p-0.5">
-                    <div class="w-4 h-4 bg-white rounded-full shadow switch-thumb transition"></div>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Switch 4: Rule of 10 Override -->
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-800 block">4. Rule of 10 Grace Override Pass</span>
-                  <span class="text-[9px] text-slate-400">Extend grace pass till 15th for students</span>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="toggle_graceOverride" onchange="window.updatePermission('graceOverride', this.checked)" class="sr-only switch-checkbox">
-                  <div class="w-9 h-5 bg-slate-300 rounded-full switch-track transition p-0.5">
-                    <div class="w-4 h-4 bg-white rounded-full shadow switch-thumb transition"></div>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Switch 5: WhatsApp Reminders -->
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-800 block">5. 1-Tap WhatsApp Reminders</span>
-                  <span class="text-[9px] text-slate-400">Send personalized overdue notices</span>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="toggle_waRemind" onchange="window.updatePermission('waRemind', this.checked)" class="sr-only switch-checkbox">
-                  <div class="w-9 h-5 bg-slate-300 rounded-full switch-track transition p-0.5">
-                    <div class="w-4 h-4 bg-white rounded-full shadow switch-thumb transition"></div>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Switch 6: Studio Deal Values -->
-              <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-800 block">6. Studio B2B Deal Pricing</span>
-                  <span class="text-[9px] text-slate-400">Show exact financial revenue per client ad</span>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="toggle_studioDeals" onchange="window.updatePermission('studioDeals', this.checked)" class="sr-only switch-checkbox">
-                  <div class="w-9 h-5 bg-slate-300 rounded-full switch-track transition p-0.5">
-                    <div class="w-4 h-4 bg-white rounded-full shadow switch-thumb transition"></div>
-                  </div>
-                </label>
-              </div>
-            </div>
+            <label class="switch">
+              <input type="checkbox" id="perm_vault" onchange="updateSwitchPermission('perm_vault', this.checked)">
+              <span class="slider"></span>
+            </label>
           </div>
 
-          <!-- SECTION: Multi-Bank & Galla Vault (Controlled by toggle_bankVault) -->
-          <div id="financialVaultSection" class="space-y-2">
-            <div class="flex justify-between items-center">
-              <h4 class="text-xs font-black uppercase text-slate-700">Multi-Account Liquid Reserves</h4>
-              <span class="text-[9px] text-slate-400 font-mono">Live Ledger</span>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Net Profit Calculations</h4>
+              <p>Academy net margin & metrics</p>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-center text-xs">
-              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[9px] text-slate-400 uppercase font-bold">Physical Galla</span>
-                <p id="disp_cashDrawer" class="text-xs font-black text-slate-800 mt-1 font-mono">Rs. 25,000</p>
-              </div>
-              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[9px] text-slate-400 uppercase font-bold">Meezan Bank</span>
-                <p id="disp_meezanBank" class="text-xs font-black text-emerald-700 mt-1 font-mono">Rs. 185,000</p>
-              </div>
-              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[9px] text-slate-400 uppercase font-bold">JazzCash Wallet</span>
-                <p id="disp_jazzCash" class="text-xs font-black text-orange-600 mt-1 font-mono">Rs. 42,000</p>
-              </div>
-              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[9px] text-slate-400 uppercase font-bold">Easypaisa</span>
-                <p id="disp_easyPaisa" class="text-xs font-black text-emerald-600 mt-1 font-mono">Rs. 18,000</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION: Net Profit & Analytics (Controlled by toggle_netProfit) -->
-          <div id="netProfitSection" class="bg-gradient-to-r from-ggBurgundy to-ggBurgundyDark text-white p-4 rounded-2xl shadow-md border border-ggGold/30">
-            <div class="flex justify-between items-center">
-              <div>
-                <span class="text-[9px] uppercase font-bold text-amber-200">Net Retained Reserve</span>
-                <h3 id="disp_netRetained" class="text-base font-black mt-0.5 font-mono">Rs. 270,000</h3>
-                <p class="text-[9px] text-rose-100 mt-0.5">Academy MRR + Studio Cash (Realtime)</p>
-              </div>
-              <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-ggGold text-lg">
-                <i class="fa-solid fa-chart-pie"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- Operational Counter Cards (Visible to both Admins) -->
-          <div class="grid grid-cols-3 gap-2 text-center">
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-              <span class="text-[8px] text-slate-400 uppercase font-bold">Enrolled</span>
-              <p id="opTotalStudents" class="text-xs font-black text-slate-800 mt-0.5">3 Students</p>
-            </div>
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-              <span class="text-[8px] text-slate-400 uppercase font-bold">Rule of 10</span>
-              <p id="opOverdueCount" class="text-xs font-black text-rose-600 mt-0.5">1 Overdue</p>
-            </div>
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-              <span class="text-[8px] text-slate-400 uppercase font-bold">Agency Ads</span>
-              <p class="text-xs font-black text-emerald-700 mt-0.5">2 Orders</p>
-            </div>
-          </div>
-
-          <!-- SECTION: Student Management Table & Rule of 10 Actions -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h4 class="text-xs font-black uppercase text-slate-800">Student Mentorship Khata</h4>
-              <span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">Batch Engine</span>
-            </div>
-
-            <!-- Dynamic Student List -->
-            <div id="adminStudentRowsContainer" class="space-y-2.5">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- SECTION: Studio Client Orders -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-            <h4 class="text-xs font-black uppercase text-slate-800 pb-2 border-b border-slate-100">Agency Studio Pipeline</h4>
-            <div class="space-y-2 text-xs">
-              <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-                <div>
-                  <p class="font-bold text-slate-900">Multan Builders (30s CGI TVC)</p>
-                  <p class="text-[10px] text-slate-500 font-mono">Status: In 3D Production</p>
-                </div>
-                <div class="text-right">
-                  <span class="studio-deal-val text-[11px] font-black text-emerald-700 font-mono block">Rs. 25,000</span>
-                  <a href="https://drive.google.com" target="_blank" class="text-[10px] text-ggBurgundy font-bold hover:underline">Drive Link</a>
-                </div>
-              </div>
-
-              <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-                <div>
-                  <p class="font-bold text-slate-900">Luxe Apparel (15s Fast Reel Hook)</p>
-                  <p class="text-[10px] text-slate-500 font-mono">Status: Delivered / Cleared</p>
-                </div>
-                <div class="text-right">
-                  <span class="studio-deal-val text-[11px] font-black text-emerald-700 font-mono block">Rs. 3,500</span>
-                  <span class="text-[10px] text-slate-400">Archived</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- ================= SCREEN 5: SETTINGS & GG DIGIBOOK HUB ================= -->
-      <section id="screen-5" class="screen-view p-4 space-y-4">
-        
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-extrabold text-slate-900">Settings & DigiBook Hub</h2>
-            <p class="text-[11px] text-slate-500">Official Profile, Backups & Contact</p>
-          </div>
-          <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">v2.5 Stable</span>
-        </div>
-
-        <!-- Signed-in Google Account Card -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-ggBurgundy text-white flex items-center justify-center font-bold text-xs shadow border border-ggGold">
-                GG
-              </div>
-              <div>
-                <h4 class="text-xs font-bold text-slate-900">Global Guru Official</h4>
-                <p class="text-[11px] text-slate-500 font-mono">globalgurubusiness@gmail.com</p>
-              </div>
-            </div>
-            <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Pro 5TB</span>
-          </div>
-
-          <div class="pt-2 border-t border-slate-100 flex gap-2">
-            <button onclick="window.handleGoogleSwitchAccount()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 rounded-xl transition">
-              <i class="fa-solid fa-arrows-rotate mr-1"></i> Switch Account
-            </button>
-            <button onclick="window.handleGoogleLogout()" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold py-2 rounded-xl transition">
-              <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Log Out
-            </button>
-          </div>
-        </div>
-
-        <!-- Data Import / Export Engine (JSON Backup) -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-2.5">
-          <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-database text-ggBurgundy text-sm"></i>
-            <h4 class="text-xs font-bold text-slate-800">GG DigiBook Data Vault</h4>
-          </div>
-          <p class="text-[11px] text-slate-500">Tamam student ledgers, permissions aur transactions ka instant local backup download ya restore karein:</p>
-          
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="window.exportSystemJSON()" class="bg-slate-800 hover:bg-slate-900 text-white text-[11px] font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center space-x-1.5">
-              <i class="fa-solid fa-file-export"></i>
-              <span>Export Backup</span>
-            </button>
-            <label class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center space-x-1.5 cursor-pointer">
-              <i class="fa-solid fa-file-import"></i>
-              <span>Import Backup</span>
-              <input type="file" id="importFileInput" accept=".json" onchange="window.importSystemJSON(event)" class="hidden">
+            <label class="switch">
+              <input type="checkbox" id="perm_profit" onchange="updateSwitchPermission('perm_profit', this.checked)">
+              <span class="slider"></span>
             </label>
           </div>
         </div>
 
-        <!-- Tiered Contact Us Gateway -->
-        <div class="bg-gradient-to-br from-rose-50 to-amber-50/60 border border-rose-200/80 rounded-2xl p-4 shadow-sm space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <i class="fa-solid fa-headset text-ggBurgundy text-sm"></i>
-              <h4 class="text-xs font-bold text-ggBurgundy">Contact Official Support</h4>
-            </div>
-            <span class="text-[9px] bg-rose-200 text-ggBurgundy font-bold px-2 py-0.5 rounded">24/7 Desk</span>
+        <!-- Financial Metrics Block -->
+        <div id="financialBlock" class="card">
+          <div class="card-title">Business Accounts Balance</div>
+          <div id="financesContent">
+            <!-- Populated dynamically based on permissions -->
           </div>
-
-          <p class="text-[11px] text-slate-600 leading-relaxed">
-            Pehle hamare instant automated chatbot se baat karein. Agar mazeed rehnumai chahiye ho toh direct WhatsApp support officer se rabta karein:
-          </p>
-
-          <div class="space-y-2 pt-1">
-            <!-- Tier 1: Interactive Chatbot -->
-            <button onclick="window.toggleChatbotModal()" class="w-full bg-ggBurgundy hover:bg-ggBurgundyDark text-white text-xs font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2">
-              <i class="fa-solid fa-comments"></i>
-              <span>Step 1: Open AI Support Chatbot</span>
-            </button>
-
-            <!-- Tier 2: Direct WhatsApp +92 311 6246000 -->
-            <button onclick="window.openDirectWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2">
-              <i class="fa-brands fa-whatsapp text-sm"></i>
-              <span>Step 2: WhatsApp (+92 311 6246000)</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Official Social Ecosystem Links -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-          <h4 class="text-xs font-bold text-slate-800 pb-2 border-b border-slate-100">Official Social Media Channels</h4>
-
-          <div class="grid grid-cols-5 gap-2 text-center">
-            <!-- Instagram -->
-            <a href="https://instagram.com" target="_blank" class="p-2.5 rounded-xl bg-pink-50 text-pink-600 hover:bg-pink-100 transition flex flex-col items-center">
-              <i class="fa-brands fa-instagram text-base"></i>
-              <span class="text-[9px] font-bold mt-1">Insta</span>
-            </a>
-
-            <!-- YouTube -->
-            <a href="https://youtube.com" target="_blank" class="p-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition flex flex-col items-center">
-              <i class="fa-brands fa-youtube text-base"></i>
-              <span class="text-[9px] font-bold mt-1">YouTube</span>
-            </a>
-
-            <!-- TikTok -->
-            <a href="https://tiktok.com" target="_blank" class="p-2.5 rounded-xl bg-slate-100 text-slate-900 hover:bg-slate-200 transition flex flex-col items-center">
-              <i class="fa-brands fa-tiktok text-base"></i>
-              <span class="text-[9px] font-bold mt-1">TikTok</span>
-            </a>
-
-            <!-- Facebook -->
-            <a href="https://facebook.com" target="_blank" class="p-2.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex flex-col items-center">
-              <i class="fa-brands fa-facebook-f text-base"></i>
-              <span class="text-[9px] font-bold mt-1">FB</span>
-            </a>
-
-            <!-- LinkedIn -->
-            <a href="https://linkedin.com" target="_blank" class="p-2.5 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 transition flex flex-col items-center">
-              <i class="fa-brands fa-linkedin-in text-base"></i>
-              <span class="text-[9px] font-bold mt-1">LinkedIn</span>
-            </a>
-          </div>
-        </div>
-
-      </section>
-
-    </main>
-
-    <!-- ================= FLOATING SUPPORT CHATBOT MODAL ================= -->
-    <div id="chatbotModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-end justify-center p-3">
-      <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[460px] border border-slate-200">
-        <!-- Chatbot Header -->
-        <div class="bg-gradient-to-r from-ggBurgundyDark to-ggBurgundy text-white p-3.5 flex items-center justify-between border-b border-ggGold/30">
-          <div class="flex items-center space-x-2">
-            <div class="w-7 h-7 rounded-full bg-white text-ggBurgundy font-extrabold text-[10px] flex items-center justify-center border border-ggGold">GG</div>
-            <div>
-              <h4 class="text-xs font-bold leading-tight">GG Smart Assistant</h4>
-              <p class="text-[9px] text-amber-200">Instant Automated Answers</p>
-            </div>
-          </div>
-          <button onclick="window.toggleChatbotModal()" class="text-white hover:text-gray-300 text-sm w-7 h-7 flex items-center justify-center">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <!-- Chat History -->
-        <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs bg-slate-50">
-          <div class="bg-white p-3 rounded-2xl border border-slate-200 text-slate-700 shadow-xs max-w-[88%] leading-relaxed">
-            Assalam-o-Alaikum! Main Global Guru ka automated assistant hoon. Kisi bhi sawal par tap karein ya niche message karein:
-          </div>
-          
-          <!-- Suggestion Chips -->
-          <div class="flex flex-wrap gap-1.5 pt-1">
-            <button onclick="window.askBotQuestion('timing')" class="text-[10px] bg-white border border-rose-200 text-ggBurgundy px-2.5 py-1 rounded-full font-semibold hover:bg-rose-50 shadow-2xs">🕒 Cohort Timings</button>
-            <button onclick="window.askBotQuestion('fee')" class="text-[10px] bg-white border border-rose-200 text-ggBurgundy px-2.5 py-1 rounded-full font-semibold hover:bg-rose-50 shadow-2xs">💰 Rs. 5,000 Plan</button>
-            <button onclick="window.askBotQuestion('rule10')" class="text-[10px] bg-white border border-rose-200 text-ggBurgundy px-2.5 py-1 rounded-full font-semibold hover:bg-rose-50 shadow-2xs">🔒 Rule of 10</button>
-            <button onclick="window.askBotQuestion('studio')" class="text-[10px] bg-white border border-slate-300 text-slate-700 px-2.5 py-1 rounded-full font-semibold hover:bg-slate-100 shadow-2xs">🎬 Studio Rates</button>
-          </div>
-        </div>
-
-        <!-- Escalate to Direct WhatsApp -->
-        <div class="p-3 border-t border-slate-100 bg-white">
-          <button onclick="window.openDirectWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white text-[11px] font-bold py-2.5 rounded-xl flex items-center justify-center space-x-2 shadow transition">
-            <i class="fa-brands fa-whatsapp text-sm"></i>
-            <span>Transfer to Officer (+92 311 6246000)</span>
-          </button>
         </div>
       </div>
     </div>
 
-    <!-- Floating Trigger Icon -->
-    <button onclick="window.toggleChatbotModal()" title="Ask Global Guru" class="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-gradient-to-tr from-ggBurgundyDark to-ggBurgundy text-white shadow-xl flex items-center justify-center z-40 hover:scale-105 active:scale-95 transition border border-ggGold/40">
-      <i class="fa-solid fa-comment-dots text-lg text-ggGold"></i>
-    </button>
+    <!-- SCREEN 5: GG DigiBook Hub & Settings -->
+    <div class="screen-panel" id="screen-5">
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-user-check"></i> Account Status</div>
+        <p style="font-size:12px; margin-bottom:4px;"><strong>Google Session:</strong> globalgurubusiness@gmail.com</p>
+        <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Status: Verified Business Operator</p>
+        <button onclick="alert('Session reset successfully.')" class="btn btn-outline" style="width:100%;"><i class="fa-solid fa-power-off"></i> Gmail Log Out / Switch</button>
+      </div>
 
-    <!-- Fixed Bottom 6-Tab App Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-nav border-t border-slate-200/80 px-1.5 py-2 flex justify-around items-center z-40 shadow-lg">
-      <button onclick="window.switchScreen(0)" id="nav-btn-0" class="nav-btn flex flex-col items-center text-ggBurgundy transition flex-1">
-        <i class="fa-solid fa-house text-sm"></i>
-        <span class="text-[8px] font-bold mt-1">Home</span>
-      </button>
-      <button onclick="window.switchScreen(1)" id="nav-btn-1" class="nav-btn flex flex-col items-center text-gray-400 transition flex-1">
-        <i class="fa-solid fa-graduation-cap text-sm"></i>
-        <span class="text-[8px] font-medium mt-1">Mentorship</span>
-      </button>
-      <button onclick="window.switchScreen(2)" id="nav-btn-2" class="nav-btn flex flex-col items-center text-gray-400 transition flex-1">
-        <i class="fa-solid fa-clapperboard text-sm"></i>
-        <span class="text-[8px] font-medium mt-1">Studio</span>
-      </button>
-      <button onclick="window.switchScreen(3)" id="nav-btn-3" class="nav-btn flex flex-col items-center text-gray-400 transition flex-1">
-        <i class="fa-solid fa-wallet text-sm"></i>
-        <span class="text-[8px] font-medium mt-1">Khata</span>
-      </button>
-      <button onclick="window.switchScreen(4)" id="nav-btn-4" class="nav-btn flex flex-col items-center text-gray-400 transition flex-1">
-        <i class="fa-solid fa-shield-halved text-sm"></i>
-        <span class="text-[8px] font-medium mt-1">Admin</span>
-      </button>
-      <button onclick="window.switchScreen(5)" id="nav-btn-5" class="nav-btn flex flex-col items-center text-gray-400 transition flex-1">
-        <i class="fa-solid fa-gear text-sm"></i>
-        <span class="text-[8px] font-medium mt-1">Settings</span>
-      </button>
-    </nav>
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-database"></i> Backup & Restore</div>
+        <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Database ka JSON backup download ya upload karein:</p>
+        <div style="display:flex; gap:8px;">
+          <button onclick="exportBackupData()" class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-download"></i> Export JSON</button>
+          <button onclick="document.getElementById('importFile').click()" class="btn btn-outline" style="flex:1;"><i class="fa-solid fa-upload"></i> Import JSON</button>
+          <input type="file" id="importFile" style="display:none;" onchange="importBackupData(event)" accept=".json">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-headset"></i> Support & Help</div>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Pehle automated instant answers lein, ya direct officer se rabta karein:</p>
+        <button onclick="openChatBot()" class="btn btn-primary" style="width:100%; margin-bottom:8px;"><i class="fa-solid fa-robot"></i> Open GG Support Bot</button>
+        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="btn btn-emerald" style="width:100%; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp (+92 311 6246000)</a>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Official Ecosystem Channels</div>
+        <a href="https://instagram.com" target="_blank" class="social-btn"><i class="fa-brands fa-instagram" style="color:#E1306C; font-size:16px;"></i> Instagram @GlobalGuru</a>
+        <a href="https://youtube.com" target="_blank" class="social-btn"><i class="fa-brands fa-youtube" style="color:#FF0000; font-size:16px;"></i> YouTube Channel</a>
+        <a href="https://tiktok.com" target="_blank" class="social-btn"><i class="fa-brands fa-tiktok" style="font-size:16px;"></i> TikTok Official</a>
+        <a href="https://facebook.com" target="_blank" class="social-btn"><i class="fa-brands fa-facebook" style="color:#1877F2; font-size:16px;"></i> Facebook Community</a>
+      </div>
+    </div>
 
   </div>
 
-  <script>
-    // Master Credentials & System Constants
-    const OWNER_PIN = "7860";
-    const SIS_PIN = "3344";
-    const TOTAL_SCREENS = 6;
-    const OFFICIAL_WHATSAPP_NUMBER = "923116246000";
+  <!-- Bottom Navigation Bar (6 Tabs) -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="goToScreen(0)" id="nav-0"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button class="nav-btn" onclick="goToScreen(1)" id="nav-1"><i class="fa-solid fa-graduation-cap"></i><span>Mentorship</span></button>
+    <button class="nav-btn" onclick="goToScreen(2)" id="nav-2"><i class="fa-solid fa-clapperboard"></i><span>Studio</span></button>
+    <button class="nav-btn" onclick="goToScreen(3)" id="nav-3"><i class="fa-solid fa-receipt"></i><span>Khata</span></button>
+    <button class="nav-btn" onclick="goToScreen(4)" id="nav-4"><i class="fa-solid fa-shield-halved"></i><span>Admin</span></button>
+    <button class="nav-btn" onclick="goToScreen(5)" id="nav-5"><i class="fa-solid fa-gear"></i><span>Hub</span></button>
+  </nav>
 
-    // Application State Variables
-    let currentScreenIndex = 0;
-    let loggedAdminRole = null; // 'OWNER' or 'SIS'
-
-    // System Defaults
-    const DEFAULT_PERMISSIONS = {
-      bankVault: false,
-      netProfit: false,
-      feeApprove: true,
-      graceOverride: true,
-      waRemind: true,
-      studioDeals: false
-    };
-
-    const DEFAULT_CASHFLOW = {
-      cashDrawer: 25000,
-      meezanBank: 185000,
-      jazzCash: 42000,
-      easyPaisa: 18000,
-      netRetained: 270000
-    };
-
-    const DEFAULT_STUDENTS = [
-      {
-        id: "GG-01",
-        name: "Muhammad Hamza",
-        phone: "03001112233",
-        track: "Cohort AI-01",
-        total: 50000,
-        paid: 10000,
-        balance: 40000,
-        lastTrx: "JC-992144",
-        status: "ACTIVE",
-        graceExtendedTill: null
-      },
-      {
-        id: "GG-02",
-        name: "Zainab Bibi",
-        phone: "03004445566",
-        track: "Cohort EC-01",
-        total: 50000,
-        paid: 5000,
-        balance: 45000,
-        lastTrx: "EP-441209",
-        status: "OVERDUE",
-        graceExtendedTill: null
-      },
-      {
-        id: "GG-03",
-        name: "Usman Tariq",
-        phone: "03007778899",
-        track: "Cohort AI-01",
-        total: 35000,
-        paid: 35000,
-        balance: 0,
-        lastTrx: "MZ-882110",
-        status: "PAID",
-        graceExtendedTill: null
-      }
-    ];
-
-    // Load State from LocalStorage
-    let currentPermissions = JSON.parse(localStorage.getItem('gg_permissions')) || DEFAULT_PERMISSIONS;
-    let currentCashflow = JSON.parse(localStorage.getItem('gg_cashflow')) || DEFAULT_CASHFLOW;
-    let students = JSON.parse(localStorage.getItem('gg_students')) || DEFAULT_STUDENTS;
-
-    function saveState() {
-      localStorage.setItem('gg_permissions', JSON.stringify(currentPermissions));
-      localStorage.setItem('gg_cashflow', JSON.stringify(currentCashflow));
-      localStorage.setItem('gg_students', JSON.stringify(students));
-    }
-
-    // Switch Screens with Breadcrumb Updates
-    window.switchScreen = function(index) {
-      if (index < 0 || index >= TOTAL_SCREENS) return;
-
-      const screenBreadcrumbs = [
-        '<i class="fa-solid fa-house mr-1.5 text-ggBurgundy"></i> Home Gateway',
-        '<i class="fa-solid fa-graduation-cap mr-1.5 text-ggBurgundy"></i> Mentorship Hub',
-        '<i class="fa-solid fa-clapperboard mr-1.5 text-slate-800"></i> Creative Studio',
-        '<i class="fa-solid fa-wallet mr-1.5 text-emerald-800"></i> Student Khata',
-        '<i class="fa-solid fa-shield-halved mr-1.5 text-ggBurgundy"></i> Super Admin',
-        '<i class="fa-solid fa-gear mr-1.5 text-amber-700"></i> Settings & DigiBook'
-      ];
-
-      for (let i = 0; i < TOTAL_SCREENS; i++) {
-        const screenEl = document.getElementById(`screen-${i}`);
-        const navBtnEl = document.getElementById(`nav-btn-${i}`);
-        
-        if (screenEl) screenEl.classList.remove('active');
-        if (navBtnEl) {
-          navBtnEl.classList.remove('text-ggBurgundy', 'font-bold');
-          navBtnEl.classList.add('text-gray-400', 'font-medium');
-        }
-      }
-
-      const activeScreenEl = document.getElementById(`screen-${index}`);
-      const activeNavBtnEl = document.getElementById(`nav-btn-${index}`);
-
-      if (activeScreenEl) activeScreenEl.classList.add('active');
-      if (activeNavBtnEl) {
-        activeNavBtnEl.classList.remove('text-gray-400', 'font-medium');
-        activeNavBtnEl.classList.add('text-ggBurgundy', 'font-bold');
-      }
-
-      document.getElementById('activeScreenBreadcrumb').innerHTML = screenBreadcrumbs[index];
-      currentScreenIndex = index;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    // Admin Authentication Engine
-    window.authenticateAdminSession = function() {
-      const pin = document.getElementById('adminPinInput').value.trim();
-      const lockScreen = document.getElementById('adminLockScreen');
-      const mainContent = document.getElementById('adminMainContent');
-      const ownerBox = document.getElementById('ownerSwitchboardBox');
-      const roleBadge = document.getElementById('adminSessionRoleBadge');
-      const titleElem = document.getElementById('adminActiveTitle');
-      const subtitleElem = document.getElementById('adminActiveSubtitle');
-      const avatarElem = document.getElementById('adminAvatar');
-
-      if (pin === OWNER_PIN) {
-        loggedAdminRole = 'OWNER';
-        lockScreen.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        ownerBox.classList.remove('hidden');
-
-        roleBadge.className = "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold";
-        roleBadge.innerText = "Master Owner (Aap)";
-        titleElem.innerText = "Master Admin (Creative & Tech)";
-        subtitleElem.innerText = "Full Control & Permissions Switchboard";
-        avatarElem.innerText = "GG";
-
-        applyPermissionsUI();
-      } else if (pin === SIS_PIN) {
-        loggedAdminRole = 'SIS';
-        lockScreen.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        ownerBox.classList.add('hidden');
-
-        roleBadge.className = "text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold";
-        roleBadge.innerText = "Operations Head (Sis)";
-        titleElem.innerText = "Master Admin (Accounts & Onboarding)";
-        subtitleElem.innerText = "Operations & Verification Desk";
-        avatarElem.innerText = "SIS";
-
-        applyPermissionsUI();
-      } else {
-        alert("Invalid PIN Code! Enter 7860 (Owner) or 3344 (Sis).");
-      }
-    };
-
-    window.logoutAdminSession = function() {
-      loggedAdminRole = null;
-      document.getElementById('adminPinInput').value = '';
-      document.getElementById('adminLockScreen').classList.remove('hidden');
-      document.getElementById('adminMainContent').classList.add('hidden');
-      document.getElementById('adminSessionRoleBadge').className = "text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold";
-      document.getElementById('adminSessionRoleBadge').innerText = "Locked";
-    };
-
-    window.updatePermission = function(permKey, isEnabled) {
-      currentPermissions[permKey] = isEnabled;
-      saveState();
-      applyPermissionsUI();
-    };
-
-    function syncSwitchboardTogglesUI() {
-      if (document.getElementById('toggle_bankVault')) {
-        document.getElementById('toggle_bankVault').checked = !!currentPermissions.bankVault;
-        document.getElementById('toggle_netProfit').checked = !!currentPermissions.netProfit;
-        document.getElementById('toggle_feeApprove').checked = !!currentPermissions.feeApprove;
-        document.getElementById('toggle_graceOverride').checked = !!currentPermissions.graceOverride;
-        document.getElementById('toggle_waRemind').checked = !!currentPermissions.waRemind;
-        document.getElementById('toggle_studioDeals').checked = !!currentPermissions.studioDeals;
-      }
-    }
-
-    function renderCashflowUI() {
-      if (document.getElementById('disp_cashDrawer')) {
-        document.getElementById('disp_cashDrawer').innerText = `Rs. ${currentCashflow.cashDrawer.toLocaleString()}`;
-        document.getElementById('disp_meezanBank').innerText = `Rs. ${currentCashflow.meezanBank.toLocaleString()}`;
-        document.getElementById('disp_jazzCash').innerText = `Rs. ${currentCashflow.jazzCash.toLocaleString()}`;
-        document.getElementById('disp_easyPaisa').innerText = `Rs. ${currentCashflow.easyPaisa.toLocaleString()}`;
-        document.getElementById('disp_netRetained').innerText = `Rs. ${currentCashflow.netRetained.toLocaleString()}`;
-      }
-    }
-
-    function applyPermissionsUI() {
-      const bankSec = document.getElementById('financialVaultSection');
-      const profitSec = document.getElementById('netProfitSection');
-      const dealValues = document.querySelectorAll('.studio-deal-val');
-
-      if (loggedAdminRole === 'OWNER') {
-        if (bankSec) bankSec.style.display = 'block';
-        if (profitSec) profitSec.style.display = 'block';
-        dealValues.forEach(el => el.style.display = 'block');
-      } else if (loggedAdminRole === 'SIS') {
-        if (bankSec) bankSec.style.display = currentPermissions.bankVault ? 'block' : 'none';
-        if (profitSec) profitSec.style.display = currentPermissions.netProfit ? 'block' : 'none';
-        dealValues.forEach(el => el.style.display = currentPermissions.studioDeals ? 'block' : 'none');
-      }
-
-      renderAdminStudentList();
-      renderCashflowUI();
-    }
-
-    function renderAdminStudentList() {
-      const container = document.getElementById('adminStudentRowsContainer');
-      if (!container) return;
-
-      const canApprove = (loggedAdminRole === 'OWNER') || (loggedAdminRole === 'SIS' && currentPermissions.feeApprove);
-      const canOverride = (loggedAdminRole === 'OWNER') || (loggedAdminRole === 'SIS' && currentPermissions.graceOverride);
-      const canRemind = (loggedAdminRole === 'OWNER') || (loggedAdminRole === 'SIS' && currentPermissions.waRemind);
-
-      container.innerHTML = students.map((s, index) => {
-        const isOverdue = s.balance > 0 && s.status === 'OVERDUE';
-        const badgeClass = s.balance === 0 
-          ? 'bg-emerald-100 text-emerald-800' 
-          : (isOverdue ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800');
-
-        return `
-          <div class="p-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs space-y-2">
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="font-bold text-slate-900">${s.name} <span class="text-[10px] text-slate-500 font-mono font-normal">(${s.phone})</span></p>
-                <p class="text-[10px] text-slate-600">${s.track} • TRX: <span class="font-mono font-bold">${s.lastTrx}</span></p>
-              </div>
-              <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${badgeClass}">${s.status}</span>
-            </div>
-
-            <div class="flex justify-between items-center text-[11px] pt-1.5 border-t border-slate-200">
-              <span>Paid: <strong class="text-emerald-700 font-mono">Rs. ${s.paid.toLocaleString()}</strong></span>
-              <span>Pending: <strong class="text-rose-600 font-mono">Rs. ${s.balance.toLocaleString()}</strong></span>
-            </div>
-
-            <div class="flex items-center gap-1.5 pt-1">
-              ${canApprove && s.balance > 0 ? `
-                <button onclick="window.approveFeeSlip(${index})" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center space-x-1 shadow transition">
-                  <i class="fa-solid fa-check"></i>
-                  <span>Approve 5k</span>
-                </button>
-              ` : ''}
-
-              ${canOverride && isOverdue ? `
-                <button onclick="window.grantGraceOverride(${index})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center space-x-1 shadow transition">
-                  <i class="fa-solid fa-unlock"></i>
-                  <span>Grace Pass</span>
-                </button>
-              ` : ''}
-
-              ${canRemind && s.balance > 0 ? `
-                <button onclick="window.sendWhatsAppReminder(${index})" class="bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg flex items-center justify-center space-x-1 shadow transition">
-                  <i class="fa-brands fa-whatsapp text-xs"></i>
-                  <span>Remind</span>
-                </button>
-              ` : ''}
-            </div>
+  <!-- Interactive Support Chatbot Modal -->
+  <div class="chat-modal" id="chatModal">
+    <div class="chat-card">
+      <div class="chat-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; color:#1C1917; font-weight:800; font-size:11px;">GG</div>
+          <div>
+            <h3 style="font-size:13px; font-weight:800;">GG Support Assistant</h3>
+            <span style="font-size:10px; color:#E8D5B5;">Instant Answers • 24/7</span>
           </div>
-        `;
-      }).join('');
+        </div>
+        <button onclick="closeChatBot()" style="background:none; border:none; color:#FFF; font-size:16px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
 
-      document.getElementById('opTotalStudents').innerText = `${students.length} Enrolled`;
-      const overdueTotal = students.filter(s => s.balance > 0 && s.status === 'OVERDUE').length;
-      document.getElementById('opOverdueCount').innerText = `${overdueTotal} Overdue`;
+      <div class="chat-body" id="chatMessages">
+        <div class="chat-msg msg-bot">
+          Assalam-o-Alaikum! Main Global Guru ka automated support assistant hoon. Kisi bhi prompt par click karein ya apna sawal likh kar <strong>Enter</strong> karein:
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin: 4px 0;" id="quickPrompts">
+          <button onclick="sendQuickPrompt('Cohort Timings')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">🕒 Timings</button>
+          <button onclick="sendQuickPrompt('Fee Plan')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">💰 Rs. 5,000 Plan</button>
+          <button onclick="sendQuickPrompt('Rule of 10')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">📜 Rule of 10</button>
+          <button onclick="sendQuickPrompt('Studio Rates')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">🎬 Studio Ads</button>
+        </div>
+      </div>
+
+      <form onsubmit="event.preventDefault(); submitChatMessage();" class="chat-footer">
+        <input type="text" id="chatInput" class="input-field" placeholder="Apna sawal likhein..." autocomplete="off">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 1. FIREBASE CONFIGURATION
+  const firebaseConfig = {
+    apiKey: "AIzaSyDrLKPN_lqSm2strGET4jAB4SUmVuZKjrM",
+    authDomain: "global-guru-portal.firebaseapp.com",
+    projectId: "global-guru-portal",
+    storageBucket: "global-guru-portal.firebasestorage.app",
+    messagingSenderId: "145806027180",
+    appId: "1:145806027180:web:f2bfe31e152e00513ab209",
+    measurementId: "G-4RKGW6ZLXH"
+  };
+
+  let db = null;
+  let isCloudConnected = false;
+
+  // Real-time In-memory Store (Synchronized with Firestore)
+  let appState = {
+    permissions: {
+      perm_bank: true,
+      perm_vault: true,
+      perm_profit: false
+    },
+    students: {
+      "03001112233": { name: "Ali Raza", cohort: "Cohort AI-01", total: 50000, received: 50000, status: "Active Paid", rule10: "Cleared" },
+      "03004445566": { name: "Muhammad Hamza", cohort: "Cohort AI-01", total: 50000, received: 15000, status: "Active Grace", rule10: "Installment Due" }
+    },
+    finances: {
+      meezan: "Rs. 420,000",
+      easypaisa: "Rs. 65,000",
+      jazzcash: "Rs. 40,000",
+      galla: "Rs. 85,000",
+      netProfit: "Rs. 380,000"
+    }
+  };
+
+  // Initialize Firebase Firestore
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    isCloudConnected = true;
+    document.getElementById('cloudText').innerText = "CLOUD LIVE";
+    document.getElementById('cloudDot').style.background = "#10B981";
+    initRealtimeSync();
+  } catch(e) {
+    console.warn("Firestore running in fallback mode:", e);
+    document.getElementById('cloudText').innerText = "OFFLINE READY";
+    document.getElementById('cloudDot').style.background = "#F59E0B";
+  }
+
+  // 2. REALTIME FIRESTORE LISTENER
+  function initRealtimeSync() {
+    if(!db) return;
+    db.collection("portal").doc("system_state").onSnapshot(doc => {
+      if(doc.exists) {
+        const data = doc.data();
+        if(data.permissions) appState.permissions = data.permissions;
+        if(data.finances) appState.finances = data.finances;
+        if(data.students) appState.students = data.students;
+        renderAdminFinances();
+        syncToggleCheckboxes();
+      } else {
+        db.collection("portal").doc("system_state").set(appState);
+      }
+    }, err => console.log("Realtime sync notice:", err));
+  }
+
+  function syncToggleCheckboxes() {
+    const b = document.getElementById('perm_bank');
+    const v = document.getElementById('perm_vault');
+    const p = document.getElementById('perm_profit');
+    if(b) b.checked = appState.permissions.perm_bank;
+    if(v) v.checked = appState.permissions.perm_vault;
+    if(p) p.checked = appState.permissions.perm_profit;
+  }
+
+  function updateSwitchPermission(key, value) {
+    appState.permissions[key] = value;
+    if(db) {
+      db.collection("portal").doc("system_state").set({ permissions: appState.permissions }, { merge: true });
+    }
+    renderAdminFinances();
+  }
+
+  // 3. NAVIGATION (6 SCREENS)
+  let currentScreen = 0;
+  const screenTitles = [
+    '<i class="fa-solid fa-house"></i> Home Gateway',
+    '<i class="fa-solid fa-graduation-cap"></i> Mentorship Academy',
+    '<i class="fa-solid fa-clapperboard"></i> Creative Studio',
+    '<i class="fa-solid fa-receipt"></i> Mera Khata',
+    '<i class="fa-solid fa-shield-halved"></i> Admin Console',
+    '<i class="fa-solid fa-gear"></i> DigiBook Hub & Settings'
+  ];
+
+  function goToScreen(index) {
+    currentScreen = index;
+    document.getElementById('screenSlider').style.transform = `translateX(-${index * 100}%)`;
+    document.getElementById('viewTitle').innerHTML = screenTitles[index];
+    document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', i === index);
+    });
+  }
+
+  // Touch Swipe Gesture Handling
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const slider = document.getElementById('screenSlider');
+
+  slider.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+  slider.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, {passive: true});
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    if (touchEndX < touchStartX - swipeThreshold && currentScreen < 5) {
+      goToScreen(currentScreen + 1);
+    }
+    if (touchEndX > touchStartX + swipeThreshold && currentScreen > 0) {
+      goToScreen(currentScreen - 1);
+    }
+  }
+
+  // 4. MERA KHATA SEARCH (ENTER KEY READY)
+  function runKhataSearch() {
+    const rawVal = document.getElementById('khataInput').value.trim().replace(/\D/g, '');
+    const out = document.getElementById('khataResultArea');
+    if(!rawVal) {
+      out.innerHTML = `<span style="font-size:12px; color:var(--rose);">Barah-e-karam apna number enter karein.</span>`;
+      return;
     }
 
-    window.approveFeeSlip = function(index) {
-      const student = students[index];
-      student.paid += 5000;
-      student.balance = Math.max(0, student.total - student.paid);
-      student.status = student.balance === 0 ? "PAID" : "ACTIVE";
-      student.lastTrx = `VERIFIED-${Math.floor(1000 + Math.random() * 9000)}`;
-
-      currentCashflow.jazzCash += 5000;
-      currentCashflow.netRetained += 5000;
-
-      saveState();
-      alert(`Success! Rs. 5,000 installment verified for ${student.name}. Access unlocked.`);
-      renderAdminStudentList();
-      renderCashflowUI();
-    };
-
-    window.grantGraceOverride = function(index) {
-      const student = students[index];
-      student.status = "GRACE EXTENDED";
-      student.graceExtendedTill = "15th of Month";
-
-      saveState();
-      alert(`Temporary Grace Pass granted to ${student.name} till 15th.`);
-      renderAdminStudentList();
-    };
-
-    window.sendWhatsAppReminder = function(index) {
-      const student = students[index];
-      const adminSignature = loggedAdminRole === 'OWNER' ? 'Master Admin (GG Lead)' : 'Accounts Desk (GG Ops)';
-      const msg = encodeURIComponent(`Assalam-o-Alaikum ${student.name}!\n\nGlobal Guru reminder regarding your ${student.track} mentorship. Aapke balance mein Rs. ${student.balance.toLocaleString()} pending hain.\n\nRule of 10 ke mutabiq continuous Google Meet link aur portal access active rakhne ke liye payment receipt share karein.\n\nJazakAllah — ${adminSignature}`);
-      window.open(`https://wa.me/92${student.phone.substring(1)}?text=${msg}`, '_blank');
-    };
-
-    window.handleStudentRegistration = function(e) {
-      e.preventDefault();
-      const name = document.getElementById('reg_name').value.trim();
-      const phone = document.getElementById('reg_phone').value.trim();
-      const track = document.getElementById('reg_track').value;
-      const plan = document.getElementById('reg_plan').value;
-      const trx = document.getElementById('reg_trx').value.trim();
-
-      const totalFee = plan === "Upfront Full" ? 35000 : 50000;
-      const initialPaid = plan === "Upfront Full" ? 35000 : 5000;
-
-      const newStudent = {
-        id: `GG-0${students.length + 1}`,
-        name: name,
-        phone: phone,
-        track: track,
-        total: totalFee,
-        paid: initialPaid,
-        balance: totalFee - initialPaid,
-        lastTrx: trx,
-        status: "ACTIVE",
-        graceExtendedTill: null
-      };
-
-      students.push(newStudent);
-      currentCashflow.meezanBank += initialPaid;
-      currentCashflow.netRetained += initialPaid;
-
-      saveState();
-
-      alert(`Shukriya ${name}! Admission application submit ho gayi hai. Hamara Accounts Desk receipt verify karke confirmation send karega.`);
-      e.target.reset();
-      window.switchScreen(3);
-      document.getElementById('khataPhoneInput').value = phone;
-      window.executeKhataLookup();
-    };
-
-    window.executeKhataLookup = function() {
-      const phone = document.getElementById('khataPhoneInput').value.trim();
-      const card = document.getElementById('khataStatementCard');
-      const found = students.find(s => s.phone.includes(phone) || phone.includes(s.phone));
-
-      if (!found) {
-        alert("Yeh number database mein nahi mila. Please check format ya admission register karein.");
-        return;
-      }
-
-      card.classList.remove('hidden');
-      document.getElementById('ks_name').innerText = found.name;
-      document.getElementById('ks_track').innerText = `${found.track} (${found.id})`;
-      document.getElementById('ks_total').innerText = `Rs. ${found.total.toLocaleString()}`;
-      document.getElementById('ks_paid').innerText = `Rs. ${found.paid.toLocaleString()}`;
-      document.getElementById('ks_balance').innerText = `Rs. ${found.balance.toLocaleString()}`;
-
-      const badge = document.getElementById('ks_statusBadge');
-      const notice = document.getElementById('ks_ruleNotice');
-
-      if (found.balance === 0) {
-        badge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
-        badge.innerText = "100% Paid";
-        notice.className = "text-[11px] p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200";
-        notice.innerText = "✅ Aapka balance bilkul clear hai. Google Meet Live class aur Drive Vault access 100% active hain.";
-      } else if (found.status === 'OVERDUE') {
-        badge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800";
-        badge.innerText = "Rule of 10 Locked";
-        notice.className = "text-[11px] p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200";
-        notice.innerText = "⚠️ Rule of 10 Notice: 10 tareekh tak payment slip clear na hone ki wajah se portal aur meeting access temporarily locked hai. Niche button daba kar slip submit karein.";
-      } else {
-        badge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800";
-        badge.innerText = "Active Grace";
-        notice.className = "text-[11px] p-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200";
-        notice.innerText = "ℹ️ Monthly Installment: Mahine ki 10 tareekh se pehle Rs. 5,000 slip submit karein taake access interrupt na ho.";
-      }
-    };
-
-    window.selectStudioTier = function(tier) {
-      const t1 = document.getElementById('tier1Card');
-      const t2 = document.getElementById('tier2Card');
-      if (tier === 'tier1') {
-        t1.className = "p-3.5 border-2 border-ggBurgundy bg-rose-50/50 rounded-2xl cursor-pointer transition shadow-sm";
-        t2.className = "p-3.5 border border-slate-200 bg-white rounded-2xl cursor-pointer transition shadow-sm";
-      } else {
-        t2.className = "p-3.5 border-2 border-slate-900 bg-slate-50 rounded-2xl cursor-pointer transition shadow-sm";
-        t1.className = "p-3.5 border border-slate-200 bg-white rounded-2xl cursor-pointer transition shadow-sm";
-      }
-    };
-
-    window.handleStudioBriefSubmission = function(e) {
-      e.preventDefault();
-      const brand = document.getElementById('sb_brand').value;
-      const scope = document.getElementById('sb_scope').value;
-      alert(`Project Order Booked! Brand: ${brand} (${scope}). Hamara creative team Google Drive assets review karke WhatsApp par preview draft share karegi.`);
-      e.target.reset();
-    };
-
-    window.toggleChatbotModal = function() {
-      document.getElementById('chatbotModal').classList.toggle('hidden');
-    };
-
-    window.askBotQuestion = function(topic) {
-      const msgBox = document.getElementById('chatMessages');
-      let botAnswer = "";
-
-      if (topic === 'timing') {
-        botAnswer = "🕒 **Cohort Timings:** Daily 5:30 PM to 7:00 PM PKT (1.5h). Mon/Wed/Fri ko AI & Digital Growth aur Tue/Thu/Sat ko E-Commerce & eBay classes live hoti hain.";
-      } else if (topic === 'fee') {
-        botAnswer = "💰 **Mentorship Investment:** Rs. 50,000 total package, marketed as easy Rs. 5,000/month. Ya Rs. 35,000 upfront full clearance.";
-      } else if (topic === 'rule10') {
-        botAnswer = "🔒 **Rule of 10 Policy:** Har month ki 1st se 10th tak payment grace period hota hai. 10 tareekh midnight ko unpaid portal access auto-lock ho jata hai.";
-      } else if (topic === 'studio') {
-        botAnswer = "🎬 **Creative Studio:** Tier 1 Quick Hooks (Rs. 2,000 - 5,000, 24h turn) aur Tier 2 CGI Commercial Ads (Rs. 18,000 - 40,000).";
-      }
-
-      msgBox.innerHTML += `
-        <div class="bg-ggBurgundy text-white p-3 rounded-2xl border border-rose-900 max-w-[85%] ml-auto text-right shadow-sm text-xs mt-2 leading-relaxed">
-          ${botAnswer}
+    const student = appState.students[rawVal];
+    if(student) {
+      const remaining = student.total - student.received;
+      out.innerHTML = `
+        <div style="background:#FDFDFD; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="font-size:14px; color:var(--primary); font-weight:800;">${student.name}</h4>
+            <span class="badge ${remaining === 0 ? 'badge-active' : 'badge-grace'}">${student.status}</span>
+          </div>
+          <span style="font-size:11px; color:var(--muted);">${student.cohort}</span>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:12px 0; background:#F8F6F0; padding:10px; border-radius:8px; text-align:center;">
+            <div><span style="font-size:10px; color:var(--muted); display:block;">Total Fee</span><strong style="font-size:12px;">Rs. ${student.total.toLocaleString()}</strong></div>
+            <div><span style="font-size:10px; color:var(--muted); display:block;">Received</span><strong style="font-size:12px; color:var(--emerald);">Rs. ${student.received.toLocaleString()}</strong></div>
+            <div><span style="font-size:10px; color:var(--muted); display:block;">Balance</span><strong style="font-size:12px; color:var(--rose);">Rs. ${remaining.toLocaleString()}</strong></div>
+          </div>
+          <p style="font-size:11px; line-height:1.4; color:#57534E; margin-bottom:10px;">
+            <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i> <strong>Rule of 10 Status:</strong> Har mahine ki 10 tareekh se pehle Rs. 5,000 installment jama karwayein taake class access jari rahe.
+          </p>
+          <a href="https://wa.me/923116246000?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(student.name)}" target="_blank" class="btn btn-emerald" style="width:100%; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Submit Slip (+92 311 6246000)</a>
         </div>
       `;
-      msgBox.scrollTop = msgBox.scrollHeight;
-    };
+    } else {
+      out.innerHTML = `
+        <div style="background:var(--rose-bg); padding:12px; border-radius:8px; border:1px solid #FECACA;">
+          <span style="font-size:12px; color:var(--rose); font-weight:700;">Record Nahi Mila!</span>
+          <p style="font-size:11px; color:#57534E; margin-top:4px;">Yeh number registered nahi hai. Barah-e-karam academy desk par rabta karein.</p>
+        </div>
+      `;
+    }
+  }
 
-    // Direct WhatsApp Handover Engine (+92 311 6246000)
-    window.openDirectWhatsApp = function() {
-      const msg = encodeURIComponent("Assalam-o-Alaikum Global Guru Team! Mujhe mentorship cohorts aur agency production ke hawalay se rabta karna hai.");
-      window.open(`https://wa.me/${OFFICIAL_WHATSAPP_NUMBER}?text=${msg}`, '_blank');
-    };
+  // 5. ADMIN AUTHENTICATION & SWITCHBOARD
+  let activeRole = null; // 'owner' or 'admin2'
 
-    // Export System Data (JSON Backup)
-    window.exportSystemJSON = function() {
-      const backupData = {
-        app: "Global Guru ERP & DigiBook",
-        version: "2.5",
-        timestamp: new Date().toISOString(),
-        permissions: currentPermissions,
-        cashflow: currentCashflow,
-        students: students
-      };
+  function verifyAdminPin() {
+    const pin = document.getElementById('adminPinInput').value.trim();
+    const err = document.getElementById('pinError');
+    err.style.display = 'none';
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `GlobalGuru_Backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    };
+    if(pin === '7860') {
+      activeRole = 'owner';
+      unlockAdminDashboard();
+    } else if(pin === '3344') {
+      activeRole = 'admin2';
+      unlockAdminDashboard();
+    } else {
+      err.style.display = 'block';
+    }
+  }
 
-    // Import System Data (JSON Restore)
-    window.importSystemJSON = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+  function unlockAdminDashboard() {
+    document.getElementById('adminLockScreen').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (parsed.students && parsed.cashflow) {
-            students = parsed.students;
-            currentCashflow = parsed.cashflow;
-            if (parsed.permissions) currentPermissions = parsed.permissions;
-            
-            saveState();
-            syncSwitchboardTogglesUI();
-            renderCashflowUI();
-            renderAdminStudentList();
-            alert("Backup successfully restored!");
-          } else {
-            alert("Invalid backup file structure.");
-          }
-        } catch (err) {
-          alert("Error parsing JSON backup file.");
-        }
-      };
-      reader.readAsText(file);
-    };
+    const title = document.getElementById('currentRoleTitle');
+    const sub = document.getElementById('currentRoleSub');
+    const ownerBox = document.getElementById('ownerControls');
 
-    window.handleGoogleSwitchAccount = function() {
-      alert("Redirecting to Google Account Switcher. Select your official 'globalgurubusiness@gmail.com' profile.");
-      window.open("https://accounts.google.com/AccountChooser", "_blank");
-    };
+    if(activeRole === 'owner') {
+      title.innerText = "Master Owner Active (7860)";
+      sub.innerText = "Full Executive Clearance";
+      ownerBox.style.display = 'block';
+      syncToggleCheckboxes();
+    } else {
+      title.innerText = "Admin 2 Active (3344)";
+      sub.innerText = "Restricted Operations";
+      ownerBox.style.display = 'none';
+    }
+    renderAdminFinances();
+  }
 
-    window.handleGoogleLogout = function() {
-      alert("Session logged out. You can now log into your desired Google Account.");
-      window.open("https://accounts.google.com/Logout", "_blank");
-    };
+  function lockAdmin() {
+    activeRole = null;
+    document.getElementById('adminPinInput').value = '';
+    document.getElementById('adminLockScreen').style.display = 'block';
+    document.getElementById('adminDashboard').style.display = 'none';
+  }
 
-    // Horizontal Touch Gestures Setup
-    function initTouchGestures() {
-      const touchZone = document.getElementById('appContainer');
-      let touchStartX = 0;
-      let touchStartY = 0;
-      let touchEndX = 0;
-      let touchEndY = 0;
+  function renderAdminFinances() {
+    const container = document.getElementById('financesContent');
+    if(!container) return;
 
-      touchZone.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-      }, { passive: true });
+    let html = '';
+    const showBank = (activeRole === 'owner') || appState.permissions.perm_bank;
+    const showVault = (activeRole === 'owner') || appState.permissions.perm_vault;
+    const showProfit = (activeRole === 'owner') || appState.permissions.perm_profit;
 
-      touchZone.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        evaluateSwipe();
-      }, { passive: true });
-
-      function evaluateSwipe() {
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-
-        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-          if (deltaX < 0) {
-            if (currentScreenIndex < TOTAL_SCREENS - 1) window.switchScreen(currentScreenIndex + 1);
-          } else {
-            if (currentScreenIndex > 0) window.switchScreen(currentScreenIndex - 1);
-          }
-        }
-      }
+    if(showBank) {
+      html += `
+        <div style="margin-bottom:10px;">
+          <span style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">Digital Accounts:</span>
+          <div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #EEE;">
+            <span>Meezan Bank</span><strong>${appState.finances.meezan}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #EEE;">
+            <span>Easypaisa Merchant</span><strong>${appState.finances.easypaisa}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #EEE;">
+            <span>JazzCash Corporate</span><strong>${appState.finances.jazzcash}</strong>
+          </div>
+        </div>
+      `;
     }
 
-    // App Initialization
-    window.addEventListener('DOMContentLoaded', () => {
-      const now = new Date();
-      document.getElementById('headerLiveDate').innerText = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-      initTouchGestures();
-      syncSwitchboardTogglesUI();
-      renderCashflowUI();
-      renderAdminStudentList();
-    });
-  </script>
+    if(showVault) {
+      html += `
+        <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0; border-bottom:1px solid #EEE;">
+          <span><strong>Physical Vault (Galla)</strong></span><strong style="color:var(--emerald);">${appState.finances.galla}</strong>
+        </div>
+      `;
+    }
+
+    if(showProfit) {
+      html += `
+        <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0; background:#FFF9E6; border-radius:6px; margin-top:8px; padding:8px;">
+          <span><strong>Calculated Net Profit</strong></span><strong style="color:var(--primary);">${appState.finances.netProfit}</strong>
+        </div>
+      `;
+    }
+
+    if(!showBank && !showVault && !showProfit) {
+      html = `<p style="font-size:11px; color:var(--muted); font-style:italic;">Owner switchboard ne financial visibility off ki hui hai.</p>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  // 6. CHATBOT LOGIC (ENTER KEY & QUICK PROMPTS)
+  function openChatBot() {
+    document.getElementById('chatModal').style.display = 'flex';
+    document.getElementById('chatInput').focus();
+  }
+
+  function closeChatBot() {
+    document.getElementById('chatModal').style.display = 'none';
+  }
+
+  function sendQuickPrompt(topic) {
+    respondChat(topic);
+  }
+
+  function submitChatMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if(!msg) return;
+    
+    appendMessage(msg, 'user');
+    input.value = '';
+    setTimeout(() => { respondChat(msg); }, 300);
+  }
+
+  function appendMessage(text, role) {
+    const box = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `chat-msg msg-${role}`;
+    div.innerHTML = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function respondChat(query) {
+    const q = query.toLowerCase();
+    let reply = "";
+
+    if(q.includes('timing') || q.includes('time') || q.includes('class')) {
+      reply = "🕒 <strong>Class Timings:</strong> Daily sham 5:30 PM se 7:00 PM PKT tak live session hota hai. Mon/Wed/Fri ko AI & Digital Growth aur Tue/Thu/Sat ko E-Commerce ki class hoti hai.";
+    } else if(q.includes('fee') || q.includes('5000') || q.includes('plan') || q.includes('kist')) {
+      reply = "💰 <strong>Mentorship Fee Plan:</strong> Total 50,000 package hai, jisay asan Rs. 5,000 mahana installments mein divide kiya gaya hai taake har student aasani se seekh sakay.";
+    } else if(q.includes('rule') || q.includes('10')) {
+      reply = "📜 <strong>Rule of 10:</strong> Har mahine ki 10 tareekh tak apni monthly fee slip submit karna zaroori hai. 10 ke baad portal automatically access lock kar deta hai.";
+    } else if(q.includes('studio') || q.includes('ad') || q.includes('commercial') || q.includes('rate')) {
+      reply = "🎬 <strong>Studio Production:</strong> Tier 1 Fast UGC hook ads 48 ghantay mein deliver hotay hain. Tier 2 high-end 3D VFX commercials customized brand package par banaye jatay hain.";
+    } else {
+      reply = `Aapke sawal ka automated jawab nahi mila. Aap direct official officer se WhatsApp par connect kar saktay hain:<br><br><a href="https://wa.me/923116246000?text=${encodeURIComponent(query)}" target="_blank" class="btn btn-emerald" style="font-size:11px; padding:6px 10px; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp (+92 311 6246000)</a>`;
+    }
+
+    appendMessage(reply, 'bot');
+  }
+
+  // 7. BACKUP IMPORT & EXPORT
+  function exportBackupData() {
+    const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `GlobalGuru_Backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importBackupData(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if(imported.permissions && imported.students) {
+          appState = imported;
+          if(db) db.collection("portal").doc("system_state").set(appState);
+          alert("Backup kamyabi se restore ho gaya!");
+          renderAdminFinances();
+        }
+      } catch(err) {
+        alert("Ghalat JSON file format!");
+      }
+    };
+    reader.readAsText(file);
+  }
+</script>
+
 </body>
 </html>
