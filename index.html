@@ -15,7 +15,6 @@
 
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <style>
@@ -29,7 +28,6 @@
       --bg: #F8FAFC;
     }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0F172A; }
-    .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); }
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 24px; }
@@ -45,7 +43,7 @@
   <!-- TOP HEADER -->
   <header class="bg-[#4A0E17] text-white p-3.5 flex justify-between items-center sticky top-0 z-30 shadow-md border-b-2 border-[#D4AF37]">
     <div class="flex items-center gap-2.5">
-      <!-- SECRET ADMIN GATEWAY: Double click or long press GG logo to open Admin Login -->
+      <!-- SECRET ADMIN GATEWAY: Double click GG logo to open Admin Login -->
       <div onclick="handleLogoTap()" title="Learner View (Owner: Tap 2 times for Admin Login)" class="w-10 h-10 rounded-full bg-white text-[#4A0E17] flex items-center justify-center font-extrabold text-sm border-2 border-[#D4AF37] cursor-pointer shadow-md select-none active:scale-95 transition">
         GG
       </div>
@@ -56,7 +54,7 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <!-- Admin Badge Indicator if Logged in -->
+      <!-- Admin Badge Indicator when active -->
       <span id="roleBadge" class="hidden text-[10px] font-black bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full uppercase tracking-wider">Super Admin</span>
       <span id="cloudBadge" class="text-[10px] font-bold bg-white/10 px-2.5 py-1 rounded-full border border-white/20 text-emerald-300 flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Live Sync
@@ -148,13 +146,13 @@
           <span class="text-xs font-bold text-emerald-700">Open →</span>
         </a>
 
-        <!-- Official WhatsApp Support -->
-        <a href="https://wa.me/923027374880?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md shadow-emerald-500/20">
+        <!-- Official WhatsApp Support Desk (+923116246000) -->
+        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md shadow-emerald-500/20">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">💬</div>
             <div>
               <p class="text-xs font-black tracking-wide">WhatsApp Support Desk</p>
-              <p class="text-[11px] text-emerald-100 font-medium">0302-7374880</p>
+              <p class="text-[11px] text-emerald-100 font-medium">0311-6246000 (+92 311 6246000)</p>
             </div>
           </div>
           <span class="text-[11px] font-black bg-white text-emerald-800 px-3 py-1.5 rounded-xl shadow-sm">Chat Now →</span>
@@ -361,7 +359,7 @@
 
   </div>
 
-  <!-- BOTTOM NAVIGATION (DEFAULT: ONLY 3 LEARNER TABS) -->
+  <!-- BOTTOM NAVIGATION (DEFAULT: ONLY 3 PUBLIC TABS - ZERO ACCESS FOR LEARNERS) -->
   <nav class="fixed bottom-0 max-w-md w-full bg-white border-t border-slate-200 flex z-30 shadow-lg" id="bottomNav">
     <button id="tab-btn-home" onclick="switchTab('home')" class="flex-1 py-2.5 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17] transition">
       <span class="text-base">🏠</span> Home
@@ -372,7 +370,7 @@
     <button id="tab-btn-khata" onclick="switchTab('khata')" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
       <span class="text-base">🧾</span> Mera Khata
     </button>
-    <!-- SECRET ADMIN TAB (Appears only after successful login) -->
+    <!-- SECRET ADMIN TAB: Hidden from public, appears only after entering PIN -->
     <button id="tab-btn-admin" onclick="switchTab('admin')" class="hidden flex-1 py-2.5 text-center text-amber-700 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-amber-600 transition bg-amber-50/60">
       <span class="text-base">🛡️</span> Admin
     </button>
@@ -407,7 +405,7 @@
 </div>
 
 <script>
-  // 1. FIREBASE CONFIGURATION (LOCKED TO YOUR DOMAIN)
+  // 1. FIREBASE CONFIGURATION (LOCKED TO YOUR GITHUB PAGES DOMAIN)
   const firebaseConfig = {
     apiKey: "AIzaSyDrLKPN_lqSm2strGET4jAB4SUmVuZKjrM",
     authDomain: "global-guru-portal.firebaseapp.com",
@@ -468,7 +466,7 @@
     }, err => console.log("Realtime error:", err));
   }
 
-  // 2. SECRET LOGO TAP (DOUBLE CLICK OPENS ADMIN LOGIN)
+  // 2. SECRET LOGO TAP (DOUBLE CLICK GG LOGO OPENS ADMIN LOGIN)
   let logoTapCounter = 0;
   let logoTapTimer = null;
 
@@ -591,7 +589,7 @@
             <div><span class="text-[9px] text-slate-400 block">Balance</span><strong class="text-[11px] text-rose-600">Rs. ${balance.toLocaleString()}</strong></div>
           </div>
           <p class="text-[10px] text-slate-500">📜 <strong>Rule of 10:</strong> Har mahine ki 10 tareekh se pehle Rs. 5,000 installment clear karein.</p>
-          <a href="https://wa.me/923027374880?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(s.name)}" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
+          <a href="https://wa.me/923116246000?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(s.name)}" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
             <i class="fa-brands fa-whatsapp"></i> Submit Slip on WhatsApp
           </a>
         </div>
