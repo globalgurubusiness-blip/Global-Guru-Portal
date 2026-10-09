@@ -6,14 +6,16 @@
   <title>Global Guru • Ecosystem Portal</title>
   <meta name="theme-color" content="#4A0E17">
   
-  <!-- Fonts & Icons -->
+  <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <style>
@@ -23,617 +25,389 @@
       --gold: #D4AF37;
       --gold-light: #FFF9E6;
       --emerald: #0D6E48;
-      --emerald-bg: #EAF7EE;
       --rose: #A31D1D;
-      --rose-bg: #FDF2F2;
-      --bg: #F7F5F0;
-      --card: #FFFFFF;
-      --text: #1C1917;
-      --muted: #6B7280;
-      --border: #E8E5DD;
-      --shadow-sm: 0 2px 4px rgba(74, 14, 23, 0.04);
-      --shadow-md: 0 4px 12px rgba(74, 14, 23, 0.08);
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --bg: #F8FAFC;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .app-viewport {
-      width: 100%;
-      max-width: 480px;
-      min-height: 100vh;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      box-shadow: 0 0 30px rgba(0,0,0,0.12);
-    }
-
-    /* Header Bar */
-    header {
-      background: var(--primary);
-      color: #fff;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      border-bottom: 2px solid var(--gold);
-    }
-    .brand-box { display: flex; align-items: center; gap: 10px; }
-    .brand-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #fff;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 15px;
-      border: 2px solid var(--gold);
-    }
-    .brand-text h1 { font-size: 14px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-    .brand-text span { font-size: 10px; color: #E8D5B5; display: block; font-weight: 500; }
-    
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; }
-
-    /* Sub-header / Swiper guide */
-    .view-indicator {
-      background: #EDEAE1;
-      padding: 6px 16px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* Screen Container */
-    .screen-slider {
-      flex: 1;
-      display: flex;
-      transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.4, 1);
-      will-change: transform;
-    }
-    .screen-panel {
-      min-width: 100%;
-      max-width: 100%;
-      padding: 16px 14px 90px;
-      overflow-y: auto;
-      max-height: calc(100vh - 120px);
-    }
-
-    /* Cards & Components */
-    .card {
-      background: var(--card);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 14px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* Friendly Welcome Hero */
-    .welcome-hero {
-      background: linear-gradient(135deg, #FFF9F2 0%, #FFFFFF 100%);
-      border: 1px solid #F3E5D8;
-      border-left: 4px solid var(--gold);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .welcome-hero h2 { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-    .welcome-hero p { font-size: 12px; color: #57534E; line-height: 1.5; margin-bottom: 12px; }
-    .welcome-badges { display: flex; gap: 6px; flex-wrap: wrap; }
-    .welcome-chip {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      background: #FFF1E6;
-      color: var(--primary);
-      border: 1px solid #FCE4D6;
-    }
-
-    /* Interactive Input & Search */
-    .search-box {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .input-field {
-      flex: 1;
-      padding: 11px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid #D1D5DB;
-      font-size: 13px;
-      font-family: inherit;
-      outline: none;
-      transition: border 0.15s ease;
-      background: #FAFAFA;
-    }
-    .input-field:focus {
-      border-color: var(--primary);
-      background: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(74, 14, 23, 0.08);
-    }
-    .btn {
-      padding: 10px 16px;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:active { background: var(--primary-light); transform: scale(0.98); }
-    .btn-emerald { background: var(--emerald); color: #fff; }
-    .btn-emerald:active { opacity: 0.9; transform: scale(0.98); }
-    .btn-gold { background: var(--gold); color: #1C1917; }
-    .btn-outline { background: #fff; border: 1px solid #D1D5DB; color: #374151; }
-
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      max-width: 480px;
-      background: #FFFFFF;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 8px 4px 12px;
-      border-top: 1px solid var(--border);
-      z-index: 60;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      background: none;
-      border: none;
-      font-family: inherit;
-      color: #9CA3AF;
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 16.66%;
-      transition: all 0.15s ease;
-    }
-    .nav-btn i { font-size: 16px; }
-    .nav-btn.active { color: var(--primary); font-weight: 800; transform: translateY(-1px); }
-
-    /* Chatbot Modal */
-    .chat-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 100;
-      justify-content: center;
-      align-items: flex-end;
-    }
-    .chat-card {
-      width: 100%;
-      max-width: 480px;
-      background: #FFF;
-      border-radius: 20px 20px 0 0;
-      height: 75vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
-    }
-    .chat-header {
-      background: var(--primary);
-      color: #FFF;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--gold);
-    }
-    .chat-body {
-      flex: 1;
-      padding: 14px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      background: #FAF8F5;
-    }
-    .chat-msg {
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 12px;
-      line-height: 1.45;
-      max-width: 85%;
-    }
-    .msg-bot { background: #FFF; border: 1px solid var(--border); color: #1C1917; align-self: flex-start; }
-    .msg-user { background: var(--primary); color: #FFF; align-self: flex-end; }
-    .chat-footer {
-      padding: 10px 14px;
-      border-top: 1px solid var(--border);
-      background: #FFF;
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Switchboard & Security */
-    .toggle-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px dashed var(--border);
-    }
-    .toggle-info h4 { font-size: 12px; font-weight: 700; }
-    .toggle-info p { font-size: 10px; color: var(--muted); }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0F172A; }
+    .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute; cursor: pointer; inset: 0;
-      background-color: #D1D5DB; transition: .2s; border-radius: 24px;
-    }
-    .slider:before {
-      position: absolute; content: ""; height: 18px; width: 18px;
-      left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%;
-    }
-    input:checked + .slider { background-color: var(--emerald); }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+    input:checked + .slider { background-color: #059669; }
     input:checked + .slider:before { transform: translateX(20px); }
-
-    /* Badges & Tables */
-    .badge {
-      display: inline-block;
-      padding: 3px 7px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    .badge-active { background: var(--emerald-bg); color: var(--emerald); }
-    .badge-grace { background: #FEF3C7; color: #B45309; }
-    .badge-locked { background: var(--rose-bg); color: var(--rose); }
-
-    .social-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      text-decoration: none;
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .social-btn:hover { background: #F3F4F6; }
   </style>
 </head>
-<body>
+<body class="flex justify-center min-h-screen text-slate-800 antialiased selection:bg-amber-400">
 
-<div class="app-viewport">
-  <!-- Top Global Header -->
-  <header>
-    <div class="brand-box">
-      <div class="brand-logo">GG</div>
-      <div class="brand-text">
-        <h1>Global Guru</h1>
-        <span>Academy & Creative Studio</span>
+<div class="w-full max-w-md min-h-screen bg-slate-50 flex flex-col relative shadow-2xl border-x border-slate-200">
+
+  <!-- TOP HEADER -->
+  <header class="bg-[#4A0E17] text-white p-3.5 flex justify-between items-center sticky top-0 z-30 shadow-md border-b-2 border-[#D4AF37]">
+    <div class="flex items-center gap-2.5">
+      <!-- SECRET ADMIN GATEWAY: Double click or long press GG logo to open Admin Login -->
+      <div onclick="handleLogoTap()" title="Learner View (Owner: Tap 2 times for Admin Login)" class="w-10 h-10 rounded-full bg-white text-[#4A0E17] flex items-center justify-center font-extrabold text-sm border-2 border-[#D4AF37] cursor-pointer shadow-md select-none active:scale-95 transition">
+        GG
+      </div>
+      <div>
+        <h1 class="text-sm font-extrabold tracking-tight uppercase leading-tight">Global Guru</h1>
+        <p class="text-[10px] text-amber-200/90 font-medium">Academy & Creative Studio</p>
       </div>
     </div>
-    <div id="cloudStatus" class="status-badge">
-      <div class="status-dot" id="cloudDot"></div>
-      <span id="cloudText">CLOUD LIVE</span>
+
+    <div class="flex items-center gap-2">
+      <!-- Admin Badge Indicator if Logged in -->
+      <span id="roleBadge" class="hidden text-[10px] font-black bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full uppercase tracking-wider">Super Admin</span>
+      <span id="cloudBadge" class="text-[10px] font-bold bg-white/10 px-2.5 py-1 rounded-full border border-white/20 text-emerald-300 flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Live Sync
+      </span>
     </div>
   </header>
 
-  <!-- Navigation View Indicator -->
-  <div class="view-indicator">
-    <span id="viewTitle"><i class="fa-solid fa-house"></i> Home Gateway</span>
-    <span><i class="fa-solid fa-arrows-left-right"></i> Swipe Navigation</span>
+  <!-- SUB-BAR VIEW GUIDE -->
+  <div class="bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 flex justify-between items-center border-b border-slate-200">
+    <span id="screenTitle" class="flex items-center gap-1.5 font-bold text-slate-700">🏠 Portal Gateway</span>
+    <span id="userStatusTag" class="text-[11px] text-emerald-700 font-bold">Public Portal</span>
   </div>
 
-  <!-- Screens Container -->
-  <div class="screen-slider" id="screenSlider">
-    
-    <!-- SCREEN 0: Home -->
-    <div class="screen-panel" id="screen-0">
-      <div class="welcome-hero">
-        <h2>👋 Welcome to Global Guru</h2>
-        <p>Aapki career growth aur business expansion ka one-stop digital hub. Yahan hum practical live mentorship aur high-impact creative commercials deliver karte hain.</p>
-        <div class="welcome-badges">
-          <span class="welcome-chip"><i class="fa-solid fa-check"></i> Live Cohorts</span>
-          <span class="welcome-chip"><i class="fa-solid fa-video"></i> Studio Ads</span>
-          <span class="welcome-chip"><i class="fa-solid fa-shield-halved"></i> 24/7 Verified</span>
+  <!-- VIEWS CONTAINER -->
+  <div class="flex-1 overflow-y-auto pb-24">
+
+    <!-- TAB 1: HOME (LEARNER FACING) -->
+    <div id="view-home" class="p-4 space-y-4">
+      <div class="bg-gradient-to-br from-[#4A0E17] to-[#2B080D] text-white p-5 rounded-3xl shadow-lg border border-amber-500/30">
+        <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 bg-white/10 px-2.5 py-1 rounded-full">Official Student Hub</span>
+        <h2 class="text-xl font-extrabold mt-3 tracking-tight">Ecosystem Gateway</h2>
+        <p class="text-xs text-slate-200 font-normal mt-1 leading-relaxed">
+          Live Mentorship Cohorts, Tier 1 Fast UGC Hooks, aur 3D Creative Commercials.
+        </p>
+        <div class="flex gap-2 mt-4 pt-3 border-t border-white/10">
+          <button onclick="switchTab('khata')" class="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            🧾 Check Mera Khata
+          </button>
+          <button onclick="switchTab('programs')" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition">
+            🎓 Programs
+          </button>
         </div>
       </div>
 
-      <div class="card" onclick="goToScreen(1)" style="cursor: pointer;">
-        <div class="card-title">
-          <span><i class="fa-solid fa-graduation-cap" style="color:var(--primary);"></i> Mentorship Academy</span>
-          <i class="fa-solid fa-chevron-right" style="color:var(--muted); font-size:12px;"></i>
+      <!-- Quick Shortcuts -->
+      <div class="grid grid-cols-2 gap-3">
+        <div onclick="switchTab('programs')" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:border-[#4A0E17] cursor-pointer transition">
+          <div class="text-2xl mb-1">🎓</div>
+          <h4 class="text-xs font-extrabold text-slate-900">Mentorship</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Live Cohorts & Schedule</p>
         </div>
-        <p style="font-size:12px; color:var(--muted); line-height:1.4;">Live AI & E-Commerce Cohorts. Structured Rs. 5,000/month installment plans.</p>
+        <div onclick="switchTab('khata')" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:border-[#4A0E17] cursor-pointer transition">
+          <div class="text-2xl mb-1">💳</div>
+          <h4 class="text-xs font-extrabold text-slate-900">Mera Khata</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Rs. 5,000 Installment Slip</p>
+        </div>
       </div>
 
-      <div class="card" onclick="goToScreen(2)" style="cursor: pointer;">
-        <div class="card-title">
-          <span><i class="fa-solid fa-clapperboard" style="color:var(--primary);"></i> Creative Agency Studio</span>
-          <i class="fa-solid fa-chevron-right" style="color:var(--muted); font-size:12px;"></i>
+      <!-- Connect Across Platforms (From GG Digi Book) -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+        <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Connect Across Platforms</h4>
+        <div class="grid grid-cols-5 gap-2">
+          <!-- YouTube -->
+          <a href="https://www.youtube.com/@globalguruofficial1" target="_blank" title="YouTube" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-red-500 hover:shadow-md transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1.5">YouTube</span>
+          </a>
+          <!-- Facebook -->
+          <a href="https://web.facebook.com/globalguruofficial1" target="_blank" title="Facebook" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-blue-600 hover:shadow-md transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1.5">Facebook</span>
+          </a>
+          <!-- Instagram -->
+          <a href="https://instagram.com/globalguruofficial1" target="_blank" title="Instagram" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-pink-500 hover:shadow-md transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-[#E4405F]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1.5">Instagram</span>
+          </a>
+          <!-- TikTok -->
+          <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" title="TikTok" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-black hover:shadow-md transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v9.09c-.03 2.01-.84 4.02-2.34 5.37-1.63 1.49-3.92 2.16-6.09 1.81-2.2-.33-4.22-1.67-5.35-3.58-1.16-1.92-1.34-4.37-.5-6.38.86-2.02 2.72-3.53 4.88-3.99.78-.17 1.58-.2 2.37-.12v4.22c-.61-.08-1.25-.01-1.83.21-.82.3-1.49.95-1.83 1.76-.36.85-.31 1.84.14 2.64.44.8 1.25 1.36 2.15 1.49.99.16 2.04-.15 2.77-.85.66-.63 1.05-1.53 1.05-2.45V.02h.65z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1.5">TikTok</span>
+          </a>
+          <!-- Threads -->
+          <a href="https://www.threads.net/@globalguruofficial1" target="_blank" title="Threads" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-black hover:shadow-md transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-black" viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2109 139.019 87.8456C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.5727 72.8138C81.0827 64.4538 89.2612 60.7788 97.2341 60.7788C110.748 60.7788 119.537 69.6013 120.487 84.1506C113.626 83.1756 106.376 82.8093 98.7188 83.0569C72.0625 83.9169 55.4544 98.2431 56.0969 119.349C56.7088 139.467 73.0688 152.012 94.0625 152.012C108.799 152.012 119.981 145.474 126.791 133.029C132.846 144.159 143.141 150.144 157.069 150.144C174.197 150.144 186.281 138.834 186.281 118.892C186.281 83.2181 158.469 64.9125 120.891 64.9125C78.435 64.9125 47.9625 87.9712 47.9625 125.683C47.9625 152.128 66.525 170.835 96.0938 170.835C112.575 170.835 126.338 165.176 135.038 154.512L147.244 165.816C134.906 180.705 116.794 187.688 96.0938 187.688C56.2875 187.688 30.7125 162.248 30.7125 125.683C30.7125 76.5412 69.4125 48.0675 120.891 48.0675C170.775 48.0675 203.531 73.7437 203.531 118.892C203.531 148.164 184.95 166.995 157.069 166.995C139.631 166.995 127.144 158.625 121.284 144.188C114.712 153.281 104.981 157.942 93.6844 157.942C77.475 157.942 65.5125 147.536 64.9969 131.627C64.4469 114.675 77.2969 103.568 98.2406 102.898C105.797 102.656 113.128 103.181 120.084 104.426C118.912 95.8425 112.444 89.9625 101.466 89.9625C95.4281 89.9625 89.8781 92.205 85.9406 96.225L75.6094 84.8812C81.8531 78.4725 90.75 74.8725 101.466 74.8725C119.869 74.8725 133.725 84.7725 136.003 103.886C137.944 104.839 139.791 105.889 141.537 107.031V88.9883ZM120.084 117.892C113.888 116.897 107.381 116.488 100.678 116.702C88.2469 117.098 79.9594 122.951 80.2875 131.957C80.6062 140.719 88.7531 146.104 99.4594 146.104C108.975 146.104 116.634 140.404 120.084 130.414V117.892Z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1.5">Threads</span>
+          </a>
         </div>
-        <p style="font-size:12px; color:var(--muted); line-height:1.4;">Tier 1 Fast Hooks & Tier 2 High-End CGI Commercial TVCs.</p>
-      </div>
 
-      <div class="card" onclick="goToScreen(5)" style="cursor: pointer;">
-        <div class="card-title">
-          <span><i class="fa-solid fa-book-bookmark" style="color:var(--gold);"></i> DigiBook Hub & Support</span>
-          <i class="fa-solid fa-chevron-right" style="color:var(--muted); font-size:12px;"></i>
-        </div>
-        <p style="font-size:12px; color:var(--muted); line-height:1.4;">Interactive Chatbot, Direct WhatsApp escalation, aur system backups.</p>
-      </div>
-    </div>
-
-    <!-- SCREEN 1: Mentorship -->
-    <div class="screen-panel" id="screen-1">
-      <div class="card">
-        <div class="card-title">Live Mentorship Batches</div>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Batch timings: Daily 5:30 PM - 7:00 PM PKT.</p>
-        <div style="background:#FAF8F5; padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <strong style="font-size:12px;">Cohort AI-01</strong>
-            <span class="badge badge-active">Active</span>
+        <!-- Official Linktree -->
+        <a href="https://linktr.ee/Globalguruofficial1" target="_blank" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 transition">
+          <div class="flex items-center gap-2.5">
+            <span class="text-base">🌲</span>
+            <div>
+              <p class="text-xs font-bold text-slate-800">All Official Ecosystem Links</p>
+              <p class="text-[10px] text-slate-400">linktr.ee/Globalguruofficial1</p>
+            </div>
           </div>
-          <span style="font-size:11px; color:var(--muted);">Mon / Wed / Fri • 48 Students Registered</span>
-        </div>
-        <div style="background:#FAF8F5; padding:12px; border-radius:8px; border:1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <strong style="font-size:12px;">Cohort ECOM-04</strong>
-            <span class="badge badge-active">Active</span>
+          <span class="text-xs font-bold text-emerald-700">Open →</span>
+        </a>
+
+        <!-- Official WhatsApp Support -->
+        <a href="https://wa.me/923027374880?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md shadow-emerald-500/20">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">💬</div>
+            <div>
+              <p class="text-xs font-black tracking-wide">WhatsApp Support Desk</p>
+              <p class="text-[11px] text-emerald-100 font-medium">0302-7374880</p>
+            </div>
           </div>
-          <span style="font-size:11px; color:var(--muted);">Tue / Thu / Sat • 36 Students Registered</span>
+          <span class="text-[11px] font-black bg-white text-emerald-800 px-3 py-1.5 rounded-xl shadow-sm">Chat Now →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB 2: PROGRAMS (MENTORSHIP & STUDIO) -->
+    <div id="view-programs" class="hidden p-4 space-y-4">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+        <h3 class="text-sm font-extrabold text-[#4A0E17]">Live Mentorship Batches</h3>
+        <p class="text-xs text-slate-500">Daily Timing: 5:30 PM - 7:00 PM PKT</p>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <div class="flex justify-between items-center mb-1">
+            <strong class="text-xs text-slate-800">Cohort AI-01</strong>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
+          </div>
+          <p class="text-[11px] text-slate-500">Mon / Wed / Fri • 48 Students Registered</p>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <div class="flex justify-between items-center mb-1">
+            <strong class="text-xs text-slate-800">Cohort ECOM-04</strong>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
+          </div>
+          <p class="text-[11px] text-slate-500">Tue / Thu / Sat • 36 Students Registered</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+        <h3 class="text-sm font-extrabold text-[#4A0E17]">Creative Agency Studio</h3>
+        <p class="text-xs text-slate-500">Commercial Production Pipeline</p>
+        <div class="border-l-4 border-emerald-600 pl-3 py-1">
+          <h4 class="text-xs font-bold text-slate-800">Tier 1 UGC Video Commercials</h4>
+          <p class="text-[11px] text-slate-400">48-Hour delivery hook ads & creator reviews.</p>
+        </div>
+        <div class="border-l-4 border-amber-500 pl-3 py-1">
+          <h4 class="text-xs font-bold text-slate-800">Tier 2 3D / VFX CGI Ads</h4>
+          <p class="text-[11px] text-slate-400">Cinematic 3D render & TVC brand commercials.</p>
         </div>
       </div>
     </div>
 
-    <!-- SCREEN 2: Studio -->
-    <div class="screen-panel" id="screen-2">
-      <div class="card">
-        <div class="card-title">Production Pipelines</div>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Active commercial shoots & CGI asset queue.</p>
-        <div style="border-left:3px solid var(--emerald); padding-left:10px; margin-bottom:12px;">
-          <h4 style="font-size:12px;">Tier 1 Commercials</h4>
-          <p style="font-size:11px; color:var(--muted);">Fast UGC Hooks & Product unboxing ads (Turnaround: 48h).</p>
+    <!-- TAB 3: MERA KHATA (STUDENT SEARCH - ENTER KEY READY) -->
+    <div id="view-khata" class="hidden p-4 space-y-4">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+        <div>
+          <h3 class="text-sm font-extrabold text-[#4A0E17]">Mera Khata (Live Verification)</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Apna registered WhatsApp number enter karein aur <strong>Enter</strong> dabayein:</p>
         </div>
-        <div style="border-left:3px solid var(--gold); padding-left:10px;">
-          <h4 style="font-size:12px;">Tier 2 3D / VFX Production</h4>
-          <p style="font-size:11px; color:var(--muted);">Cinematic lighting & VFX rendering for brand launches.</p>
-        </div>
-      </div>
-    </div>
 
-    <!-- SCREEN 3: Khata (Student Fee Search) -->
-    <div class="screen-panel" id="screen-3">
-      <div class="card">
-        <div class="card-title">Mera Khata (Live Verification)</div>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Apna registered WhatsApp number enter karein aur <strong>Enter</strong> press karein:</p>
-        
-        <!-- Form allows Enter key submission directly -->
-        <form onsubmit="event.preventDefault(); runKhataSearch();" class="search-box">
-          <input type="text" id="khataInput" class="input-field" placeholder="e.g. 03001112233 or 03004445566" autocomplete="off">
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        <form onsubmit="event.preventDefault(); runStudentSearch();" class="flex gap-2">
+          <input type="text" id="studentSearchInput" placeholder="e.g. 03001112233" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#4A0E17]/20 focus:border-[#4A0E17]">
+          <button type="submit" class="px-4 py-2.5 bg-[#4A0E17] text-white rounded-xl text-xs font-bold hover:bg-[#681522] transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
         </form>
 
-        <div id="khataResultArea" style="margin-top:14px;"></div>
+        <div id="studentSearchResult" class="pt-2"></div>
       </div>
     </div>
 
-    <!-- SCREEN 4: Admin & Switchboard -->
-    <div class="screen-panel" id="screen-4">
-      <div id="adminLockScreen" class="card">
-        <div class="card-title"><i class="fa-solid fa-lock"></i> Admin Portal Login</div>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Owner (PIN: 7860) ya Admin 2 (PIN: 3344) enter karein:</p>
-        
-        <!-- Enter key enabled for Admin PIN -->
-        <form onsubmit="event.preventDefault(); verifyAdminPin();" class="search-box">
-          <input type="password" id="adminPinInput" class="input-field" placeholder="Enter 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
-          <button type="submit" class="btn btn-primary">Unlock</button>
-        </form>
-        <span id="pinError" style="font-size:11px; color:var(--rose); display:none;">Ghalat PIN code, dobara koshish karein.</span>
+    <!-- TAB 4: SUPER ADMIN / OWNER DASHBOARD (HIDDEN FROM LEARNERS) -->
+    <div id="view-admin" class="hidden p-4 space-y-4">
+      
+      <!-- Session Bar -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <h3 id="adminHeaderTitle" class="text-sm font-extrabold text-[#4A0E17]">Master Owner Session</h3>
+          <p id="adminHeaderSub" class="text-[11px] text-slate-400 font-medium">PIN: 7860 • Full Clearance</p>
+        </div>
+        <button onclick="logoutAdmin()" class="px-3 py-1.5 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold hover:bg-rose-50 transition active:scale-95">
+          🔒 Lock Dashboard
+        </button>
       </div>
 
-      <div id="adminDashboard" style="display:none;">
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+      <!-- MASTER SWITCHBOARD (ALL 7 CONTROLS - EXCLUSIVE TO OWNER) -->
+      <div id="ownerSwitchboardCard" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 border-l-4 border-amber-400">
+        <div class="flex justify-between items-center">
           <div>
-            <h3 id="currentRoleTitle" style="font-size:14px; font-weight:800; color:var(--primary);">Session Active</h3>
-            <span id="currentRoleSub" style="font-size:11px; color:var(--muted);">Full Access Mode</span>
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Master Owner Switchboard</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5">Sub-Admin (3344) ke liye portal permissions manage karein:</p>
           </div>
-          <button onclick="lockAdmin()" class="btn btn-outline" style="padding:6px 12px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Lock</button>
+          <span class="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md">7 Controls</span>
         </div>
 
-        <!-- Master Owner Switchboard (Only visible to Owner PIN 7860) -->
-        <div id="ownerControls" class="card" style="display:none; border-left:4px solid var(--gold);">
-          <div class="card-title"><i class="fa-solid fa-sliders"></i> Master Owner Switchboard</div>
-          <p style="font-size:11px; color:var(--muted); margin-bottom:8px;">Admin 2 ke liye sensitive financial data on/off karein:</p>
-          
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <h4>Bank Balances Access</h4>
-              <p>Meezan, Easypaisa, JazzCash view</p>
+        <div class="divide-y divide-slate-100 pt-1">
+          <!-- 1. Bank Balances -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">1. Bank Balances Access</h5>
+              <p class="text-[10px] text-slate-400">Meezan, Easypaisa, JazzCash visibility</p>
             </div>
             <label class="switch">
-              <input type="checkbox" id="perm_bank" onchange="updateSwitchPermission('perm_bank', this.checked)">
+              <input type="checkbox" id="perm_bank" onchange="togglePerm('perm_bank', this.checked)">
               <span class="slider"></span>
             </label>
           </div>
-
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <h4>Galla (Cash Vault) Access</h4>
-              <p>Physical vault drawer balance</p>
+          <!-- 2. Cash Vault (Galla) -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">2. Galla (Cash Vault) Access</h5>
+              <p class="text-[10px] text-slate-400">Physical drawer cash balance</p>
             </div>
             <label class="switch">
-              <input type="checkbox" id="perm_vault" onchange="updateSwitchPermission('perm_vault', this.checked)">
+              <input type="checkbox" id="perm_vault" onchange="togglePerm('perm_vault', this.checked)">
               <span class="slider"></span>
             </label>
           </div>
-
-          <div class="toggle-row">
-            <div class="toggle-info">
-              <h4>Net Profit Calculations</h4>
-              <p>Academy net margin & metrics</p>
+          <!-- 3. Net Profit -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">3. Net Profit Calculations</h5>
+              <p class="text-[10px] text-slate-400">Academy net margin calculations</p>
             </div>
             <label class="switch">
-              <input type="checkbox" id="perm_profit" onchange="updateSwitchPermission('perm_profit', this.checked)">
+              <input type="checkbox" id="perm_profit" onchange="togglePerm('perm_profit', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- 4. Student Directory -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">4. Student Directory View</h5>
+              <p class="text-[10px] text-slate-400">Phone numbers aur student details</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="perm_students" onchange="togglePerm('perm_students', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- 5. Fee Editing -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">5. Fee Editing & Slips Approval</h5>
+              <p class="text-[10px] text-slate-400">New student entry aur payment updates</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="perm_fee_edit" onchange="togglePerm('perm_fee_edit', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- 6. Batch Schedule -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">6. Batch & Schedule Management</h5>
+              <p class="text-[10px] text-slate-400">Timing updates aur cohort changes</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="perm_schedule" onchange="togglePerm('perm_schedule', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- 7. Backups -->
+          <div class="py-2.5 flex justify-between items-center">
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">7. System Backups Access</h5>
+              <p class="text-[10px] text-slate-400">JSON/CSV download clearance</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="perm_backup" onchange="togglePerm('perm_backup', this.checked)">
               <span class="slider"></span>
             </label>
           </div>
         </div>
+      </div>
 
-        <!-- Financial Metrics Block -->
-        <div id="financialBlock" class="card">
-          <div class="card-title">Business Accounts Balance</div>
-          <div id="financesContent">
-            <!-- Populated dynamically based on permissions -->
+      <!-- Financial Metrics Card -->
+      <div id="adminFinancialCard" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Ecosystem Financial Overview</h4>
+        <div id="financialDisplay" class="space-y-2 text-xs"></div>
+      </div>
+
+      <!-- Student Admission & Fee Entry -->
+      <div id="adminStudentEntryCard" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">New Student / Fee Entry</h4>
+        <form onsubmit="event.preventDefault(); saveStudentFromAdmin();" class="space-y-2.5">
+          <input type="text" id="adminNewPhone" placeholder="WhatsApp Number (0300...)" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+          <input type="text" id="adminNewName" placeholder="Student Full Name" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="adminNewReceived" placeholder="Fee Paid (Rs.)" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+            <select id="adminNewCohort" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+              <option value="Cohort AI-01">AI-01</option>
+              <option value="Cohort ECOM-04">ECOM-04</option>
+            </select>
           </div>
+          <button type="submit" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-plus"></i> Save Student Record
+          </button>
+        </form>
+      </div>
+
+      <!-- Backup Download in Admin -->
+      <div id="adminBackupCard" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <h5 class="text-xs font-bold text-slate-800">Database JSON Export</h5>
+          <p class="text-[11px] text-slate-400">Download complete portal snapshot</p>
         </div>
-      </div>
-    </div>
-
-    <!-- SCREEN 5: GG DigiBook Hub & Settings -->
-    <div class="screen-panel" id="screen-5">
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-user-check"></i> Account Status</div>
-        <p style="font-size:12px; margin-bottom:4px;"><strong>Google Session:</strong> globalgurubusiness@gmail.com</p>
-        <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Status: Verified Business Operator</p>
-        <button onclick="alert('Session reset successfully.')" class="btn btn-outline" style="width:100%;"><i class="fa-solid fa-power-off"></i> Gmail Log Out / Switch</button>
+        <button onclick="exportPortalBackup()" class="px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition">
+          📥 Backup
+        </button>
       </div>
 
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-database"></i> Backup & Restore</div>
-        <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">Database ka JSON backup download ya upload karein:</p>
-        <div style="display:flex; gap:8px;">
-          <button onclick="exportBackupData()" class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-download"></i> Export JSON</button>
-          <button onclick="document.getElementById('importFile').click()" class="btn btn-outline" style="flex:1;"><i class="fa-solid fa-upload"></i> Import JSON</button>
-          <input type="file" id="importFile" style="display:none;" onchange="importBackupData(event)" accept=".json">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-headset"></i> Support & Help</div>
-        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Pehle automated instant answers lein, ya direct officer se rabta karein:</p>
-        <button onclick="openChatBot()" class="btn btn-primary" style="width:100%; margin-bottom:8px;"><i class="fa-solid fa-robot"></i> Open GG Support Bot</button>
-        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="btn btn-emerald" style="width:100%; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp (+92 311 6246000)</a>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Official Ecosystem Channels</div>
-        <a href="https://instagram.com" target="_blank" class="social-btn"><i class="fa-brands fa-instagram" style="color:#E1306C; font-size:16px;"></i> Instagram @GlobalGuru</a>
-        <a href="https://youtube.com" target="_blank" class="social-btn"><i class="fa-brands fa-youtube" style="color:#FF0000; font-size:16px;"></i> YouTube Channel</a>
-        <a href="https://tiktok.com" target="_blank" class="social-btn"><i class="fa-brands fa-tiktok" style="font-size:16px;"></i> TikTok Official</a>
-        <a href="https://facebook.com" target="_blank" class="social-btn"><i class="fa-brands fa-facebook" style="color:#1877F2; font-size:16px;"></i> Facebook Community</a>
-      </div>
     </div>
 
   </div>
 
-  <!-- Bottom Navigation Bar (6 Tabs) -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="goToScreen(0)" id="nav-0"><i class="fa-solid fa-house"></i><span>Home</span></button>
-    <button class="nav-btn" onclick="goToScreen(1)" id="nav-1"><i class="fa-solid fa-graduation-cap"></i><span>Mentorship</span></button>
-    <button class="nav-btn" onclick="goToScreen(2)" id="nav-2"><i class="fa-solid fa-clapperboard"></i><span>Studio</span></button>
-    <button class="nav-btn" onclick="goToScreen(3)" id="nav-3"><i class="fa-solid fa-receipt"></i><span>Khata</span></button>
-    <button class="nav-btn" onclick="goToScreen(4)" id="nav-4"><i class="fa-solid fa-shield-halved"></i><span>Admin</span></button>
-    <button class="nav-btn" onclick="goToScreen(5)" id="nav-5"><i class="fa-solid fa-gear"></i><span>Hub</span></button>
+  <!-- BOTTOM NAVIGATION (DEFAULT: ONLY 3 LEARNER TABS) -->
+  <nav class="fixed bottom-0 max-w-md w-full bg-white border-t border-slate-200 flex z-30 shadow-lg" id="bottomNav">
+    <button id="tab-btn-home" onclick="switchTab('home')" class="flex-1 py-2.5 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17] transition">
+      <span class="text-base">🏠</span> Home
+    </button>
+    <button id="tab-btn-programs" onclick="switchTab('programs')" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
+      <span class="text-base">🎓</span> Programs
+    </button>
+    <button id="tab-btn-khata" onclick="switchTab('khata')" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
+      <span class="text-base">🧾</span> Mera Khata
+    </button>
+    <!-- SECRET ADMIN TAB (Appears only after successful login) -->
+    <button id="tab-btn-admin" onclick="switchTab('admin')" class="hidden flex-1 py-2.5 text-center text-amber-700 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-amber-600 transition bg-amber-50/60">
+      <span class="text-base">🛡️</span> Admin
+    </button>
   </nav>
 
-  <!-- Interactive Support Chatbot Modal -->
-  <div class="chat-modal" id="chatModal">
-    <div class="chat-card">
-      <div class="chat-header">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div style="width:28px; height:28px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; color:#1C1917; font-weight:800; font-size:11px;">GG</div>
-          <div>
-            <h3 style="font-size:13px; font-weight:800;">GG Support Assistant</h3>
-            <span style="font-size:10px; color:#E8D5B5;">Instant Answers • 24/7</span>
-          </div>
+  <!-- SECRET ADMIN LOGIN MODAL -->
+  <div id="adminLoginModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-xs w-full rounded-3xl p-6 shadow-2xl space-y-4 animate-in border border-slate-100">
+      <div class="text-center">
+        <div class="w-12 h-12 rounded-full bg-[#4A0E17] text-amber-300 font-extrabold text-lg flex items-center justify-center mx-auto mb-2 border-2 border-[#D4AF37]">
+          GG
         </div>
-        <button onclick="closeChatBot()" style="background:none; border:none; color:#FFF; font-size:16px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="text-base font-extrabold text-slate-900">Executive Authentication</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Super Admin (7860) ya Sub-Admin (3344)</p>
       </div>
 
-      <div class="chat-body" id="chatMessages">
-        <div class="chat-msg msg-bot">
-          Assalam-o-Alaikum! Main Global Guru ka automated support assistant hoon. Kisi bhi prompt par click karein ya apna sawal likh kar <strong>Enter</strong> karein:
-        </div>
-        <div style="display:flex; flex-wrap:wrap; gap:6px; margin: 4px 0;" id="quickPrompts">
-          <button onclick="sendQuickPrompt('Cohort Timings')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">🕒 Timings</button>
-          <button onclick="sendQuickPrompt('Fee Plan')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">💰 Rs. 5,000 Plan</button>
-          <button onclick="sendQuickPrompt('Rule of 10')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">📜 Rule of 10</button>
-          <button onclick="sendQuickPrompt('Studio Rates')" class="btn btn-outline" style="font-size:11px; padding:6px 10px;">🎬 Studio Ads</button>
-        </div>
-      </div>
-
-      <form onsubmit="event.preventDefault(); submitChatMessage();" class="chat-footer">
-        <input type="text" id="chatInput" class="input-field" placeholder="Apna sawal likhein..." autocomplete="off">
-        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+      <form onsubmit="event.preventDefault(); verifyPinCode();" class="space-y-3">
+        <input type="password" id="adminSecretPin" placeholder="Enter 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" autofocus class="w-full text-center text-lg tracking-widest font-black py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#4A0E17]/20 focus:border-[#4A0E17]">
+        <button type="submit" class="w-full py-3 bg-[#4A0E17] hover:bg-[#681522] text-white rounded-xl text-xs font-bold transition shadow-md">
+          Authenticate Session
+        </button>
       </form>
+
+      <span id="pinErrorMsg" class="hidden text-center text-xs font-bold text-rose-600 block">Ghalat PIN code! Access Denied.</span>
+      
+      <button onclick="closeAdminModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
+        Cancel / Return to Learner Portal
+      </button>
     </div>
   </div>
+
 </div>
 
 <script>
-  // 1. FIREBASE CONFIGURATION
+  // 1. FIREBASE CONFIGURATION (LOCKED TO YOUR DOMAIN)
   const firebaseConfig = {
     apiKey: "AIzaSyDrLKPN_lqSm2strGET4jAB4SUmVuZKjrM",
     authDomain: "global-guru-portal.firebaseapp.com",
@@ -645,14 +419,17 @@
   };
 
   let db = null;
-  let isCloudConnected = false;
+  let currentAdminRole = null; // null = Learner/Guest, 'owner' = Super Admin, 'admin2' = Sub-Admin
 
-  // Real-time In-memory Store (Synchronized with Firestore)
   let appState = {
     permissions: {
       perm_bank: true,
       perm_vault: true,
-      perm_profit: false
+      perm_profit: false,
+      perm_students: true,
+      perm_fee_edit: true,
+      perm_schedule: false,
+      perm_backup: false
     },
     students: {
       "03001112233": { name: "Ali Raza", cohort: "Cohort AI-01", total: 50000, received: 50000, status: "Active Paid", rule10: "Cleared" },
@@ -667,312 +444,287 @@
     }
   };
 
-  // Initialize Firebase Firestore
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
-    isCloudConnected = true;
-    document.getElementById('cloudText').innerText = "CLOUD LIVE";
-    document.getElementById('cloudDot').style.background = "#10B981";
     initRealtimeSync();
   } catch(e) {
     console.warn("Firestore running in fallback mode:", e);
-    document.getElementById('cloudText').innerText = "OFFLINE READY";
-    document.getElementById('cloudDot').style.background = "#F59E0B";
   }
 
-  // 2. REALTIME FIRESTORE LISTENER
   function initRealtimeSync() {
-    if(!db) return;
+    if (!db) return;
     db.collection("portal").doc("system_state").onSnapshot(doc => {
       if(doc.exists) {
         const data = doc.data();
-        if(data.permissions) appState.permissions = data.permissions;
+        if(data.permissions) appState.permissions = Object.assign(appState.permissions, data.permissions);
         if(data.finances) appState.finances = data.finances;
         if(data.students) appState.students = data.students;
-        renderAdminFinances();
-        syncToggleCheckboxes();
+        renderAdminDashboard();
+        syncSwitchCheckboxes();
       } else {
         db.collection("portal").doc("system_state").set(appState);
       }
-    }, err => console.log("Realtime sync notice:", err));
+    }, err => console.log("Realtime error:", err));
   }
 
-  function syncToggleCheckboxes() {
-    const b = document.getElementById('perm_bank');
-    const v = document.getElementById('perm_vault');
-    const p = document.getElementById('perm_profit');
-    if(b) b.checked = appState.permissions.perm_bank;
-    if(v) v.checked = appState.permissions.perm_vault;
-    if(p) p.checked = appState.permissions.perm_profit;
-  }
+  // 2. SECRET LOGO TAP (DOUBLE CLICK OPENS ADMIN LOGIN)
+  let logoTapCounter = 0;
+  let logoTapTimer = null;
 
-  function updateSwitchPermission(key, value) {
-    appState.permissions[key] = value;
-    if(db) {
-      db.collection("portal").doc("system_state").set({ permissions: appState.permissions }, { merge: true });
+  function handleLogoTap() {
+    logoTapCounter++;
+    if (logoTapCounter === 1) {
+      logoTapTimer = setTimeout(() => { logoTapCounter = 0; }, 400);
+    } else if (logoTapCounter === 2) {
+      clearTimeout(logoTapTimer);
+      logoTapCounter = 0;
+      openAdminModal();
     }
-    renderAdminFinances();
   }
 
-  // 3. NAVIGATION (6 SCREENS)
-  let currentScreen = 0;
-  const screenTitles = [
-    '<i class="fa-solid fa-house"></i> Home Gateway',
-    '<i class="fa-solid fa-graduation-cap"></i> Mentorship Academy',
-    '<i class="fa-solid fa-clapperboard"></i> Creative Studio',
-    '<i class="fa-solid fa-receipt"></i> Mera Khata',
-    '<i class="fa-solid fa-shield-halved"></i> Admin Console',
-    '<i class="fa-solid fa-gear"></i> DigiBook Hub & Settings'
-  ];
+  function openAdminModal() {
+    document.getElementById('adminSecretPin').value = '';
+    document.getElementById('pinErrorMsg').classList.add('hidden');
+    document.getElementById('adminLoginModal').classList.remove('hidden');
+    setTimeout(() => { document.getElementById('adminSecretPin').focus(); }, 150);
+  }
 
-  function goToScreen(index) {
-    currentScreen = index;
-    document.getElementById('screenSlider').style.transform = `translateX(-${index * 100}%)`;
-    document.getElementById('viewTitle').innerHTML = screenTitles[index];
-    document.querySelectorAll('.nav-btn').forEach((btn, i) => {
-      btn.classList.toggle('active', i === index);
+  function closeAdminModal() {
+    document.getElementById('adminLoginModal').classList.add('hidden');
+  }
+
+  function verifyPinCode() {
+    const pin = document.getElementById('adminSecretPin').value.trim();
+    const err = document.getElementById('pinErrorMsg');
+    err.classList.add('hidden');
+
+    if (pin === '7860') {
+      currentAdminRole = 'owner';
+      onAdminSuccess();
+    } else if (pin === '3344') {
+      currentAdminRole = 'admin2';
+      onAdminSuccess();
+    } else {
+      err.classList.remove('hidden');
+    }
+  }
+
+  function onAdminSuccess() {
+    closeAdminModal();
+    document.getElementById('roleBadge').classList.remove('hidden');
+    document.getElementById('tab-btn-admin').classList.remove('hidden');
+    
+    if (currentAdminRole === 'owner') {
+      document.getElementById('roleBadge').innerText = "Super Admin";
+      document.getElementById('roleBadge').className = "text-[10px] font-black bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full uppercase tracking-wider";
+    } else {
+      document.getElementById('roleBadge').innerText = "Sub-Admin";
+      document.getElementById('roleBadge').className = "text-[10px] font-black bg-emerald-400 text-slate-900 px-2 py-0.5 rounded-full uppercase tracking-wider";
+    }
+
+    renderAdminDashboard();
+    switchTab('admin');
+  }
+
+  function logoutAdmin() {
+    currentAdminRole = null;
+    document.getElementById('roleBadge').classList.add('hidden');
+    document.getElementById('tab-btn-admin').classList.add('hidden');
+    switchTab('home');
+  }
+
+  // 3. TAB NAVIGATION
+  window.switchTab = (tab) => {
+    const views = ['home', 'programs', 'khata', 'admin'];
+    views.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.classList.add('hidden');
+      const btn = document.getElementById(`tab-btn-${v}`);
+      if (btn) {
+        btn.className = "flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition";
+      }
     });
-  }
 
-  // Touch Swipe Gesture Handling
-  let touchStartX = 0;
-  let touchEndX = 0;
-  const slider = document.getElementById('screenSlider');
-
-  slider.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-  slider.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  }, {passive: true});
-
-  function handleSwipe() {
-    const swipeThreshold = 50;
-    if (touchEndX < touchStartX - swipeThreshold && currentScreen < 5) {
-      goToScreen(currentScreen + 1);
+    const activeView = document.getElementById(`view-${tab}`);
+    const activeBtn = document.getElementById(`tab-btn-${tab}`);
+    if (activeView) activeView.classList.remove('hidden');
+    
+    if (activeBtn) {
+      if (tab === 'admin') {
+        activeBtn.className = "flex-1 py-2.5 text-center text-amber-700 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-amber-600 transition bg-amber-50/60";
+      } else {
+        activeBtn.className = "flex-1 py-2.5 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17] transition";
+      }
     }
-    if (touchEndX > touchStartX + swipeThreshold && currentScreen > 0) {
-      goToScreen(currentScreen - 1);
-    }
-  }
+
+    // Title update
+    const titleEl = document.getElementById('screenTitle');
+    if (tab === 'home') titleEl.innerHTML = "🏠 Portal Gateway";
+    if (tab === 'programs') titleEl.innerHTML = "🎓 Mentorship & Studio";
+    if (tab === 'khata') titleEl.innerHTML = "🧾 Mera Khata Search";
+    if (tab === 'admin') titleEl.innerHTML = "🛡️ Executive Console";
+  };
 
   // 4. MERA KHATA SEARCH (ENTER KEY READY)
-  function runKhataSearch() {
-    const rawVal = document.getElementById('khataInput').value.trim().replace(/\D/g, '');
-    const out = document.getElementById('khataResultArea');
-    if(!rawVal) {
-      out.innerHTML = `<span style="font-size:12px; color:var(--rose);">Barah-e-karam apna number enter karein.</span>`;
+  function runStudentSearch() {
+    const query = document.getElementById('studentSearchInput').value.trim().replace(/\D/g, '');
+    const out = document.getElementById('studentSearchResult');
+    if (!query) {
+      out.innerHTML = `<p class="text-xs font-bold text-rose-600">Barah-e-karam mobile number darj karein.</p>`;
       return;
     }
 
-    const student = appState.students[rawVal];
-    if(student) {
-      const remaining = student.total - student.received;
+    const s = appState.students[query];
+    if (s) {
+      const balance = s.total - s.received;
       out.innerHTML = `
-        <div style="background:#FDFDFD; border:1px solid var(--border); border-radius:12px; padding:14px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h4 style="font-size:14px; color:var(--primary); font-weight:800;">${student.name}</h4>
-            <span class="badge ${remaining === 0 ? 'badge-active' : 'badge-grace'}">${student.status}</span>
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <div class="flex justify-between items-center">
+            <h4 class="text-xs font-extrabold text-slate-900">${s.name}</h4>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${balance === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${s.status}</span>
           </div>
-          <span style="font-size:11px; color:var(--muted);">${student.cohort}</span>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:12px 0; background:#F8F6F0; padding:10px; border-radius:8px; text-align:center;">
-            <div><span style="font-size:10px; color:var(--muted); display:block;">Total Fee</span><strong style="font-size:12px;">Rs. ${student.total.toLocaleString()}</strong></div>
-            <div><span style="font-size:10px; color:var(--muted); display:block;">Received</span><strong style="font-size:12px; color:var(--emerald);">Rs. ${student.received.toLocaleString()}</strong></div>
-            <div><span style="font-size:10px; color:var(--muted); display:block;">Balance</span><strong style="font-size:12px; color:var(--rose);">Rs. ${remaining.toLocaleString()}</strong></div>
+          <p class="text-[11px] text-slate-400 font-medium">${s.cohort}</p>
+          <div class="grid grid-cols-3 gap-2 bg-white p-2 rounded-xl text-center border border-slate-100">
+            <div><span class="text-[9px] text-slate-400 block">Total</span><strong class="text-[11px] text-slate-800">Rs. ${s.total.toLocaleString()}</strong></div>
+            <div><span class="text-[9px] text-slate-400 block">Paid</span><strong class="text-[11px] text-emerald-600">Rs. ${s.received.toLocaleString()}</strong></div>
+            <div><span class="text-[9px] text-slate-400 block">Balance</span><strong class="text-[11px] text-rose-600">Rs. ${balance.toLocaleString()}</strong></div>
           </div>
-          <p style="font-size:11px; line-height:1.4; color:#57534E; margin-bottom:10px;">
-            <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i> <strong>Rule of 10 Status:</strong> Har mahine ki 10 tareekh se pehle Rs. 5,000 installment jama karwayein taake class access jari rahe.
-          </p>
-          <a href="https://wa.me/923116246000?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(student.name)}" target="_blank" class="btn btn-emerald" style="width:100%; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Submit Slip (+92 311 6246000)</a>
+          <p class="text-[10px] text-slate-500">📜 <strong>Rule of 10:</strong> Har mahine ki 10 tareekh se pehle Rs. 5,000 installment clear karein.</p>
+          <a href="https://wa.me/923027374880?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(s.name)}" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
+            <i class="fa-brands fa-whatsapp"></i> Submit Slip on WhatsApp
+          </a>
         </div>
       `;
     } else {
       out.innerHTML = `
-        <div style="background:var(--rose-bg); padding:12px; border-radius:8px; border:1px solid #FECACA;">
-          <span style="font-size:12px; color:var(--rose); font-weight:700;">Record Nahi Mila!</span>
-          <p style="font-size:11px; color:#57534E; margin-top:4px;">Yeh number registered nahi hai. Barah-e-karam academy desk par rabta karein.</p>
+        <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center">
+          <p class="text-xs font-bold text-rose-700">Record Nahi Mila</p>
+          <p class="text-[11px] text-rose-500 mt-0.5">Apna number check karein ya desk se rabta karein.</p>
         </div>
       `;
     }
   }
 
-  // 5. ADMIN AUTHENTICATION & SWITCHBOARD
-  let activeRole = null; // 'owner' or 'admin2'
+  // 5. ADMIN DASHBOARD LOGIC
+  function renderAdminDashboard() {
+    const isOwner = currentAdminRole === 'owner';
+    const switchCard = document.getElementById('ownerSwitchboardCard');
+    const headerTitle = document.getElementById('adminHeaderTitle');
+    const headerSub = document.getElementById('adminHeaderSub');
 
-  function verifyAdminPin() {
-    const pin = document.getElementById('adminPinInput').value.trim();
-    const err = document.getElementById('pinError');
-    err.style.display = 'none';
-
-    if(pin === '7860') {
-      activeRole = 'owner';
-      unlockAdminDashboard();
-    } else if(pin === '3344') {
-      activeRole = 'admin2';
-      unlockAdminDashboard();
+    if (isOwner) {
+      switchCard.classList.remove('hidden');
+      headerTitle.innerText = "Master Owner Session";
+      headerSub.innerText = "PIN: 7860 • Full 7-Switch Clearance";
     } else {
-      err.style.display = 'block';
+      switchCard.classList.add('hidden');
+      headerTitle.innerText = "Sub-Admin Operations";
+      headerSub.innerText = "PIN: 3344 • Restricted Mode";
     }
+
+    renderFinances();
+    renderStudentEntryAccess();
+    renderBackupAccess();
   }
 
-  function unlockAdminDashboard() {
-    document.getElementById('adminLockScreen').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
+  function syncSwitchCheckboxes() {
+    const keys = ['perm_bank', 'perm_vault', 'perm_profit', 'perm_students', 'perm_fee_edit', 'perm_schedule', 'perm_backup'];
+    keys.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.checked = !!appState.permissions[k];
+    });
+  }
 
-    const title = document.getElementById('currentRoleTitle');
-    const sub = document.getElementById('currentRoleSub');
-    const ownerBox = document.getElementById('ownerControls');
-
-    if(activeRole === 'owner') {
-      title.innerText = "Master Owner Active (7860)";
-      sub.innerText = "Full Executive Clearance";
-      ownerBox.style.display = 'block';
-      syncToggleCheckboxes();
-    } else {
-      title.innerText = "Admin 2 Active (3344)";
-      sub.innerText = "Restricted Operations";
-      ownerBox.style.display = 'none';
+  function togglePerm(key, val) {
+    appState.permissions[key] = val;
+    if (db) {
+      db.collection("portal").doc("system_state").set({ permissions: appState.permissions }, { merge: true });
     }
-    renderAdminFinances();
+    renderAdminDashboard();
   }
 
-  function lockAdmin() {
-    activeRole = null;
-    document.getElementById('adminPinInput').value = '';
-    document.getElementById('adminLockScreen').style.display = 'block';
-    document.getElementById('adminDashboard').style.display = 'none';
-  }
-
-  function renderAdminFinances() {
-    const container = document.getElementById('financesContent');
-    if(!container) return;
+  function renderFinances() {
+    const box = document.getElementById('financialDisplay');
+    const isOwner = currentAdminRole === 'owner';
+    const p = appState.permissions;
 
     let html = '';
-    const showBank = (activeRole === 'owner') || appState.permissions.perm_bank;
-    const showVault = (activeRole === 'owner') || appState.permissions.perm_vault;
-    const showProfit = (activeRole === 'owner') || appState.permissions.perm_profit;
-
-    if(showBank) {
+    if (isOwner || p.perm_bank) {
       html += `
-        <div style="margin-bottom:10px;">
-          <span style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">Digital Accounts:</span>
-          <div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #EEE;">
-            <span>Meezan Bank</span><strong>${appState.finances.meezan}</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #EEE;">
-            <span>Easypaisa Merchant</span><strong>${appState.finances.easypaisa}</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #EEE;">
-            <span>JazzCash Corporate</span><strong>${appState.finances.jazzcash}</strong>
-          </div>
+        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+          <div class="flex justify-between"><span>Meezan Bank</span><strong>${appState.finances.meezan}</strong></div>
+          <div class="flex justify-between"><span>Easypaisa</span><strong>${appState.finances.easypaisa}</strong></div>
+          <div class="flex justify-between"><span>JazzCash</span><strong>${appState.finances.jazzcash}</strong></div>
         </div>
       `;
     }
-
-    if(showVault) {
+    if (isOwner || p.perm_vault) {
       html += `
-        <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0; border-bottom:1px solid #EEE;">
-          <span><strong>Physical Vault (Galla)</strong></span><strong style="color:var(--emerald);">${appState.finances.galla}</strong>
+        <div class="flex justify-between p-2.5 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-100">
+          <span>Physical Vault (Galla)</span><strong class="text-emerald-700">${appState.finances.galla}</strong>
         </div>
       `;
     }
-
-    if(showProfit) {
+    if (isOwner || p.perm_profit) {
       html += `
-        <div style="display:flex; justify-content:space-between; font-size:12px; padding:8px 0; background:#FFF9E6; border-radius:6px; margin-top:8px; padding:8px;">
-          <span><strong>Calculated Net Profit</strong></span><strong style="color:var(--primary);">${appState.finances.netProfit}</strong>
+        <div class="flex justify-between p-2.5 bg-amber-50 text-amber-900 rounded-xl border border-amber-200">
+          <span>Net Profit</span><strong class="text-[#4A0E17]">${appState.finances.netProfit}</strong>
         </div>
       `;
     }
-
-    if(!showBank && !showVault && !showProfit) {
-      html = `<p style="font-size:11px; color:var(--muted); font-style:italic;">Owner switchboard ne financial visibility off ki hui hai.</p>`;
+    if (!html) {
+      html = `<p class="text-[11px] text-slate-400 italic">Financial data visibility disabled by Master Owner.</p>`;
     }
-
-    container.innerHTML = html;
+    box.innerHTML = html;
   }
 
-  // 6. CHATBOT LOGIC (ENTER KEY & QUICK PROMPTS)
-  function openChatBot() {
-    document.getElementById('chatModal').style.display = 'flex';
-    document.getElementById('chatInput').focus();
+  function renderStudentEntryAccess() {
+    const box = document.getElementById('adminStudentEntryCard');
+    const isOwner = currentAdminRole === 'owner';
+    box.style.display = (isOwner || appState.permissions.perm_fee_edit) ? 'block' : 'none';
   }
 
-  function closeChatBot() {
-    document.getElementById('chatModal').style.display = 'none';
+  function renderBackupAccess() {
+    const box = document.getElementById('adminBackupCard');
+    const isOwner = currentAdminRole === 'owner';
+    box.style.display = (isOwner || appState.permissions.perm_backup) ? 'flex' : 'none';
   }
 
-  function sendQuickPrompt(topic) {
-    respondChat(topic);
-  }
+  function saveStudentFromAdmin() {
+    const phone = document.getElementById('adminNewPhone').value.trim().replace(/\D/g, '');
+    const name = document.getElementById('adminNewName').value.trim();
+    const paid = parseInt(document.getElementById('adminNewReceived').value) || 0;
+    const cohort = document.getElementById('adminNewCohort').value;
 
-  function submitChatMessage() {
-    const input = document.getElementById('chatInput');
-    const msg = input.value.trim();
-    if(!msg) return;
-    
-    appendMessage(msg, 'user');
-    input.value = '';
-    setTimeout(() => { respondChat(msg); }, 300);
-  }
+    if (!phone || !name) return;
 
-  function appendMessage(text, role) {
-    const box = document.getElementById('chatMessages');
-    const div = document.createElement('div');
-    div.className = `chat-msg msg-${role}`;
-    div.innerHTML = text;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-  }
+    appState.students[phone] = {
+      name: name,
+      cohort: cohort,
+      total: 50000,
+      received: paid,
+      status: paid >= 50000 ? "Active Paid" : "Active Grace",
+      rule10: paid >= 5000 ? "Cleared" : "Installment Due"
+    };
 
-  function respondChat(query) {
-    const q = query.toLowerCase();
-    let reply = "";
-
-    if(q.includes('timing') || q.includes('time') || q.includes('class')) {
-      reply = "🕒 <strong>Class Timings:</strong> Daily sham 5:30 PM se 7:00 PM PKT tak live session hota hai. Mon/Wed/Fri ko AI & Digital Growth aur Tue/Thu/Sat ko E-Commerce ki class hoti hai.";
-    } else if(q.includes('fee') || q.includes('5000') || q.includes('plan') || q.includes('kist')) {
-      reply = "💰 <strong>Mentorship Fee Plan:</strong> Total 50,000 package hai, jisay asan Rs. 5,000 mahana installments mein divide kiya gaya hai taake har student aasani se seekh sakay.";
-    } else if(q.includes('rule') || q.includes('10')) {
-      reply = "📜 <strong>Rule of 10:</strong> Har mahine ki 10 tareekh tak apni monthly fee slip submit karna zaroori hai. 10 ke baad portal automatically access lock kar deta hai.";
-    } else if(q.includes('studio') || q.includes('ad') || q.includes('commercial') || q.includes('rate')) {
-      reply = "🎬 <strong>Studio Production:</strong> Tier 1 Fast UGC hook ads 48 ghantay mein deliver hotay hain. Tier 2 high-end 3D VFX commercials customized brand package par banaye jatay hain.";
-    } else {
-      reply = `Aapke sawal ka automated jawab nahi mila. Aap direct official officer se WhatsApp par connect kar saktay hain:<br><br><a href="https://wa.me/923116246000?text=${encodeURIComponent(query)}" target="_blank" class="btn btn-emerald" style="font-size:11px; padding:6px 10px; text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp (+92 311 6246000)</a>`;
+    if (db) {
+      db.collection("portal").doc("system_state").set({ students: appState.students }, { merge: true });
     }
-
-    appendMessage(reply, 'bot');
+    alert(`Student ${name} successfully added!`);
+    document.getElementById('adminNewPhone').value = '';
+    document.getElementById('adminNewName').value = '';
+    document.getElementById('adminNewReceived').value = '';
   }
 
-  // 7. BACKUP IMPORT & EXPORT
-  function exportBackupData() {
+  function exportPortalBackup() {
     const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `GlobalGuru_Backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `GlobalGuru_Portal_Backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }
-
-  function importBackupData(event) {
-    const file = event.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const imported = JSON.parse(e.target.result);
-        if(imported.permissions && imported.students) {
-          appState = imported;
-          if(db) db.collection("portal").doc("system_state").set(appState);
-          alert("Backup kamyabi se restore ho gaya!");
-          renderAdminFinances();
-        }
-      } catch(err) {
-        alert("Ghalat JSON file format!");
-      }
-    };
-    reader.readAsText(file);
   }
 </script>
 
