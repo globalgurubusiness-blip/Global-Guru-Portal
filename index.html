@@ -24,7 +24,7 @@
       --primary-dark: #32070D;
       --gold: #D4AF37;
     }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0F172A; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0B0F19; }
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 24px; }
@@ -35,13 +35,14 @@
 </head>
 <body class="flex justify-center min-h-screen text-slate-800 antialiased selection:bg-amber-400">
 
-<div class="w-full max-w-md min-h-screen bg-slate-50 flex flex-col relative shadow-2xl border-x border-slate-200">
+<!-- Hybrid Container: Mobile par auto fit, Web/Desktop par wide spacious container -->
+<div class="w-full max-w-full md:max-w-4xl lg:max-w-6xl min-h-screen bg-slate-50 flex flex-col relative shadow-2xl md:border-x border-slate-200">
 
   <!-- ================================================= -->
   <!-- SCREEN 1: SPLASH & GOOGLE SIGN-IN ENTRY GATEWAY   -->
   <!-- ================================================= -->
   <div id="stage-login" class="flex-1 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#4A0E17]/10 via-slate-50 to-slate-100">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-slate-200">
+    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-slate-200">
       
       <!-- Official Logo Container -->
       <div class="relative inline-block mb-4">
@@ -67,23 +68,24 @@
   </div>
 
   <!-- ================================================= -->
-  <!-- SCREEN 2: ROLE SELECTION (LEARNER / CLIENT / ADMIN)-->
+  <!-- SCREEN 2: ROLE SELECTION (PUBLIC: LEARNER & CLIENT)-->
   <!-- ================================================= -->
-  <div id="stage-role-select" class="hidden flex-1 flex flex-col justify-center p-5 bg-gradient-to-b from-slate-50 to-slate-100">
-    <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-200 space-y-4">
+  <div id="stage-role-select" class="hidden flex-1 flex flex-col justify-center items-center p-5 bg-gradient-to-b from-slate-50 to-slate-100">
+    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-200 max-w-md w-full space-y-5">
       
+      <!-- Top GG Logo with Secret Triple Click Action -->
       <div class="text-center pb-2 border-b border-slate-100">
-        <div class="w-12 h-12 rounded-full bg-[#4A0E17]/10 flex items-center justify-center mx-auto mb-2 text-xl">
-          👋
+        <div onclick="handleLogoSecretClick()" title="GG Portal" class="cursor-pointer inline-block transform active:scale-95 transition">
+          <img src="logo.png" alt="GG Logo" class="w-14 h-14 rounded-full mx-auto object-contain border-2 border-[#D4AF37] shadow-md bg-white p-0.5" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GG&background=4A0E17&color=fff&size=128';">
         </div>
-        <h3 class="text-base font-extrabold text-slate-900">Welcome, <span id="authenticatedUserName">User</span></h3>
-        <p class="text-xs text-slate-400 mt-0.5">Apna role select karein taake portal configure ho sake:</p>
+        <h3 class="text-base font-extrabold text-slate-900 mt-2">Welcome, <span id="authenticatedUserName">User</span></h3>
+        <p class="text-xs text-slate-400 mt-0.5">Apna authorized portal option select karein:</p>
       </div>
 
-      <!-- 3 Role Options -->
+      <!-- Public Options (Super Admin is Hidden) -->
       <div class="space-y-3">
         <!-- Option 1: Learner -->
-        <div onclick="selectUserRole('learner')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-[#4A0E17] hover:bg-slate-50 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
+        <div onclick="openLearnerAuthModal()" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-[#4A0E17] hover:bg-slate-50 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-lg">🎓</div>
             <div>
@@ -95,7 +97,7 @@
         </div>
 
         <!-- Option 2: Client -->
-        <div onclick="selectUserRole('client')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-[#4A0E17] hover:bg-slate-50 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
+        <div onclick="openClientAuthModal()" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 hover:bg-emerald-50/30 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-lg">💼</div>
             <div>
@@ -105,21 +107,9 @@
           </div>
           <span class="text-xs font-bold text-emerald-700">Select →</span>
         </div>
-
-        <!-- Option 3: Super Admin -->
-        <div onclick="selectUserRole('admin')" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-[#4A0E17] hover:bg-slate-50 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-[#4A0E17] text-white flex items-center justify-center text-lg">👑</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900">Super Admin (Master Owner)</h4>
-              <p class="text-[11px] text-slate-400">Full Executive Switchboard & Finances</p>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-slate-900">Unlock →</span>
-        </div>
       </div>
 
-      <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-600 hover:text-rose-700 pt-2 block">
+      <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-600 hover:text-rose-700 pt-1 block">
         Sign Out / Change Account
       </button>
 
@@ -132,8 +122,8 @@
   <div id="stage-portal" class="hidden flex-1 flex flex-col relative">
 
     <!-- Top Navigation Header -->
-    <header class="bg-[#4A0E17] text-white p-3.5 flex justify-between items-center sticky top-0 z-30 shadow-md border-b-2 border-[#D4AF37]">
-      <div class="flex items-center gap-2.5">
+    <header class="bg-[#4A0E17] text-white p-3.5 md:px-8 flex justify-between items-center sticky top-0 z-30 shadow-md border-b-2 border-[#D4AF37]">
+      <div class="flex items-center gap-3">
         <img src="logo.png" alt="GG" class="w-9 h-9 rounded-full bg-white object-contain border border-[#D4AF37]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GG&background=4A0E17&color=fff&size=128';">
         <div>
           <h1 class="text-sm font-extrabold tracking-tight uppercase leading-tight">Global Guru</h1>
@@ -141,233 +131,321 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span id="activeRoleChip" class="text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider bg-white/20 text-white">Learner</span>
-        <button onclick="handleLogout()" title="Logout" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-white">
+      <div class="flex items-center gap-3">
+        <span id="activeRoleChip" class="text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-white/20 text-white">Learner</span>
+        <button onclick="handleLogout()" title="Logout" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-white">
           <i class="fa-solid fa-power-off"></i>
         </button>
       </div>
     </header>
 
     <!-- Sub Header Bar -->
-    <div class="bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 flex justify-between items-center border-b border-slate-200">
-      <span id="portalViewHeading" class="font-bold text-slate-700">🏠 Overview</span>
+    <div class="bg-slate-100 px-4 md:px-8 py-2.5 text-xs font-semibold text-slate-500 flex justify-between items-center border-b border-slate-200">
+      <span id="portalViewHeading" class="font-bold text-slate-700">🏠 Overview Dashboard</span>
       <span class="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Cloud Live
       </span>
     </div>
 
-    <!-- VIEWS SCROLLER CONTAINER -->
-    <div class="flex-1 overflow-y-auto pb-24 p-4 space-y-4">
+    <!-- VIEWS SCROLLER CONTAINER (Hybrid Grid Layout for Desktop) -->
+    <div class="flex-1 overflow-y-auto pb-24 p-4 md:p-8 space-y-6">
 
       <!-- VIEW A: LEARNER PORTAL (Classes & Mera Khata) -->
-      <div id="view-learner" class="space-y-4 hidden">
-        <div class="bg-gradient-to-br from-[#4A0E17] to-[#2B080D] text-white p-5 rounded-3xl shadow-lg border border-amber-500/30">
-          <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 bg-white/10 px-2.5 py-1 rounded-full">Student Portal</span>
-          <h2 class="text-lg font-extrabold mt-3 tracking-tight">Mentorship Batches</h2>
-          <p class="text-xs text-slate-200 mt-1">Live AI & E-Commerce Cohorts schedule aur details:</p>
-          <div class="mt-4 pt-3 border-t border-white/10 flex gap-2">
-            <span class="text-xs bg-white/10 px-3 py-1 rounded-lg">🕒 5:30 PM - 7:00 PM PKT</span>
+      <div id="view-learner" class="space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-gradient-to-br from-[#4A0E17] to-[#2B080D] text-white p-6 rounded-3xl shadow-lg border border-amber-500/30 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 bg-white/10 px-2.5 py-1 rounded-full">Student Portal</span>
+              <h2 class="text-xl font-extrabold mt-3 tracking-tight">Mentorship Batches</h2>
+              <p class="text-xs text-slate-200 mt-1">Live AI & E-Commerce Cohorts schedule aur details:</p>
+            </div>
+            <div class="mt-6 pt-3 border-t border-white/10 flex gap-2">
+              <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl font-bold">🕒 5:30 PM - 7:00 PM PKT</span>
+            </div>
           </div>
-        </div>
 
-        <!-- Mera Khata Live Verification Form (Enter Key Responsive) -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-          <div class="flex justify-between items-center">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Mera Khata (Fee Verification)</h3>
-            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Live Verification</span>
+          <!-- Mera Khata Live Verification Form -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-center">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Mera Khata (Fee Verification)</h3>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Live Verification</span>
+            </div>
+            <p class="text-xs text-slate-500">Apna registered WhatsApp number enter karein aur <strong>Enter</strong> press karein:</p>
+            
+            <form onsubmit="event.preventDefault(); runKhataSearch();" class="flex gap-2">
+              <input type="text" id="khataInput" placeholder="e.g. 03001112233" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#4A0E17]/20 focus:border-[#4A0E17]">
+              <button type="submit" class="px-4 py-2.5 bg-[#4A0E17] text-white rounded-xl text-xs font-bold hover:bg-[#681522] transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+              </button>
+            </form>
+
+            <div id="khataResultBox" class="pt-1"></div>
           </div>
-          <p class="text-xs text-slate-500">Apna registered WhatsApp number enter karein aur <strong>Enter</strong> press karein:</p>
-          
-          <form onsubmit="event.preventDefault(); runKhataSearch();" class="flex gap-2">
-            <input type="text" id="khataInput" placeholder="e.g. 03001112233" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#4A0E17]/20 focus:border-[#4A0E17]">
-            <button type="submit" class="px-4 py-2.5 bg-[#4A0E17] text-white rounded-xl text-xs font-bold hover:bg-[#681522] transition flex items-center gap-1.5 shadow-sm">
-              <i class="fa-solid fa-magnifying-glass"></i> Search
-            </button>
-          </form>
-
-          <div id="khataResultBox" class="pt-1"></div>
         </div>
       </div>
 
       <!-- VIEW B: CLIENT PORTAL (Commercial Production & Order Desk) -->
-      <div id="view-client" class="space-y-4 hidden">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-5 rounded-3xl shadow-lg border border-slate-700">
+      <div id="view-client" class="space-y-6 hidden">
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-700">
           <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-white/10 px-2.5 py-1 rounded-full">Creative Agency Studio</span>
-          <h2 class="text-lg font-extrabold mt-3 tracking-tight">Commercial Production</h2>
+          <h2 class="text-xl font-extrabold mt-3 tracking-tight">Commercial Production & Media Ads</h2>
           <p class="text-xs text-slate-300 mt-1">High-converting UGC video hooks aur cinematic 3D commercials.</p>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-          <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Production Packages</h3>
-          
-          <div class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1">
-            <div class="flex justify-between items-center">
-              <strong class="text-xs text-emerald-900">Tier 1 UGC Hook Ads</strong>
-              <span class="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">48h Delivery</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Production Packages</h3>
+            
+            <div class="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 space-y-1">
+              <div class="flex justify-between items-center">
+                <strong class="text-xs text-emerald-900">Tier 1 UGC Hook Ads</strong>
+                <span class="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">48h Delivery</span>
+              </div>
+              <p class="text-[11px] text-slate-600">TikTok, Instagram Reels & Meta Ads ke liye high-converting hooks.</p>
             </div>
-            <p class="text-[11px] text-slate-600">TikTok, Instagram Reels & Meta Ads ke liye high-converting hooks.</p>
+
+            <div class="p-4 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-1">
+              <div class="flex justify-between items-center">
+                <strong class="text-xs text-amber-900">Tier 2 3D / VFX CGI Commercials</strong>
+                <span class="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Premium TVC</span>
+              </div>
+              <p class="text-[11px] text-slate-600">Cinematic 3D lighting, bottle liquid simulations & premium branding.</p>
+            </div>
           </div>
 
-          <div class="p-3 rounded-xl border border-amber-200 bg-amber-50/50 space-y-1">
-            <div class="flex justify-between items-center">
-              <strong class="text-xs text-amber-900">Tier 2 3D / VFX CGI Commercials</strong>
-              <span class="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Premium TVC</span>
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Client Quotation Desk</h3>
+              <p class="text-xs text-slate-500 mt-2">Apne customized campaign ki requirements studio manager ke sath discuss karein aur live quote hasil karein.</p>
             </div>
-            <p class="text-[11px] text-slate-600">Cinematic 3D lighting, bottle liquid simulations & premium branding.</p>
-          </div>
 
-          <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20I%20want%20to%20order%20commercial%20production" target="_blank" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md">
-            <i class="fa-brands fa-whatsapp text-sm"></i> Order on WhatsApp (+92 311 6246000)
-          </a>
+            <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20I%20want%20to%20order%20commercial%20production" target="_blank" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md">
+              <i class="fa-brands fa-whatsapp text-sm"></i> Order on WhatsApp (+92 311 6246000)
+            </a>
+          </div>
         </div>
       </div>
 
       <!-- VIEW C: SUPER ADMIN PORTAL (7 SWITCHES & SENSITIVE FINANCES) -->
-      <div id="view-admin" class="space-y-4 hidden">
-        
-        <!-- Master Owner Switchboard (ALL 7 CONTROLS) -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 border-l-4 border-amber-400">
-          <div class="flex justify-between items-center">
-            <div>
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Master Owner Switchboard</h4>
-              <p class="text-[11px] text-slate-400 mt-0.5">Control live operational visibility:</p>
+      <div id="view-admin" class="space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Master Owner Switchboard (ALL 7 CONTROLS) -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 border-l-4 border-amber-400">
+            <div class="flex justify-between items-center">
+              <div>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Master Owner Switchboard</h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Control live operational visibility:</p>
+              </div>
+              <span class="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md">7 Controls Active</span>
             </div>
-            <span class="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md">7 Controls Active</span>
+
+            <div class="divide-y divide-slate-100 text-xs">
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">1. Bank Balances Access</strong><p class="text-[10px] text-slate-400">Meezan, Easypaisa, JazzCash</p></div>
+                <label class="switch"><input type="checkbox" id="perm_bank" onchange="updateSwitch('perm_bank', this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">2. Galla (Cash Vault) Access</strong><p class="text-[10px] text-slate-400">Physical drawer cash balance</p></div>
+                <label class="switch"><input type="checkbox" id="perm_vault" onchange="updateSwitch('perm_vault', this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">3. Net Profit Calculations</strong><p class="text-[10px] text-slate-400">Calculated margin metrics</p></div>
+                <label class="switch"><input type="checkbox" id="perm_profit" onchange="updateSwitch('perm_profit', this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">4. Student Directory View</strong><p class="text-[10px] text-slate-400">Registered phone directory</p></div>
+                <label class="switch"><input type="checkbox" id="perm_students" onchange="updateSwitch('perm_students', this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">5. Fee Editing & Slips Approval</strong><p class="text-[10px] text-slate-400">Direct admission & fee entries</p></div>
+                <label class="switch"><input type="checkbox" id="perm_fee_edit" onchange="updateSwitch('perm_fee_edit', this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">6. Batch & Schedule Management</strong><p class="text-[10px] text-slate-400">Timing updates aur cohorts</p></div>
+                <label class="switch"><input type="checkbox" id="perm_schedule" onchange="updateSwitch('perm_schedule', this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="py-2.5 flex justify-between items-center">
+                <div><strong class="text-slate-800">7. System Backups Access</strong><p class="text-[10px] text-slate-400">JSON/CSV download clearance</p></div>
+                <label class="switch"><input type="checkbox" id="perm_backup" onchange="updateSwitch('perm_backup', this.checked)"><span class="slider"></span></label>
+              </div>
+            </div>
           </div>
 
-          <div class="divide-y divide-slate-100 text-xs">
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">1. Bank Balances Access</strong><p class="text-[10px] text-slate-400">Meezan, Easypaisa, JazzCash</p></div>
-              <label class="switch"><input type="checkbox" id="perm_bank" onchange="updateSwitch('perm_bank', this.checked)"><span class="slider"></span></label>
+          <div class="space-y-6">
+            <!-- Financial Overview Card -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Ecosystem Financial Balances</h4>
+              <div id="adminFinancesDisplay" class="space-y-2 text-xs"></div>
             </div>
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">2. Galla (Cash Vault) Access</strong><p class="text-[10px] text-slate-400">Physical drawer cash balance</p></div>
-              <label class="switch"><input type="checkbox" id="perm_vault" onchange="updateSwitch('perm_vault', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">3. Net Profit Calculations</strong><p class="text-[10px] text-slate-400">Calculated margin metrics</p></div>
-              <label class="switch"><input type="checkbox" id="perm_profit" onchange="updateSwitch('perm_profit', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">4. Student Directory View</strong><p class="text-[10px] text-slate-400">Registered phone directory</p></div>
-              <label class="switch"><input type="checkbox" id="perm_students" onchange="updateSwitch('perm_students', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">5. Fee Editing & Slips Approval</strong><p class="text-[10px] text-slate-400">Direct admission & fee entries</p></div>
-              <label class="switch"><input type="checkbox" id="perm_fee_edit" onchange="updateSwitch('perm_fee_edit', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">6. Batch & Schedule Management</strong><p class="text-[10px] text-slate-400">Timing updates aur cohorts</p></div>
-              <label class="switch"><input type="checkbox" id="perm_schedule" onchange="updateSwitch('perm_schedule', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="py-2 flex justify-between items-center">
-              <div><strong class="text-slate-800">7. System Backups Access</strong><p class="text-[10px] text-slate-400">JSON/CSV download clearance</p></div>
-              <label class="switch"><input type="checkbox" id="perm_backup" onchange="updateSwitch('perm_backup', this.checked)"><span class="slider"></span></label>
+
+            <!-- Add New Student Record Form -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Add New Student Entry</h4>
+              <form onsubmit="event.preventDefault(); saveStudentEntry();" class="space-y-2.5">
+                <input type="text" id="newStdPhone" placeholder="WhatsApp (0300...)" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+                <input type="text" id="newStdName" placeholder="Student Full Name" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" id="newStdAmount" placeholder="Paid Amount (Rs.)" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+                  <select id="newStdCohort" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+                    <option value="Cohort AI-01">Cohort AI-01</option>
+                    <option value="Cohort ECOM-04">Cohort ECOM-04</option>
+                  </select>
+                </div>
+                <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+                  <i class="fa-solid fa-plus"></i> Save Student Fee
+                </button>
+              </form>
             </div>
           </div>
-        </div>
 
-        <!-- Financial Overview Card -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-          <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Ecosystem Financial Balances</h4>
-          <div id="adminFinancesDisplay" class="space-y-2 text-xs"></div>
-        </div>
-
-        <!-- Add New Student Record Form (Enter Key Responsive) -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-          <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Add New Student Entry</h4>
-          <form onsubmit="event.preventDefault(); saveStudentEntry();" class="space-y-2.5">
-            <input type="text" id="newStdPhone" placeholder="WhatsApp (0300...)" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-            <input type="text" id="newStdName" placeholder="Student Full Name" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-            <div class="grid grid-cols-2 gap-2">
-              <input type="number" id="newStdAmount" placeholder="Paid Amount (Rs.)" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-              <select id="newStdCohort" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-                <option value="Cohort AI-01">AI-01</option>
-                <option value="Cohort ECOM-04">ECOM-04</option>
-              </select>
-            </div>
-            <button type="submit" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
-              <i class="fa-solid fa-plus"></i> Save Student Fee
-            </button>
-          </form>
         </div>
       </div>
 
       <!-- CONNECT ACROSS PLATFORMS (ALL OFFICIAL SOCIALS) -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
         <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Connect Across Platforms</h4>
-        <div class="grid grid-cols-5 gap-2">
+        
+        <div class="grid grid-cols-5 gap-2 md:gap-4">
           <!-- YouTube -->
-          <a href="https://www.youtube.com/@globalguruofficial1" target="_blank" title="YouTube" class="flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-slate-200 hover:border-red-500 transition active:scale-95 shadow-sm">
-            <svg class="w-5 h-5 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            <span class="text-[8px] font-bold text-slate-700 mt-1">YouTube</span>
+          <a href="https://www.youtube.com/@globalguruofficial1" target="_blank" title="YouTube" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-red-500 transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1">YouTube</span>
           </a>
           <!-- Facebook -->
-          <a href="https://web.facebook.com/globalguruofficial1" target="_blank" title="Facebook" class="flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-slate-200 hover:border-blue-600 transition active:scale-95 shadow-sm">
-            <svg class="w-5 h-5 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            <span class="text-[8px] font-bold text-slate-700 mt-1">Facebook</span>
+          <a href="https://web.facebook.com/globalguruofficial1" target="_blank" title="Facebook" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-blue-600 transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1">Facebook</span>
           </a>
           <!-- Instagram -->
-          <a href="https://instagram.com/globalguruofficial1" target="_blank" title="Instagram" class="flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-slate-200 hover:border-pink-500 transition active:scale-95 shadow-sm">
-            <svg class="w-5 h-5 text-[#E4405F]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            <span class="text-[8px] font-bold text-slate-700 mt-1">Instagram</span>
+          <a href="https://instagram.com/globalguruofficial1" target="_blank" title="Instagram" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-pink-500 transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-[#E4405F]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1">Instagram</span>
           </a>
           <!-- TikTok -->
-          <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" title="TikTok" class="flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-slate-200 hover:border-black transition active:scale-95 shadow-sm">
-            <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v9.09c-.03 2.01-.84 4.02-2.34 5.37-1.63 1.49-3.92 2.16-6.09 1.81-2.2-.33-4.22-1.67-5.35-3.58-1.16-1.92-1.34-4.37-.5-6.38.86-2.02 2.72-3.53 4.88-3.99.78-.17 1.58-.2 2.37-.12v4.22c-.61-.08-1.25-.01-1.83.21-.82.3-1.49.95-1.83 1.76-.36.85-.31 1.84.14 2.64.44.8 1.25 1.36 2.15 1.49.99.16 2.04-.15 2.77-.85.66-.63 1.05-1.53 1.05-2.45V.02h.65z"/></svg>
-            <span class="text-[8px] font-bold text-slate-700 mt-1">TikTok</span>
+          <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" title="TikTok" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-black transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v9.09c-.03 2.01-.84 4.02-2.34 5.37-1.63 1.49-3.92 2.16-6.09 1.81-2.2-.33-4.22-1.67-5.35-3.58-1.16-1.92-1.34-4.37-.5-6.38.86-2.02 2.72-3.53 4.88-3.99.78-.17 1.58-.2 2.37-.12v4.22c-.61-.08-1.25-.01-1.83.21-.82.3-1.49.95-1.83 1.76-.36.85-.31 1.84.14 2.64.44.8 1.25 1.36 2.15 1.49.99.16 2.04-.15 2.77-.85.66-.63 1.05-1.53 1.05-2.45V.02h.65z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1">TikTok</span>
           </a>
           <!-- Threads -->
-          <a href="https://www.threads.net/@globalguruofficial1" target="_blank" title="Threads" class="flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-slate-200 hover:border-black transition active:scale-95 shadow-sm">
-            <svg class="w-5 h-5 text-black" viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2109 139.019 87.8456C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.5727 72.8138C81.0827 64.4538 89.2612 60.7788 97.2341 60.7788C110.748 60.7788 119.537 69.6013 120.487 84.1506C113.626 83.1756 106.376 82.8093 98.7188 83.0569C72.0625 83.9169 55.4544 98.2431 56.0969 119.349C56.7088 139.467 73.0688 152.012 94.0625 152.012C108.799 152.012 119.981 145.474 126.791 133.029C132.846 144.159 143.141 150.144 157.069 150.144C174.197 150.144 186.281 138.834 186.281 118.892C186.281 83.2181 158.469 64.9125 120.891 64.9125C78.435 64.9125 47.9625 87.9712 47.9625 125.683C47.9625 152.128 66.525 170.835 96.0938 170.835C112.575 170.835 126.338 165.176 135.038 154.512L147.244 165.816C134.906 180.705 116.794 187.688 96.0938 187.688C56.2875 187.688 30.7125 162.248 30.7125 125.683C30.7125 76.5412 69.4125 48.0675 120.891 48.0675C170.775 48.0675 203.531 73.7437 203.531 118.892C203.531 148.164 184.95 166.995 157.069 166.995C139.631 166.995 127.144 158.625 121.284 144.188C114.712 153.281 104.981 157.942 93.6844 157.942C77.475 157.942 65.5125 147.536 64.9969 131.627C64.4469 114.675 77.2969 103.568 98.2406 102.898C105.797 102.656 113.128 103.181 120.084 104.426C118.912 95.8425 112.444 89.9625 101.466 89.9625C95.4281 89.9625 89.8781 92.205 85.9406 96.225L75.6094 84.8812C81.8531 78.4725 90.75 74.8725 101.466 74.8725C119.869 74.8725 133.725 84.7725 136.003 103.886C137.944 104.839 139.791 105.889 141.537 107.031V88.9883ZM120.084 117.892C113.888 116.897 107.381 116.488 100.678 116.702C88.2469 117.098 79.9594 122.951 80.2875 131.957C80.6062 140.719 88.7531 146.104 99.4594 146.104C108.975 146.104 116.634 140.404 120.084 130.414V117.892Z"/></svg>
-            <span class="text-[8px] font-bold text-slate-700 mt-1">Threads</span>
+          <a href="https://www.threads.net/@globalguruofficial1" target="_blank" title="Threads" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-black transition active:scale-95 shadow-sm">
+            <svg class="w-6 h-6 text-black" viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2109 139.019 87.8456C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.5727 72.8138C81.0827 64.4538 89.2612 60.7788 97.2341 60.7788C110.748 60.7788 119.537 69.6013 120.487 84.1506C113.626 83.1756 106.376 82.8093 98.7188 83.0569C72.0625 83.9169 55.4544 98.2431 56.0969 119.349C56.7088 139.467 73.0688 152.012 94.0625 152.012C108.799 152.012 119.981 145.474 126.791 133.029C132.846 144.159 143.141 150.144 157.069 150.144C174.197 150.144 186.281 138.834 186.281 118.892C186.281 83.2181 158.469 64.9125 120.891 64.9125C78.435 64.9125 47.9625 87.9712 47.9625 125.683C47.9625 152.128 66.525 170.835 96.0938 170.835C112.575 170.835 126.338 165.176 135.038 154.512L147.244 165.816C134.906 180.705 116.794 187.688 96.0938 187.688C56.2875 187.688 30.7125 162.248 30.7125 125.683C30.7125 76.5412 69.4125 48.0675 120.891 48.0675C170.775 48.0675 203.531 73.7437 203.531 118.892C203.531 148.164 184.95 166.995 157.069 166.995C139.631 166.995 127.144 158.625 121.284 144.188C114.712 153.281 104.981 157.942 93.6844 157.942C77.475 157.942 65.5125 147.536 64.9969 131.627C64.4469 114.675 77.2969 103.568 98.2406 102.898C105.797 102.656 113.128 103.181 120.084 104.426C118.912 95.8425 112.444 89.9625 101.466 89.9625C95.4281 89.9625 89.8781 92.205 85.9406 96.225L75.6094 84.8812C81.8531 78.4725 90.75 74.8725 101.466 74.8725C119.869 74.8725 133.725 84.7725 136.003 103.886C137.944 104.839 139.791 105.889 141.537 107.031V88.9883ZM120.084 117.892C113.888 116.897 107.381 116.488 100.678 116.702C88.2469 117.098 79.9594 122.951 80.2875 131.957C80.6062 140.719 88.7531 146.104 99.4594 146.104C108.975 146.104 116.634 140.404 120.084 130.414V117.892Z"/></svg>
+            <span class="text-[9px] font-bold text-slate-700 mt-1">Threads</span>
           </a>
         </div>
 
-        <a href="https://linktr.ee/Globalguruofficial1" target="_blank" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 transition">
-          <div class="flex items-center gap-2">
-            <span class="text-base">🌲</span>
-            <div>
-              <p class="text-xs font-bold text-slate-800">All Official Ecosystem Links</p>
-              <p class="text-[10px] text-slate-400">linktr.ee/Globalguruofficial1</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+          <a href="https://linktr.ee/Globalguruofficial1" target="_blank" class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 transition">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🌲</span>
+              <div>
+                <p class="text-xs font-bold text-slate-800">All Official Ecosystem Links</p>
+                <p class="text-[10px] text-slate-400">linktr.ee/Globalguruofficial1</p>
+              </div>
             </div>
-          </div>
-          <span class="text-xs font-bold text-emerald-700">Open →</span>
-        </a>
+            <span class="text-xs font-bold text-emerald-700">Open →</span>
+          </a>
 
-        <!-- Official Support WhatsApp -->
-        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="w-full flex items-center justify-between p-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">💬</div>
-            <div>
-              <p class="text-xs font-black tracking-wide">WhatsApp Support Desk</p>
-              <p class="text-[10px] text-emerald-100 font-medium">+92 311 6246000 (0311-6246000)</p>
+          <!-- Official Support WhatsApp -->
+          <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">💬</div>
+              <div>
+                <p class="text-xs font-black tracking-wide">WhatsApp Support Desk</p>
+                <p class="text-[10px] text-emerald-100 font-medium">+92 311 6246000 (0311-6246000)</p>
+              </div>
             </div>
-          </div>
-          <span class="text-[10px] font-black bg-white text-emerald-800 px-2.5 py-1 rounded-xl">Chat Now →</span>
-        </a>
+            <span class="text-[10px] font-black bg-white text-emerald-800 px-3 py-1.5 rounded-xl">Chat Now →</span>
+          </a>
+        </div>
       </div>
 
     </div>
 
-    <!-- Bottom Navigation Bar (Dynamic According to Role) -->
-    <nav class="fixed bottom-0 max-w-md w-full bg-white border-t border-slate-200 flex z-30 shadow-lg" id="portalBottomNav">
-      <!-- Injected Dynamically Based on Role -->
+    <!-- Bottom Navigation Bar (Dynamic Based on Role) -->
+    <nav class="fixed md:sticky bottom-0 max-w-full md:max-w-4xl lg:max-w-6xl w-full bg-white border-t border-slate-200 flex z-30 shadow-lg" id="portalBottomNav">
     </nav>
   </div>
 
   <!-- ================================================= -->
-  <!-- MODAL: SUPER ADMIN MASTER PIN AUTHENTICATION     -->
+  <!-- MODAL: LEARNER VERIFICATION (WHATSAPP + BATCH)     -->
   <!-- ================================================= -->
-  <div id="adminPinModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white max-w-xs w-full rounded-3xl p-6 shadow-2xl space-y-4 animate-in border border-slate-100">
+  <div id="learnerAuthModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-sm w-full rounded-3xl p-6 md:p-8 shadow-2xl space-y-4 border border-slate-100 animate-in">
+      <div class="text-center">
+        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 text-xl flex items-center justify-center mx-auto mb-2">🎓</div>
+        <h3 class="text-base font-extrabold text-slate-900">Student Portal Access</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Enter your enrolled details to unlock</p>
+      </div>
+
+      <form onsubmit="event.preventDefault(); verifyLearnerAccess();" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 block mb-1">REGISTERED WHATSAPP NUMBER</label>
+          <input type="text" id="authLearnerPhone" placeholder="e.g. 03001112233" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#4A0E17]">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 block mb-1">ALLOTED BATCH CODE</label>
+          <input type="text" id="authLearnerBatch" placeholder="e.g. AI-01 ya ECOM-04" required class="w-full uppercase px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#4A0E17]">
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-[#4A0E17] hover:bg-[#681522] text-white rounded-xl text-xs font-bold transition shadow-md">
+          Verify & Enter
+        </button>
+      </form>
+
+      <span id="learnerAuthError" class="hidden text-center text-xs font-bold text-rose-600 block">Record verify nahi hua! Sahi WhatsApp aur Batch code enter karein.</span>
+
+      <button onclick="closeLearnerAuthModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
+        Cancel / Back
+      </button>
+    </div>
+  </div>
+
+  <!-- ================================================= -->
+  <!-- MODAL: CLIENT VERIFICATION (WHATSAPP + CODE)      -->
+  <!-- ================================================= -->
+  <div id="clientAuthModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-sm w-full rounded-3xl p-6 md:p-8 shadow-2xl space-y-4 border border-slate-100 animate-in">
+      <div class="text-center">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 text-xl flex items-center justify-center mx-auto mb-2">💼</div>
+        <h3 class="text-base font-extrabold text-slate-900">Commercial Studio Access</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Enter authorized business client details</p>
+      </div>
+
+      <form onsubmit="event.preventDefault(); verifyClientAccess();" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 block mb-1">BUSINESS WHATSAPP NUMBER</label>
+          <input type="text" id="authClientPhone" placeholder="e.g. 03116246000" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-emerald-600">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 block mb-1">CLIENT ACCESS CODE (OR ENTER 'GG-CLIENT-2026')</label>
+          <input type="text" id="authClientCode" placeholder="Enter Client Code" required class="w-full uppercase px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-emerald-600">
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-md">
+          Verify & Enter
+        </button>
+      </form>
+
+      <span id="clientAuthError" class="hidden text-center text-xs font-bold text-rose-600 block">Invalid Client Code! Sahi code provide karein ya Studio desk se rabta karein.</span>
+
+      <button onclick="closeClientAuthModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
+        Cancel / Back
+      </button>
+    </div>
+  </div>
+
+  <!-- ================================================= -->
+  <!-- MODAL: SECRET SUPER ADMIN TRIPLE-TAP PIN MODAL    -->
+  <!-- ================================================= -->
+  <div id="adminPinModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-xs w-full rounded-3xl p-6 shadow-2xl space-y-4 animate-in border border-amber-300">
       <div class="text-center">
         <div class="w-12 h-12 rounded-full bg-[#4A0E17] text-amber-300 font-extrabold text-lg flex items-center justify-center mx-auto mb-2 border-2 border-[#D4AF37]">
           GG
         </div>
-        <h3 class="text-base font-extrabold text-slate-900">Super Admin Security</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Enter Master Owner Clearance PIN</p>
+        <h3 class="text-base font-extrabold text-slate-900">Master Owner Security</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Secret Executive PIN Entry</p>
       </div>
 
       <form onsubmit="event.preventDefault(); verifySuperAdminPin();" class="space-y-3">
@@ -380,7 +458,7 @@
       <span id="pinErrorAlert" class="hidden text-center text-xs font-bold text-rose-600 block">Ghalat PIN code! Access Denied.</span>
       
       <button onclick="closeAdminPinModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
-        Cancel / Back to Role Selection
+        Cancel / Back
       </button>
     </div>
   </div>
@@ -388,7 +466,7 @@
 </div>
 
 <script>
-  // 1. FIREBASE INITIALIZATION & REDIRECT HANDLER (UPDATED ACTIVE KEY)
+  // 1. FIREBASE INITIALIZATION & REDIRECT HANDLER (ACTIVE API KEY)
   const firebaseConfig = {
     apiKey: "AIzaSyBTQT43EnFY4P2KcqFEJwNlx1VUKAiNdM4",
     authDomain: "global-guru-portal.firebaseapp.com",
@@ -404,6 +482,8 @@
   let currentUser = null;
   let selectedRole = null;
   let isLoggingIn = false;
+  let logoClickCount = 0;
+  let logoClickTimer = null;
 
   let appState = {
     permissions: {
@@ -416,8 +496,11 @@
       perm_backup: false
     },
     students: {
-      "03001112233": { name: "Ali Raza", cohort: "Cohort AI-01", total: 50000, received: 50000, status: "Active Paid", rule10: "Cleared" },
-      "03004445566": { name: "Muhammad Hamza", cohort: "Cohort AI-01", total: 50000, received: 15000, status: "Active Grace", rule10: "Installment Due" }
+      "03001112233": { name: "Ali Raza", cohort: "Cohort AI-01", batchCode: "AI-01", total: 50000, received: 50000, status: "Active Paid", rule10: "Cleared" },
+      "03004445566": { name: "Muhammad Hamza", cohort: "Cohort AI-01", batchCode: "AI-01", total: 50000, received: 15000, status: "Active Grace", rule10: "Installment Due" }
+    },
+    clients: {
+      "03116246000": { name: "Creative Brand Desk", code: "GG-CLIENT-2026" }
     },
     finances: {
       meezan: "Rs. 420,000",
@@ -469,7 +552,7 @@
     document.getElementById('authenticatedUserName').innerText = user.displayName || user.email.split('@')[0];
   }
 
-  // 2. ROBUST GOOGLE SIGN-IN HANDLER
+  // 2. GOOGLE SIGN-IN HANDLER
   function handleGoogleSignIn() {
     if (isLoggingIn) return;
     isLoggingIn = true;
@@ -518,9 +601,13 @@
     document.getElementById('stage-login').classList.remove('hidden');
   }
 
-  // 3. ROLE SELECTION & SECURITY GATES
-  function selectUserRole(role) {
-    if (role === 'admin') {
+  // 3. TRIPLE TAP LOGO TRIGGER FOR SUPER ADMIN
+  function handleLogoSecretClick() {
+    logoClickCount++;
+    clearTimeout(logoClickTimer);
+    
+    if (logoClickCount === 3) {
+      logoClickCount = 0;
       document.getElementById('secretPinInput').value = '';
       document.getElementById('pinErrorAlert').classList.add('hidden');
       document.getElementById('adminPinModal').classList.remove('hidden');
@@ -528,8 +615,9 @@
       return;
     }
 
-    selectedRole = role;
-    launchPortal();
+    logoClickTimer = setTimeout(() => {
+      logoClickCount = 0;
+    }, 700);
   }
 
   function verifySuperAdminPin() {
@@ -550,7 +638,71 @@
     document.getElementById('adminPinModal').classList.add('hidden');
   }
 
-  // 4. LAUNCH ROLE-SPECIFIC PORTAL
+  // 4. LEARNER VERIFICATION (WHATSAPP + BATCH CODE)
+  function openLearnerAuthModal() {
+    document.getElementById('authLearnerPhone').value = '';
+    document.getElementById('authLearnerBatch').value = '';
+    document.getElementById('learnerAuthError').classList.add('hidden');
+    document.getElementById('learnerAuthModal').classList.remove('hidden');
+  }
+
+  function closeLearnerAuthModal() {
+    document.getElementById('learnerAuthModal').classList.add('hidden');
+  }
+
+  function verifyLearnerAccess() {
+    const phone = document.getElementById('authLearnerPhone').value.trim().replace(/\D/g, '');
+    const batch = document.getElementById('authLearnerBatch').value.trim().toUpperCase().replace(/\s+/g, '');
+    const err = document.getElementById('learnerAuthError');
+    err.classList.add('hidden');
+
+    const s = appState.students[phone];
+    if (s && (s.batchCode === batch || s.cohort.toUpperCase().includes(batch))) {
+      selectedRole = 'learner';
+      closeLearnerAuthModal();
+      launchPortal();
+      // Auto populate search box with this phone
+      setTimeout(() => {
+        const ki = document.getElementById('khataInput');
+        if (ki) {
+          ki.value = phone;
+          runKhataSearch();
+        }
+      }, 300);
+    } else {
+      err.classList.remove('hidden');
+    }
+  }
+
+  // 5. CLIENT VERIFICATION (WHATSAPP + CLIENT ACCESS CODE)
+  function openClientAuthModal() {
+    document.getElementById('authClientPhone').value = '';
+    document.getElementById('authClientCode').value = '';
+    document.getElementById('clientAuthError').classList.add('hidden');
+    document.getElementById('clientAuthModal').classList.remove('hidden');
+  }
+
+  function closeClientAuthModal() {
+    document.getElementById('clientAuthModal').classList.add('hidden');
+  }
+
+  function verifyClientAccess() {
+    const phone = document.getElementById('authClientPhone').value.trim().replace(/\D/g, '');
+    const code = document.getElementById('authClientCode').value.trim().toUpperCase();
+    const err = document.getElementById('clientAuthError');
+    err.classList.add('hidden');
+
+    // Default universal demo code or specific registered client code
+    if (code === 'GG-CLIENT-2026' || (appState.clients[phone] && appState.clients[phone].code === code)) {
+      selectedRole = 'client';
+      closeClientAuthModal();
+      launchPortal();
+    } else {
+      err.classList.remove('hidden');
+    }
+  }
+
+  // 6. LAUNCH ROLE-SPECIFIC PORTAL
   function launchPortal() {
     document.getElementById('stage-role-select').classList.add('hidden');
     document.getElementById('stage-portal').classList.remove('hidden');
@@ -565,52 +717,52 @@
 
     if (selectedRole === 'learner') {
       roleChip.innerText = "Learner";
-      roleChip.className = "text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider bg-amber-400 text-slate-900";
+      roleChip.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-amber-400 text-slate-900";
       subTag.innerText = "Student Mentorship Hub";
       document.getElementById('view-learner').classList.remove('hidden');
       
       nav.innerHTML = `
-        <button class="flex-1 py-2.5 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17]">
+        <button class="flex-1 py-3 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17]">
           <span>🎓</span> Mentorship
         </button>
-        <button onclick="document.getElementById('khataInput').focus()" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
+        <button onclick="document.getElementById('khataInput').focus()" class="flex-1 py-3 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
           <span>🧾</span> Mera Khata
         </button>
       `;
     } else if (selectedRole === 'client') {
       roleChip.innerText = "Client";
-      roleChip.className = "text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider bg-emerald-400 text-slate-900";
+      roleChip.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-emerald-400 text-slate-900";
       subTag.innerText = "Creative Studio Hub";
       document.getElementById('view-client').classList.remove('hidden');
 
       nav.innerHTML = `
-        <button class="flex-1 py-2.5 text-center text-emerald-800 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600">
+        <button class="flex-1 py-3 text-center text-emerald-800 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600">
           <span>🎬</span> Services
         </button>
-        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Services" target="_blank" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
+        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Services" target="_blank" class="flex-1 py-3 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
           <span>💬</span> WhatsApp Desk
         </a>
       `;
     } else if (selectedRole === 'admin') {
       roleChip.innerText = "Super Admin";
-      roleChip.className = "text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider bg-rose-500 text-white";
+      roleChip.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-rose-500 text-white";
       subTag.innerText = "Executive Switchboard";
       document.getElementById('view-admin').classList.remove('hidden');
       renderAdminFinances();
       syncSwitchCheckboxes();
 
       nav.innerHTML = `
-        <button class="flex-1 py-2.5 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17] bg-amber-50/50">
+        <button class="flex-1 py-3 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17] bg-amber-50/50">
           <span>🛡️</span> Switchboard
         </button>
-        <button onclick="document.getElementById('newStdPhone').focus()" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
+        <button onclick="document.getElementById('newStdPhone').focus()" class="flex-1 py-3 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
           <span>➕</span> Add Student
         </button>
       `;
     }
   }
 
-  // 5. MERA KHATA SEARCH
+  // 7. MERA KHATA SEARCH (ENTER KEY READY)
   function runKhataSearch() {
     const rawVal = document.getElementById('khataInput').value.trim().replace(/\D/g, '');
     const out = document.getElementById('khataResultBox');
@@ -623,19 +775,19 @@
     if (s) {
       const remaining = s.total - s.received;
       out.innerHTML = `
-        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-2">
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 mt-2">
           <div class="flex justify-between items-center">
             <h4 class="text-xs font-extrabold text-slate-900">${s.name}</h4>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${remaining === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${s.status}</span>
+            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${remaining === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${s.status}</span>
           </div>
-          <p class="text-[11px] text-slate-400 font-medium">${s.cohort}</p>
-          <div class="grid grid-cols-3 gap-2 bg-white p-2 rounded-xl text-center border border-slate-100">
+          <p class="text-[11px] text-slate-400 font-medium">${s.cohort} (Batch: ${s.batchCode || 'AI-01'})</p>
+          <div class="grid grid-cols-3 gap-2 bg-white p-2.5 rounded-xl text-center border border-slate-100">
             <div><span class="text-[9px] text-slate-400 block">Total</span><strong class="text-[11px] text-slate-800">Rs. ${s.total.toLocaleString()}</strong></div>
             <div><span class="text-[9px] text-slate-400 block">Paid</span><strong class="text-[11px] text-emerald-600">Rs. ${s.received.toLocaleString()}</strong></div>
             <div><span class="text-[9px] text-slate-400 block">Balance</span><strong class="text-[11px] text-rose-600">Rs. ${remaining.toLocaleString()}</strong></div>
           </div>
           <p class="text-[10px] text-slate-500">📜 <strong>Rule of 10:</strong> Har mahine ki 10 tareekh se pehle Rs. 5,000 installment clear karein.</p>
-          <a href="https://wa.me/923116246000?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(s.name)}" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
+          <a href="https://wa.me/923116246000?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(s.name)}" target="_blank" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
             <i class="fa-brands fa-whatsapp"></i> Submit Slip on WhatsApp (+92 311 6246000)
           </a>
         </div>
@@ -650,7 +802,7 @@
     }
   }
 
-  // 6. FIRESTORE REALTIME SYNC & SWITCHBOARD
+  // 8. FIRESTORE REALTIME SYNC & SWITCHBOARD
   function initFirestoreSync() {
     if (!db) return;
     db.collection("portal").doc("system_state").onSnapshot(doc => {
@@ -688,15 +840,15 @@
     const box = document.getElementById('adminFinancesDisplay');
     if (!box) return;
     box.innerHTML = `
-      <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+      <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
         <div class="flex justify-between"><span>Meezan Bank</span><strong>${appState.finances.meezan}</strong></div>
         <div class="flex justify-between"><span>Easypaisa</span><strong>${appState.finances.easypaisa}</strong></div>
         <div class="flex justify-between"><span>JazzCash</span><strong>${appState.finances.jazzcash}</strong></div>
       </div>
-      <div class="flex justify-between p-2.5 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-100">
+      <div class="flex justify-between p-3 bg-emerald-50 text-emerald-900 rounded-2xl border border-emerald-100">
         <span>Physical Vault (Galla)</span><strong class="text-emerald-700">${appState.finances.galla}</strong>
       </div>
-      <div class="flex justify-between p-2.5 bg-amber-50 text-amber-900 rounded-xl border border-amber-200">
+      <div class="flex justify-between p-3 bg-amber-50 text-amber-900 rounded-2xl border border-amber-200">
         <span>Net Profit Calculation</span><strong class="text-[#4A0E17]">${appState.finances.netProfit}</strong>
       </div>
     `;
@@ -707,12 +859,14 @@
     const name = document.getElementById('newStdName').value.trim();
     const paid = parseInt(document.getElementById('newStdAmount').value) || 0;
     const cohort = document.getElementById('newStdCohort').value;
+    const batchCode = cohort.replace('Cohort ', '').trim();
 
     if (!phone || !name) return;
 
     appState.students[phone] = {
       name: name,
       cohort: cohort,
+      batchCode: batchCode,
       total: 50000,
       received: paid,
       status: paid >= 50000 ? "Active Paid" : "Active Grace",
@@ -722,7 +876,7 @@
     if (db) {
       db.collection("portal").doc("system_state").set({ students: appState.students }, { merge: true });
     }
-    alert(`Student ${name} successfully saved!`);
+    alert(`Student ${name} successfully saved with Batch ${batchCode}!`);
     document.getElementById('newStdPhone').value = '';
     document.getElementById('newStdName').value = '';
     document.getElementById('newStdAmount').value = '';
