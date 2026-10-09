@@ -388,9 +388,9 @@
 </div>
 
 <script>
-  // 1. FIREBASE INITIALIZATION & REDIRECT HANDLER
+  // 1. FIREBASE INITIALIZATION & REDIRECT HANDLER (UPDATED ACTIVE KEY)
   const firebaseConfig = {
-    apiKey: "AIzaSyDrLKPN_lqSm2strGET4jAB4SUmVuZKjrM",
+    apiKey: "AIzaSyBTQT43EnFY4P2KcqFEJwNlx1VUKAiNdM4",
     authDomain: "global-guru-portal.firebaseapp.com",
     projectId: "global-guru-portal",
     storageBucket: "global-guru-portal.firebasestorage.app",
@@ -402,7 +402,7 @@
   let db = null;
   let auth = null;
   let currentUser = null;
-  let selectedRole = null; // 'learner', 'client', or 'admin'
+  let selectedRole = null;
   let isLoggingIn = false;
 
   let appState = {
@@ -437,7 +437,7 @@
     console.warn("Firebase initialized in fallback mode:", e);
   }
 
-  // Handle Redirect Result (If popup was blocked)
+  // Handle Redirect Result
   if (auth) {
     auth.getRedirectResult().then(result => {
       if (result && result.user) {
@@ -469,7 +469,7 @@
     document.getElementById('authenticatedUserName').innerText = user.displayName || user.email.split('@')[0];
   }
 
-  // 2. ROBUST GOOGLE SIGN-IN HANDLER (CLASH & POPUP SHIELD)
+  // 2. ROBUST GOOGLE SIGN-IN HANDLER
   function handleGoogleSignIn() {
     if (isLoggingIn) return;
     isLoggingIn = true;
@@ -495,7 +495,6 @@
       })
       .catch(err => {
         console.warn("Popup attempt notice:", err.code);
-        // If popup was cancelled or blocked, seamlessly fallback to redirect
         if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
           return auth.signInWithRedirect(provider);
         } else if (err.code !== 'auth/popup-closed-by-user') {
@@ -560,7 +559,6 @@
     const subTag = document.getElementById('portalSubTag');
     const nav = document.getElementById('portalBottomNav');
 
-    // Hide all internal panels first
     document.getElementById('view-learner').classList.add('hidden');
     document.getElementById('view-client').classList.add('hidden');
     document.getElementById('view-admin').classList.add('hidden');
@@ -612,7 +610,7 @@
     }
   }
 
-  // 5. MERA KHATA SEARCH (ENTER KEY READY)
+  // 5. MERA KHATA SEARCH
   function runKhataSearch() {
     const rawVal = document.getElementById('khataInput').value.trim().replace(/\D/g, '');
     const out = document.getElementById('khataResultBox');
