@@ -1,52 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" class="h-full bg-slate-100">
+<!-- GG Digi Book - Complete Corrected Single-File Frontend v2.0 (11 Oct 2026) -->
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GG Digi Book - Digital Ledger & Cash Book</title>
-  
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GG Digi Book - Digital Ledger</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#ecfdf5',
-              100: '#d1fae5',
-              500: '#10b981',
-              600: '#059669',
-              700: '#047857',
-              800: '#065f46',
-              900: '#064e3b',
-            }
-          }
-        }
-      }
-    }
-  </script>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- jsPDF & jsPDF AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); }
-    /* Custom scrollbars for clean UI */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .glass-card { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px); }
   </style>
 
   <script type="module">
@@ -54,9 +20,13 @@
     import { 
       getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, collection, addDoc, onSnapshot, query, where, doc, setDoc, updateDoc, deleteDoc, getDocs 
+    import {
+      getFirestore, collection, addDoc, onSnapshot, query, where, doc, setDoc,
+      getDocs, getDoc, runTransaction, writeBatch
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import {
+      getStorage, ref as storageRef, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBnzL_AKXDZFE6feQJf5XnasBqcLey0uOs",
@@ -71,6 +41,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
     let currentUser = null;
@@ -79,7 +50,11 @@
     let selectedCustomer = null;
     let currentTransactions = [];
     let unsubscribeTx = null;
-    let attachedPhotoBase64 = "";
+    let unsubscribeCustomers = null;
+    let unsubscribeAllTx = null;
+    let unsubscribeGallaMeta = null;
+    let attachedPhotoBlob = null;
+    let attachedPhotoPreviewUrl = "";
     let gallaTxHistory = [];
 
     let gallaOpeningBalance = 0;
@@ -88,29 +63,22 @@
     let gallaClosingCash = 0;
     let calculatedTodayOpening = 0;
 
-    // Cache logo if available or create fallback
     let cachedLogoBase64 = null;
     function loadLogoImage() {
       const img = new Image();
       img.crossOrigin = "Anonymous";
       img.onload = () => {
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
-          cachedLogoBase64 = canvas.toDataURL("image/png");
-        } catch(e) {
-          console.warn("Logo conversion skipped", e);
-        }
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        cachedLogoBase64 = canvas.toDataURL("image/png");
       };
-      img.onerror = () => { cachedLogoBase64 = null; };
       img.src = "logo.png";
     }
     loadLogoImage();
 
-    // Synthesized Sound Engine using Web Audio API
     let audioCtx = null;
     function getAudioCtx() {
       if (!audioCtx) {
@@ -214,62 +182,73 @@
       }
     };
 
-    // Math Evaluation Engine (Supports +, -, *, /, parenthesis)
     window.evaluateExpression = (inputVal) => {
       if (!inputVal) return 0;
       let cleaned = inputVal.toString().replace(/[^0-9+\-*/().]/g, '');
       if (!cleaned) return 0;
       try {
         const result = Function(`'use strict'; return (${cleaned})`)();
-        return isNaN(result) ? 0 : Math.round(Number(result) * 100) / 100;
+        const numberResult = Number(result);
+        return Number.isFinite(numberResult) ? numberResult : 0;
       } catch (e) {
         return 0;
       }
     };
 
-    // Helper for Clean Title Case (e.g., 'jazzcash' -> 'Jazzcash', 'direct cash' -> 'Direct Cash')
-    window.toTitleCase = (str) => {
-      if (!str) return '';
-      return str.toString().replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
-    };
-
-    function getTodayDateString() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
     }
 
-    // Modal/Toast Notification (Replaces native browser alert)
-    window.showAppNotification = (title, message, isError = false) => {
-      const container = document.getElementById('notification-toast');
-      const titleEl = document.getElementById('toast-title');
-      const msgEl = document.getElementById('toast-message');
-      const iconEl = document.getElementById('toast-icon');
+    function getPakistanDateKey(dateValue = new Date()) {
+      const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+      if (Number.isNaN(date.getTime())) return '';
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(date);
+      const values = Object.fromEntries(parts.map(p => [p.type, p.value]));
+      return `${values.year}-${values.month}-${values.day}`;
+    }
 
-      if (!container) return;
-      titleEl.innerText = title;
-      msgEl.innerText = message;
-      
-      if (isError) {
-        iconEl.innerText = '⚠️';
-        container.className = "fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-rose-900/95 text-white px-5 py-4 rounded-2xl shadow-2xl border border-rose-500/50 backdrop-blur-md transition-all duration-300 transform translate-y-0 opacity-100 max-w-md";
-      } else {
-        iconEl.innerText = '✅';
-        container.className = "fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-slate-900/95 text-white px-5 py-4 rounded-2xl shadow-2xl border border-emerald-500/50 backdrop-blur-md transition-all duration-300 transform translate-y-0 opacity-100 max-w-md";
-      }
+    function formatPakistanDateTime(dateValue, includeTime = true) {
+      const date = new Date(dateValue);
+      if (Number.isNaN(date.getTime())) return 'Date unavailable';
+      return new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Karachi',
+        day: '2-digit', month: 'short', year: 'numeric',
+        ...(includeTime ? { hour: '2-digit', minute: '2-digit', hour12: true } : {})
+      }).format(date);
+    }
 
-      setTimeout(() => {
-        container.className = "fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-slate-900/95 text-white px-5 py-4 rounded-2xl shadow-2xl border border-emerald-500/50 backdrop-blur-md transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none max-w-md";
-      }, 4000);
-    };
+    function toTitleCase(str) {
+      if (!str) return '';
+      return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    }
 
-    // Auth Listener
+    function getTodayDateString() {
+      return getPakistanDateKey(new Date());
+    }
+
+    function cleanupRealtimeListeners() {
+      if (unsubscribeCustomers) unsubscribeCustomers();
+      if (unsubscribeAllTx) unsubscribeAllTx();
+      if (unsubscribeGallaMeta) unsubscribeGallaMeta();
+      if (unsubscribeTx) unsubscribeTx();
+      unsubscribeCustomers = unsubscribeAllTx = unsubscribeGallaMeta = unsubscribeTx = null;
+    }
+
     onAuthStateChanged(auth, (user) => {
+      cleanupRealtimeListeners();
       currentUser = user;
       if (user) {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
         
-        const displayName = user.displayName || user.email.split('@')[0];
+        const displayName = user.displayName || user.email;
         document.getElementById('user-name').innerText = displayName;
         document.getElementById('desktop-user-name').innerText = displayName;
         document.getElementById('desktop-user-email').innerText = user.email || '';
@@ -280,6 +259,10 @@
         listenAllTransactions();
         listenGallaMetadata();
       } else {
+        selectedCustomer = null;
+        customersList = [];
+        currentTransactions = [];
+        gallaTxHistory = [];
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('app-screen').classList.add('hidden');
       }
@@ -287,17 +270,15 @@
 
     window.loginGoogle = () => {
       playSound('tap');
-      signInWithPopup(auth, provider).catch(err => {
-        showAppNotification("Login Error", err.message, true);
-      });
+      signInWithPopup(auth, provider).catch(err => alert("Login Error: " + err.message));
     };
 
     window.logout = () => {
       playSound('tap');
+      cleanupRealtimeListeners();
       signOut(auth);
     };
 
-    // Tab Navigation
     window.switchTab = (tab) => {
       playSound('tap');
       const ledgerView = document.getElementById('view-ledger');
@@ -316,15 +297,15 @@
       accountsView.classList.add('hidden');
       settingsView.classList.add('hidden');
 
-      const inactiveMob = "flex-1 py-3 text-center text-slate-400 font-bold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition";
-      const activeMob = "flex-1 py-3 text-center text-emerald-700 font-black text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600 transition";
+      const inactiveMob = "flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition";
+      const activeMob = "flex-1 py-2.5 text-center text-emerald-700 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600 transition";
 
       tabLedgerBtn.className = inactiveMob;
       tabAccountsBtn.className = inactiveMob;
       tabSettingsBtn.className = inactiveMob;
 
-      const inactiveDesk = "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-slate-600 font-bold text-sm hover:bg-slate-100 hover:text-slate-900 transition";
-      const activeDesk = "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-emerald-50 text-emerald-800 font-extrabold text-sm shadow-sm transition border border-emerald-200/50";
+      const inactiveDesk = "w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 font-bold text-sm hover:bg-slate-100 transition";
+      const activeDesk = "w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-emerald-50 text-emerald-800 font-extrabold text-sm shadow-sm transition";
 
       if (dTabLedgerBtn) dTabLedgerBtn.className = inactiveDesk;
       if (dTabAccountsBtn) dTabAccountsBtn.className = inactiveDesk;
@@ -340,7 +321,6 @@
         if (dTabAccountsBtn) dTabAccountsBtn.className = activeDesk;
         populateAccountSelectDropdown();
         recalculateGallaStrip();
-        renderGallaTransactionsTable();
       } else if (tab === 'settings') {
         settingsView.classList.remove('hidden');
         tabSettingsBtn.className = activeMob;
@@ -348,10 +328,9 @@
       }
     };
 
-    // Load Customers from Firestore
     function loadCustomers() {
       const q = query(collection(db, "customers"), where("userId", "==", currentUser.uid));
-      onSnapshot(q, (snapshot) => {
+      unsubscribeCustomers = onSnapshot(q, (snapshot) => {
         customersList = [];
         let totalReceivable = 0;
         let totalPayable = 0;
@@ -375,17 +354,17 @@
         netEl.innerText = `Rs. ${Math.abs(net).toLocaleString()}`;
 
         if (net > 0) {
-          netEl.className = "text-2xl font-black text-emerald-600 tracking-tight";
+          netEl.className = "text-xl font-black text-emerald-600 tracking-tight";
           netStatusEl.innerText = "Net Receivable (+)";
-          netStatusEl.className = "text-[11px] font-bold text-emerald-600 mt-0.5";
+          netStatusEl.className = "text-[10px] font-bold text-emerald-600 mt-0.5";
         } else if (net < 0) {
-          netEl.className = "text-2xl font-black text-rose-600 tracking-tight";
+          netEl.className = "text-xl font-black text-rose-600 tracking-tight";
           netStatusEl.innerText = "Net Payable (-)";
-          netStatusEl.className = "text-[11px] font-bold text-rose-600 mt-0.5";
+          netStatusEl.className = "text-[10px] font-bold text-rose-600 mt-0.5";
         } else {
-          netEl.className = "text-2xl font-black text-slate-800 tracking-tight";
+          netEl.className = "text-xl font-black text-slate-800 tracking-tight";
           netStatusEl.innerText = "Settled (Nil)";
-          netStatusEl.className = "text-[11px] font-bold text-slate-500 mt-0.5";
+          netStatusEl.className = "text-[10px] font-bold text-slate-500 mt-0.5";
         }
 
         renderCustomers();
@@ -401,57 +380,60 @@
       }, (err) => console.error("Firestore Error:", err));
     }
 
-    // Listen to Galla Base Opening Balance
     function listenGallaMetadata() {
       const metaRef = doc(db, "galla_meta", currentUser.uid);
-      onSnapshot(metaRef, (docSnap) => {
+      unsubscribeGallaMeta = onSnapshot(metaRef, (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           gallaOpeningBalance = Number(data.openingBalance || 0);
         } else {
           gallaOpeningBalance = 0;
         }
-        recalculateGallaStrip();
-        renderGallaTransactionsTable();
+        recalculateGallaFromHistory();
       });
     }
 
-    // Live Flow: Listen to All Transactions
+    function recalculateGallaFromHistory() {
+      let pastTotalIn = 0;
+      let pastTotalOut = 0;
+      let todayIn = 0;
+      let todayOut = 0;
+      const todayStr = getTodayDateString();
+
+      gallaTxHistory.forEach(data => {
+        const amount = Number(data.amount || 0);
+        const txDate = data.createdAt ? getPakistanDateKey(data.createdAt) : todayStr;
+        const action = data.gallaAction || (data.type === 'liye' ? 'in' : 'out');
+        if (txDate === todayStr) {
+          if (action === 'in') todayIn += amount;
+          else if (action === 'out') todayOut += amount;
+        } else if (txDate < todayStr) {
+          if (action === 'in') pastTotalIn += amount;
+          else if (action === 'out') pastTotalOut += amount;
+        }
+      });
+
+      calculatedTodayOpening = gallaOpeningBalance + pastTotalIn - pastTotalOut;
+      gallaTodayIn = todayIn;
+      gallaTodayOut = todayOut;
+      gallaClosingCash = calculatedTodayOpening + todayIn - todayOut;
+      recalculateGallaStrip();
+    }
+
     function listenAllTransactions() {
       const q = query(collection(db, "transactions"), where("userId", "==", currentUser.uid));
-      onSnapshot(q, (snapshot) => {
+      unsubscribeAllTx = onSnapshot(q, (snapshot) => {
         gallaTxHistory = [];
-        let pastTotalIn = 0;
-        let pastTotalOut = 0;
-        let todayIn = 0;
-        let todayOut = 0;
-
-        const todayStr = getTodayDateString();
 
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
 
           if (data.isGallaEntry === true) {
             gallaTxHistory.push(data);
-            const amt = Number(data.amount || 0);
-            const txDate = data.createdAt ? data.createdAt.slice(0, 10) : todayStr;
-
-            if (txDate === todayStr) {
-              if (data.gallaAction === 'in') todayIn += amt;
-              else if (data.gallaAction === 'out') todayOut += amt;
-            } else if (txDate < todayStr) {
-              if (data.gallaAction === 'in') pastTotalIn += amt;
-              else if (data.gallaAction === 'out') pastTotalOut += amt;
-            }
           }
         });
 
-        calculatedTodayOpening = gallaOpeningBalance + (pastTotalIn - pastTotalOut);
-        gallaTodayIn = todayIn;
-        gallaTodayOut = todayOut;
-        gallaClosingCash = calculatedTodayOpening + todayIn - todayOut;
-
-        recalculateGallaStrip();
+        recalculateGallaFromHistory();
 
         gallaTxHistory.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         renderGallaTransactionsTable();
@@ -469,12 +451,12 @@
       if (outEl) outEl.innerText = `Rs. ${gallaTodayOut.toLocaleString()}`;
       if (closeEl) closeEl.innerText = `Rs. ${gallaClosingCash.toLocaleString()}`;
 
-      const fIn = document.getElementById('footer-total-in');
-      const fOut = document.getElementById('footer-total-out');
+      const fFlow = document.getElementById('footer-today-flow');
+      const fDayNet = document.getElementById('footer-day-net');
       const fNet = document.getElementById('footer-grand-closing');
-      if (fIn) fIn.innerText = `+ Rs. ${gallaTodayIn.toLocaleString()}`;
-      if (fOut) fOut.innerText = `- Rs. ${gallaTodayOut.toLocaleString()}`;
-      if (fNet) fNet.innerText = `Rs. ${gallaClosingCash.toLocaleString()}`;
+      if (fFlow) fFlow.innerText = `In: Rs. ${gallaTodayIn.toLocaleString()} | Out: Rs. ${gallaTodayOut.toLocaleString()}`;
+      if (fDayNet) fDayNet.innerText = `Day Net: Rs. ${(gallaTodayIn - gallaTodayOut).toLocaleString()}`;
+      if (fNet) fNet.innerText = `Closing: Rs. ${gallaClosingCash.toLocaleString()}`;
     }
 
     window.editOpeningBalance = async () => {
@@ -482,8 +464,8 @@
       const val = prompt("Apna Initial Galla Base Opening Balance likhein:", gallaOpeningBalance);
       if (val === null) return;
       const num = evaluateExpression(val);
-      if (isNaN(num)) {
-        showAppNotification("Invalid Input", "Please enter a valid number or calculation!", true);
+      if (!Number.isFinite(num)) {
+        alert("Please enter a valid number!");
         return;
       }
 
@@ -493,13 +475,11 @@
           updatedAt: new Date().toISOString()
         }, { merge: true });
         playSound('success');
-        showAppNotification("Opening Balance Updated", `New base opening: Rs. ${num.toLocaleString()}`);
       } catch (err) {
-        showAppNotification("Error", err.message, true);
+        alert("Error updating opening balance: " + err.message);
       }
     };
 
-    // Render Customers List
     window.renderCustomers = () => {
       const searchVal = document.getElementById('search-input').value.toLowerCase();
       const listDiv = document.getElementById('customer-list');
@@ -515,10 +495,10 @@
 
       if (filtered.length === 0) {
         listDiv.innerHTML = `
-          <div class="py-16 text-center text-slate-400">
-            <div class="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-inner">📖</div>
-            <p class="text-sm font-bold text-slate-700">No Accounts Found</p>
-            <p class="text-xs text-slate-400 mt-1">Add a new customer to start your digital ledger</p>
+          <div class="py-16 text-center text-gray-400">
+            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">📖</div>
+            <p class="text-sm font-semibold text-gray-600">No Customers Found</p>
+            <p class="text-xs text-gray-400 mt-1">Add a customer to start your digital ledger</p>
           </div>`;
         return;
       }
@@ -526,7 +506,7 @@
       filtered.forEach(cust => {
         const item = document.createElement('div');
         const isSelected = selectedCustomer && selectedCustomer.id === cust.id;
-        item.className = `p-4 flex justify-between items-center ${isSelected ? 'bg-emerald-50/90 border-l-4 border-emerald-600' : 'bg-white hover:bg-slate-50/80'} border-b border-slate-100 cursor-pointer transition`;
+        item.className = `p-4 flex justify-between items-center ${isSelected ? 'bg-emerald-50/80 border-l-4 border-emerald-600' : 'bg-white hover:bg-slate-50'} border-b border-gray-100 cursor-pointer transition`;
         item.onclick = () => selectAndOpenCustomer(cust);
 
         const firstLetter = cust.name ? cust.name.charAt(0).toUpperCase() : 'C';
@@ -534,20 +514,20 @@
         const isPayable = cust.balance < 0;
 
         item.innerHTML = `
-          <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-2xl bg-emerald-100/80 text-emerald-900 flex items-center justify-center font-black text-base shadow-sm ring-1 ring-emerald-500/20">
-              ${firstLetter}
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm shadow-inner">
+              ${escapeHtml(firstLetter)}
             </div>
             <div>
-              <h4 class="font-extrabold text-slate-900 text-sm leading-tight">${toTitleCase(cust.name)}</h4>
-              <p class="text-[11px] text-slate-400 font-semibold mt-0.5">${cust.phone || 'No phone recorded'}</p>
+              <h4 class="font-bold text-gray-900 text-sm leading-tight">${escapeHtml(toTitleCase(cust.name))}</h4>
+              <p class="text-[11px] text-gray-400 font-medium mt-0.5">${escapeHtml(cust.phone || 'No phone number')}</p>
             </div>
           </div>
           <div class="text-right">
-            <span class="text-sm font-black ${isReceivable ? 'text-rose-600' : isPayable ? 'text-emerald-600' : 'text-slate-400'}">
+            <span class="text-sm font-extrabold ${isReceivable ? 'text-rose-600' : isPayable ? 'text-emerald-600' : 'text-gray-400'}">
               Rs. ${Math.abs(cust.balance || 0).toLocaleString()}
             </span>
-            <p class="text-[10px] font-black tracking-tight uppercase mt-0.5 ${isReceivable ? 'text-rose-500' : isPayable ? 'text-emerald-600' : 'text-slate-400'}">
+            <p class="text-[10px] font-bold tracking-tight uppercase ${isReceivable ? 'text-rose-500' : isPayable ? 'text-emerald-600' : 'text-gray-400'}">
               ${isReceivable ? 'You Will Get' : isPayable ? 'You Will Give' : 'Settled'}
             </p>
           </div>
@@ -574,9 +554,9 @@
       ['all', 'receivable', 'payable'].forEach(f => {
         const btn = document.getElementById(`filter-${f}`);
         if (f === type) {
-          btn.className = "px-4 py-2 rounded-full text-xs font-black bg-emerald-700 text-white shadow-sm transition";
+          btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-700 text-white shadow-sm transition";
         } else {
-          btn.className = "px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
+          btn.className = "px-4 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
         }
       });
       renderCustomers();
@@ -597,9 +577,8 @@
           createdAt: new Date().toISOString()
         });
         playSound('success');
-        showAppNotification("Account Added", `${toTitleCase(name.trim())} has been created successfully.`);
       } catch (err) {
-        showAppNotification("Failed", err.message, true);
+        alert("Failed to create customer: " + err.message);
       }
     };
 
@@ -620,10 +599,10 @@
       if (!selectedCustomer) return;
       const bal = selectedCustomer.balance || 0;
       const statusText = bal > 0 ? 'You Will Get' : bal < 0 ? 'You Will Give' : 'Settled';
-      const balClass = `text-xs font-black px-3 py-1.5 rounded-xl inline-block ${bal > 0 ? 'bg-rose-50 text-rose-600 border border-rose-200' : bal < 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}`;
+      const balClass = `text-xs font-bold px-2.5 py-1 rounded-md inline-block ${bal > 0 ? 'bg-rose-50 text-rose-600' : bal < 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-600'}`;
 
       document.getElementById('modal-cust-name').innerText = toTitleCase(selectedCustomer.name);
-      document.getElementById('modal-cust-phone').innerText = selectedCustomer.phone || 'No phone recorded';
+      document.getElementById('modal-cust-phone').innerText = selectedCustomer.phone || 'No phone available';
       const mBalEl = document.getElementById('modal-cust-balance');
       mBalEl.innerText = `Rs. ${Math.abs(bal).toLocaleString()} (${statusText})`;
       mBalEl.className = balClass;
@@ -634,7 +613,7 @@
         dPlaceholder.classList.add('hidden');
         dDetailPane.classList.remove('hidden');
         document.getElementById('d-cust-name').innerText = toTitleCase(selectedCustomer.name);
-        document.getElementById('d-cust-phone').innerText = selectedCustomer.phone || 'No phone recorded';
+        document.getElementById('d-cust-phone').innerText = selectedCustomer.phone || 'No phone available';
         const dBalEl = document.getElementById('d-cust-balance');
         dBalEl.innerText = `Rs. ${Math.abs(bal).toLocaleString()} (${statusText})`;
         dBalEl.className = balClass;
@@ -645,12 +624,16 @@
       const txListEl = document.getElementById('tx-history-list');
       const dTxListEl = document.getElementById('d-tx-history-list');
 
-      if (txListEl) txListEl.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Loading ledger records...</p>';
-      if (dTxListEl) dTxListEl.innerHTML = '<p class="text-xs text-slate-400 text-center py-10">Loading ledger records...</p>';
+      if (txListEl) txListEl.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">Loading transactions...</p>';
+      if (dTxListEl) dTxListEl.innerHTML = '<p class="text-xs text-gray-400 text-center py-8">Loading transactions...</p>';
 
       if (unsubscribeTx) unsubscribeTx();
 
-      const q = query(collection(db, "transactions"), where("customerId", "==", customerId));
+      const q = query(
+        collection(db, "transactions"),
+        where("userId", "==", currentUser.uid),
+        where("customerId", "==", customerId)
+      );
       unsubscribeTx = onSnapshot(q, (snapshot) => {
         currentTransactions = [];
         snapshot.forEach(docSnap => currentTransactions.push({ id: docSnap.id, ...docSnap.data() }));
@@ -659,7 +642,6 @@
       });
     }
 
-    // Ledger Running Balance
     function renderTransactions() {
       const txListEl = document.getElementById('tx-history-list');
       const dTxListEl = document.getElementById('d-tx-history-list');
@@ -677,29 +659,32 @@
 
       const renderHtml = () => {
         if (currentTransactions.length === 0) {
-          return '<p class="text-xs text-slate-400 text-center py-12 font-medium">No transactions recorded yet in this ledger.</p>';
+          return '<p class="text-xs text-gray-400 text-center py-8">No transactions recorded yet.</p>';
         }
         return currentTransactions.map(t => {
-          const dateStr = new Date(t.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+          const dateStr = formatPakistanDateTime(t.createdAt, true);
           const isGiven = t.type === 'diye';
           const balAfterThis = txWithBalMap[t.id] !== undefined ? txWithBalMap[t.id] : 0;
           const isRec = balAfterThis >= 0;
-          const photoIcon = t.receiptImage ? `<button onclick="window.viewImage('${t.receiptImage}')" class="text-[10px] bg-white border border-slate-200 px-2.5 py-1 rounded-lg font-bold text-slate-700 shadow-sm ml-2.5 hover:bg-slate-100 transition">📷 Bill Receipt</button>` : '';
+          const receiptSource = t.receiptImageUrl || t.receiptImage || '';
+          const photoIcon = receiptSource
+            ? `<button onclick="window.viewTransactionImage('${escapeHtml(t.id)}')" class="text-[10px] bg-white border border-gray-200 px-2 py-0.5 rounded-md font-bold text-gray-700 shadow-sm ml-2">📷 Bill</button>`
+            : '';
 
           return `
-            <div class="flex justify-between items-center p-3.5 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 hover:shadow-sm transition">
+            <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50/70 border border-gray-100 hover:bg-slate-50 transition">
               <div>
                 <div class="flex items-center">
-                  <span class="font-extrabold text-slate-800 text-xs">${t.note || (isGiven ? 'Given (Debit)' : 'Received (Credit)')}</span>
+                  <span class="font-bold text-gray-800 text-xs">${escapeHtml(t.note || (isGiven ? 'Given (Debit)' : 'Received (Credit)'))}</span>
                   ${photoIcon}
                 </div>
-                <p class="text-[10px] text-slate-400 font-medium mt-1">${dateStr}</p>
+                <p class="text-[10px] text-gray-400 mt-0.5">${dateStr}</p>
               </div>
               <div class="text-right">
-                <span class="font-black text-xs ${isGiven ? 'text-rose-600' : 'text-emerald-600'} block">
+                <span class="font-extrabold text-xs ${isGiven ? 'text-rose-600' : 'text-emerald-600'} block">
                   ${isGiven ? '-' : '+'} Rs. ${Number(t.amount).toLocaleString()}
                 </span>
-                <span class="text-[9px] font-bold ${isRec ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-emerald-700 bg-emerald-50 border-emerald-100'} px-2 py-0.5 rounded-md border shadow-xs inline-block mt-1">
+                <span class="text-[9px] font-bold ${isRec ? 'text-rose-500' : 'text-emerald-600'} bg-white px-2 py-0.5 rounded-md border border-slate-100 shadow-xs inline-block mt-1">
                   Bal: Rs. ${Math.abs(balAfterThis).toLocaleString()} ${isRec ? '(Rec)' : '(Pay)'}
                 </span>
               </div>
@@ -741,50 +726,61 @@
       }
     };
 
-    // Add Ledger Transaction
     window.addTransaction = async (type, isDesktop = false) => {
       const amountInput = document.getElementById(isDesktop ? 'd-tx-amount' : 'tx-amount');
       const noteInput = document.getElementById(isDesktop ? 'd-tx-note' : 'tx-note');
       
       const evaluated = evaluateExpression(amountInput.value);
       if (!evaluated || evaluated <= 0) {
-        showAppNotification("Invalid Amount", "Please enter a valid amount or formula (e.g. 500+6000)", true);
+        alert("Please enter a valid amount or formula (e.g. 500+6000)");
         return;
       }
 
       amountInput.value = evaluated;
       playSound(type === 'diye' ? 'debit' : 'credit');
 
-      const balanceDiff = (type === 'diye') ? evaluated : -evaluated;
-      const newBal = (selectedCustomer.balance || 0) + balanceDiff;
-
       try {
-        await updateDoc(doc(db, "customers", selectedCustomer.id), { balance: newBal });
-        await addDoc(collection(db, "transactions"), {
-          userId: currentUser.uid,
-          customerId: selectedCustomer.id,
-          customerName: selectedCustomer.name,
-          type: type,
-          amount: evaluated,
-          note: noteInput.value.trim(),
-          isGallaEntry: false,
-          receiptImage: attachedPhotoBase64 || "",
-          createdAt: new Date().toISOString()
+        const customerId = selectedCustomer.id;
+        const customerName = selectedCustomer.name;
+        const receiptImageUrl = await uploadAttachedReceipt();
+        let committedBalance = 0;
+
+        await runTransaction(db, async (firestoreTransaction) => {
+          const customerRef = doc(db, "customers", customerId);
+          const customerSnap = await firestoreTransaction.get(customerRef);
+          if (!customerSnap.exists()) throw new Error('Customer account no longer exists.');
+          if (customerSnap.data().userId !== currentUser.uid) throw new Error('Unauthorized customer account.');
+
+          const latestBalance = Number(customerSnap.data().balance || 0);
+          const balanceDiff = type === 'diye' ? evaluated : -evaluated;
+          committedBalance = latestBalance + balanceDiff;
+          const txRef = doc(collection(db, "transactions"));
+
+          firestoreTransaction.update(customerRef, { balance: committedBalance });
+          firestoreTransaction.set(txRef, {
+            userId: currentUser.uid,
+            customerId,
+            customerName,
+            type,
+            amount: evaluated,
+            note: noteInput.value.trim(),
+            isGallaEntry: false,
+            receiptImageUrl,
+            createdAt: new Date().toISOString()
+          });
         });
 
-        selectedCustomer.balance = newBal;
+        selectedCustomer.balance = committedBalance;
         updateCustomerDetailUI();
         amountInput.value = '';
         noteInput.value = '';
         clearPhotoAttachment();
         if (!isDesktop) closeModal();
-        showAppNotification("Saved", `Ledger updated: Rs. ${evaluated.toLocaleString()}`);
       } catch (err) {
-        showAppNotification("Save Error", err.message, true);
+        alert("Error saving transaction: " + err.message);
       }
     };
 
-    // Process Galla / Accounts Entry
     window.processGallaAccountEntry = async (actionType) => {
       const partySelect = document.getElementById('galla-party-select');
       const amountInput = document.getElementById('galla-entry-amount');
@@ -795,7 +791,7 @@
       const note = noteInput.value.trim();
 
       if (!evaluated || evaluated <= 0) {
-        showAppNotification("Invalid Amount", "Please enter a valid amount or math formula!", true);
+        alert("Please enter a valid amount or formula (e.g. 500+6000)!");
         return;
       }
 
@@ -808,56 +804,69 @@
         playSound('debit');
       }
 
-      let txTypeForParty = actionType === 'in' ? 'liye' : 'diye';
-      if (partyObj) {
-        const partyBalanceDiff = actionType === 'in' ? -evaluated : evaluated;
-        const newPartyBalance = (partyObj.balance || 0) + partyBalanceDiff;
-        try {
-          await updateDoc(doc(db, "customers", partyObj.id), { balance: newPartyBalance });
-        } catch (e) {
-          console.warn("Could not update customer balance", e);
-        }
-      }
+      const txTypeForParty = actionType === 'in' ? 'liye' : 'diye';
 
       const defaultNote = partyObj 
         ? (actionType === 'in' ? `Cash In from ${toTitleCase(partyObj.name)}` : `Cash Out to ${toTitleCase(partyObj.name)}`)
         : (actionType === 'in' ? `Counter Cash In` : `Counter Cash Out`);
 
       try {
-        await addDoc(collection(db, "transactions"), {
-          userId: currentUser.uid,
-          customerId: partyObj ? partyObj.id : "direct_cash",
-          customerName: partyObj ? partyObj.name : "Direct Cash",
-          type: txTypeForParty,
-          amount: evaluated,
-          note: note || defaultNote,
-          isGallaEntry: true,
-          gallaAction: actionType,
-          createdAt: new Date().toISOString()
-        });
+        if (partyObj) {
+          await runTransaction(db, async (firestoreTransaction) => {
+            const customerRef = doc(db, "customers", partyObj.id);
+            const customerSnap = await firestoreTransaction.get(customerRef);
+            if (!customerSnap.exists()) throw new Error('Selected party no longer exists.');
+            if (customerSnap.data().userId !== currentUser.uid) throw new Error('Unauthorized party account.');
+
+            const latestBalance = Number(customerSnap.data().balance || 0);
+            const partyBalanceDiff = actionType === 'in' ? -evaluated : evaluated;
+            const txRef = doc(collection(db, "transactions"));
+            firestoreTransaction.update(customerRef, { balance: latestBalance + partyBalanceDiff });
+            firestoreTransaction.set(txRef, {
+              userId: currentUser.uid,
+              customerId: partyObj.id,
+              customerName: partyObj.name,
+              type: txTypeForParty,
+              amount: evaluated,
+              note: note || defaultNote,
+              isGallaEntry: true,
+              gallaAction: actionType,
+              createdAt: new Date().toISOString()
+            });
+          });
+        } else {
+          await addDoc(collection(db, "transactions"), {
+            userId: currentUser.uid,
+            customerId: "direct_cash",
+            customerName: "Direct Cash",
+            type: txTypeForParty,
+            amount: evaluated,
+            note: note || defaultNote,
+            isGallaEntry: true,
+            gallaAction: actionType,
+            createdAt: new Date().toISOString()
+          });
+        }
 
         amountInput.value = '';
         noteInput.value = '';
         partySelect.value = '';
         playSound('success');
-        showAppNotification("Galla Updated", `${actionType === 'in' ? 'Cash In' : 'Cash Out'} of Rs. ${evaluated.toLocaleString()} recorded.`);
       } catch (err) {
-        showAppNotification("Error", err.message, true);
+        alert("Error updating cash book: " + err.message);
       }
     };
 
-    // CASH BOOK ACTIVITY TABLE: 6 FULL COLUMNS WITH RUNNING BALANCE
     function renderGallaTransactionsTable() {
       const listEl = document.getElementById('galla-history-tbody');
       if (!listEl) return;
       listEl.innerHTML = '';
 
       if (gallaTxHistory.length === 0) {
-        listEl.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-xs text-slate-400 font-semibold">No cash activity entries recorded yet.</td></tr>';
+        listEl.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-xs text-slate-400">No cash entries recorded yet.</td></tr>';
         return;
       }
 
-      // 1. Calculate running closing balance chronologically
       const chronological = [...gallaTxHistory].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       let running = gallaOpeningBalance;
       const runningMap = {};
@@ -869,28 +878,27 @@
         runningMap[t.id] = running;
       });
 
-      // 2. Render entries newest first
-      gallaTxHistory.slice(0, 100).forEach(t => {
+      gallaTxHistory.slice(0, 60).forEach(t => {
         const row = document.createElement('tr');
-        row.className = "border-b border-slate-100 hover:bg-slate-50/90 transition text-xs font-medium";
+        row.className = "border-b border-slate-100 hover:bg-slate-50/80 transition text-xs";
         const isCashIn = (t.gallaAction === 'in') || (t.type === 'liye');
-        const dateStr = new Date(t.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        const dateStr = formatPakistanDateTime(t.createdAt, true);
         const entryBal = runningMap[t.id] !== undefined ? runningMap[t.id] : 0;
         const formattedAccountName = toTitleCase(t.customerName || 'Direct Cash');
 
         row.innerHTML = `
-          <td class="p-3.5 text-slate-500 font-semibold whitespace-nowrap">${dateStr}</td>
-          <td class="p-3.5 font-bold text-slate-900 whitespace-nowrap">${formattedAccountName}</td>
-          <td class="p-3.5 text-slate-600 font-medium max-w-xs xl:max-w-md truncate" title="${t.note || '-'}">${t.note || '-'}</td>
-          <td class="p-3.5 whitespace-nowrap text-center">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wider ${isCashIn ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}">
-              ${isCashIn ? 'CASH IN (+)' : 'CASH OUT (-)'}
+          <td class="p-3 text-slate-500 font-semibold whitespace-nowrap">${escapeHtml(dateStr)}</td>
+          <td class="p-3 font-bold text-slate-800 whitespace-nowrap">${escapeHtml(formattedAccountName)}</td>
+          <td class="p-3 whitespace-nowrap text-center">
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-wide ${isCashIn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+              ${isCashIn ? 'CASH IN' : 'CASH OUT'}
             </span>
           </td>
-          <td class="p-3.5 text-right font-black whitespace-nowrap ${isCashIn ? 'text-emerald-600' : 'text-rose-600'}">
+          <td class="p-3 text-slate-600 font-medium max-w-[220px] truncate" title="${escapeHtml(t.note || '-')}">${escapeHtml(t.note || '-')}</td>
+          <td class="p-3 text-right font-black whitespace-nowrap ${isCashIn ? 'text-emerald-600' : 'text-rose-600'}">
             ${isCashIn ? '+' : '-'} Rs. ${Number(t.amount).toLocaleString()}
           </td>
-          <td class="p-3.5 text-right font-black whitespace-nowrap text-slate-900 bg-slate-50/80">
+          <td class="p-3 text-right font-black whitespace-nowrap text-slate-900 bg-slate-50/70">
             Rs. ${entryBal.toLocaleString()}
           </td>
         `;
@@ -915,23 +923,18 @@
       const bottomY = pageHeight - 7;
 
       if (cachedLogoBase64) {
-        try {
-          doc.addImage(cachedLogoBase64, 'PNG', startX, bottomY - iconSize + 0.8, iconSize, iconSize);
-        } catch(e) {}
+        doc.addImage(cachedLogoBase64, 'PNG', startX, bottomY - iconSize + 0.8, iconSize, iconSize);
       }
       doc.text(text, startX + iconSize + spacing, bottomY);
     }
 
-    // 1. Download Galla Cash Book Statement (PDF)
     window.downloadGallaPDF = () => {
       playSound('download');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
 
       if (cachedLogoBase64) {
-        try {
-          pdf.addImage(cachedLogoBase64, 'PNG', 14, 12, 14, 14);
-        } catch(e) {}
+        pdf.addImage(cachedLogoBase64, 'PNG', 14, 12, 14, 14);
       }
       
       pdf.setFontSize(16);
@@ -941,7 +944,7 @@
       pdf.setFontSize(9);
       pdf.setTextColor(100, 116, 139);
       pdf.text(`User Account: ${currentUser.email || 'Admin'}`, 32, 26);
-      pdf.text(`Generated On: ${new Date().toLocaleString('en-GB')}`, 32, 31);
+      pdf.text(`Generated On: ${formatPakistanDateTime(new Date().toISOString(), true)} PKT`, 32, 31);
 
       pdf.setFillColor(248, 250, 252);
       pdf.roundedRect(14, 36, 182, 15, 2, 2, 'F');
@@ -964,34 +967,34 @@
         const amt = Number(t.amount || 0);
         currentRunning += isCashIn ? amt : -amt;
 
-        const dateStr = new Date(t.createdAt).toLocaleDateString('en-GB', { 
-          day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
-        });
+        const dateStr = formatPakistanDateTime(t.createdAt, true);
 
         return [
           dateStr,
           toTitleCase(t.customerName || 'Direct Cash'),
-          t.note || '-',
           isCashIn ? 'CASH IN (+)' : 'CASH OUT (-)',
+          t.note || '-',
           `${isCashIn ? '+' : '-'} Rs. ${amt.toLocaleString()}`,
           `Rs. ${currentRunning.toLocaleString()}`
         ];
       });
 
+      const dayNet = gallaTodayIn - gallaTodayOut;
+
       const footRow = [
         [
-          'GRAND TOTAL',
+          'GRAND TOTAL (MEEZAN)',
           `Entries: ${sortedHistory.length}`,
-          '-',
-          'FLOW',
+          'TODAY FLOW',
           `In: Rs. ${gallaTodayIn.toLocaleString()} | Out: Rs. ${gallaTodayOut.toLocaleString()}`,
-          `Rs. ${gallaClosingCash.toLocaleString()}`
+          `Day Net: Rs. ${dayNet.toLocaleString()}`,
+          `Closing: Rs. ${gallaClosingCash.toLocaleString()}`
         ]
       ];
 
       pdf.autoTable({
         startY: 55,
-        head: [['Date & Time', 'Account / Party', 'Note / Description', 'Type', 'Amount', 'Balance']],
+        head: [['Date & Time', 'Account / Party', 'Type', 'Description / Note', 'Amount', 'Balance']],
         body: tableData,
         foot: footRow,
         theme: 'striped',
@@ -1007,19 +1010,16 @@
         }
       });
 
-      pdf.save(`GG_Galla_Statement_${new Date().toISOString().slice(0, 10)}.pdf`);
+      pdf.save(`GG_Galla_Statement_${getTodayDateString()}.pdf`);
     };
 
-    // 2. Download Customer Ledger (PDF)
     window.downloadPDF = () => {
       playSound('download');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
 
       if (cachedLogoBase64) {
-        try {
-          pdf.addImage(cachedLogoBase64, 'PNG', 14, 12, 14, 14);
-        } catch(e) {}
+        pdf.addImage(cachedLogoBase64, 'PNG', 14, 12, 14, 14);
       }
 
       pdf.setFontSize(16);
@@ -1029,7 +1029,7 @@
       pdf.setFontSize(9);
       pdf.setTextColor(100, 116, 139);
       pdf.text(`Customer Name: ${toTitleCase(selectedCustomer.name)}`, 32, 26);
-      pdf.text(`Phone: ${selectedCustomer.phone || 'N/A'}  |  Date: ${new Date().toLocaleDateString('en-GB')}`, 32, 31);
+      pdf.text(`Phone: ${selectedCustomer.phone || 'N/A'}  |  Date: ${getTodayDateString()}`, 32, 31);
 
       const balStatus = selectedCustomer.balance >= 0 ? 'Receivable' : 'Payable';
       const balText = `Current Balance: Rs. ${Math.abs(selectedCustomer.balance || 0).toLocaleString()} (${balStatus})`;
@@ -1050,7 +1050,7 @@
 
         let noteText = t.note || (isGiven ? 'Given (Debit)' : 'Received (Credit)');
         return [
-          new Date(t.createdAt).toLocaleDateString('en-GB'),
+          formatPakistanDateTime(t.createdAt, false),
           noteText,
           isGiven ? `Rs. ${amt.toLocaleString()}` : '-',
           !isGiven ? `Rs. ${amt.toLocaleString()}` : '-',
@@ -1085,7 +1085,6 @@
       pdf.save(`${selectedCustomer.name}_Ledger.pdf`);
     };
 
-    // Download Backup (CSV or JSON)
     window.downloadBackup = async () => {
       playSound('tap');
       const choice = prompt("Select Backup Format:\n1 = Excel Sheet (.CSV)\n2 = JSON Backup (.JSON - For Shifting Account)\n\nType 1 or 2 below:", "1");
@@ -1101,7 +1100,7 @@
           getDocs(qTx)
         ]);
 
-        const dateStr = new Date().toISOString().slice(0, 10);
+        const dateStr = getTodayDateString();
 
         if (choice === "1") {
           const customersMap = {};
@@ -1137,10 +1136,10 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          showAppNotification("Export Done", "Excel CSV downloaded successfully.");
 
         } else if (choice === "2") {
           const backupData = {
+            backupId: crypto.randomUUID(),
             exportDate: new Date().toISOString(),
             user: currentUser.email,
             totalCustomers: custSnap.docs.length,
@@ -1160,10 +1159,9 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          showAppNotification("Export Done", "Full JSON backup downloaded successfully.");
         }
       } catch (err) {
-        showAppNotification("Backup Failed", err.message, true);
+        alert("Backup failed: " + err.message);
       }
     };
 
@@ -1191,6 +1189,13 @@
             throw new Error("Invalid backup format. Please select an authentic GG Digi Book JSON backup.");
           }
 
+          const fallbackBackupId = `${imported.exportDate || 'legacy'}_${imported.user || 'unknown'}_${imported.customers.length}_${imported.transactions.length}`;
+          const safeBackupId = String(imported.backupId || fallbackBackupId).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 180);
+          const importMarkerRef = doc(db, "backup_imports", `${currentUser.uid}_${safeBackupId}`);
+          if ((await getDoc(importMarkerRef)).exists()) {
+            throw new Error("This backup has already been imported into this account.");
+          }
+
           const customerIdMap = {};
           for (const cust of imported.customers) {
             const newCustRef = await addDoc(collection(db, "customers"), {
@@ -1214,32 +1219,56 @@
               note: tx.note || "",
               isGallaEntry: tx.isGallaEntry || false,
               gallaAction: tx.gallaAction || "",
+              receiptImageUrl: tx.receiptImageUrl || "",
               receiptImage: tx.receiptImage || "",
               createdAt: tx.createdAt || new Date().toISOString()
             });
           }
 
-          if (imported.gallaMeta && imported.gallaMeta.openingBalance) {
+          if (imported.gallaMeta && Object.prototype.hasOwnProperty.call(imported.gallaMeta, 'openingBalance')) {
             await setDoc(doc(db, "galla_meta", currentUser.uid), {
               openingBalance: Number(imported.gallaMeta.openingBalance)
             }, { merge: true });
           }
 
+          await setDoc(importMarkerRef, {
+            userId: currentUser.uid,
+            backupId: safeBackupId,
+            importedAt: new Date().toISOString()
+          });
+
           playSound('success');
-          showAppNotification("Import Success", `Restored ${imported.customers.length} customers and ${imported.transactions.length} records!`);
+          alert(`Successfully imported ${imported.customers.length} customers and ${imported.transactions.length} transactions to your account!`);
           event.target.value = "";
         } catch (err) {
-          showAppNotification("Import Error", err.message, true);
+          alert("Import Error: " + err.message);
           event.target.value = "";
         }
       };
       reader.readAsText(file);
     };
 
-    // Camera Receipt Attachment
+    async function uploadAttachedReceipt() {
+      if (!attachedPhotoBlob) return '';
+      const fileName = `${Date.now()}_${crypto.randomUUID()}.jpg`;
+      const fileRef = storageRef(storage, `receipts/${currentUser.uid}/${fileName}`);
+      await uploadBytes(fileRef, attachedPhotoBlob, { contentType: 'image/jpeg' });
+      return await getDownloadURL(fileRef);
+    }
+
     window.handleReceiptUpload = (event) => {
       const file = event.target.files[0];
       if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file.');
+        event.target.value = '';
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image is too large. Maximum allowed size is 10 MB.');
+        event.target.value = '';
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1259,18 +1288,27 @@
           canvas.height = height;
           canvas.getContext('2d').drawImage(img, 0, 0, width, height);
 
-          attachedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.65);
-          const p1 = document.getElementById('photo-preview-container');
-          const p2 = document.getElementById('d-photo-preview-container');
-          if (p1) {
-            p1.classList.remove('hidden');
-            document.getElementById('photo-preview-thumb').src = attachedPhotoBase64;
-          }
-          if (p2) {
-            p2.classList.remove('hidden');
-            document.getElementById('d-photo-preview-thumb').src = attachedPhotoBase64;
-          }
-          playSound('success');
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              alert('Could not process this image.');
+              return;
+            }
+            attachedPhotoBlob = blob;
+            if (attachedPhotoPreviewUrl) URL.revokeObjectURL(attachedPhotoPreviewUrl);
+            attachedPhotoPreviewUrl = URL.createObjectURL(blob);
+
+            const p1 = document.getElementById('photo-preview-container');
+            const p2 = document.getElementById('d-photo-preview-container');
+            if (p1) {
+              p1.classList.remove('hidden');
+              document.getElementById('photo-preview-thumb').src = attachedPhotoPreviewUrl;
+            }
+            if (p2) {
+              p2.classList.remove('hidden');
+              document.getElementById('d-photo-preview-thumb').src = attachedPhotoPreviewUrl;
+            }
+            playSound('success');
+          }, 'image/jpeg', 0.72);
         };
         img.src = e.target.result;
       };
@@ -1278,7 +1316,9 @@
     };
 
     window.clearPhotoAttachment = () => {
-      attachedPhotoBase64 = "";
+      attachedPhotoBlob = null;
+      if (attachedPhotoPreviewUrl) URL.revokeObjectURL(attachedPhotoPreviewUrl);
+      attachedPhotoPreviewUrl = "";
       const input = document.getElementById('receipt-camera-input');
       const dInput = document.getElementById('d-receipt-camera-input');
       if (input) input.value = "";
@@ -1289,17 +1329,30 @@
       if (p2) p2.classList.add('hidden');
     };
 
-    window.viewImage = (base64) => {
+    window.viewTransactionImage = (transactionId) => {
       playSound('tap');
+      const transaction = currentTransactions.find(t => t.id === transactionId);
+      const imageSource = transaction?.receiptImageUrl || transaction?.receiptImage || '';
+      if (!imageSource || (!imageSource.startsWith('https://') && !imageSource.startsWith('data:image/'))) {
+        alert('Receipt image is unavailable.');
+        return;
+      }
       const w = window.open("");
-      w.document.write(`<div style="display:flex;justify-content:center;align-items:center;min-height:90vh;background:#0f172a;margin:0;"><img src="${base64}" style="max-width:92%; max-height:90vh; object-fit:contain; border-radius:16px; box-shadow:0 20px 40px rgba(0,0,0,0.5);"></div>`);
+      if (!w) {
+        alert('Please allow pop-ups to view the receipt.');
+        return;
+      }
+      const image = w.document.createElement('img');
+      image.src = imageSource;
+      image.style.cssText = 'max-width:92%;margin:30px auto;display:block;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.15)';
+      w.document.body.appendChild(image);
     };
 
     window.startSpeechRecognition = (isDesktop = false) => {
       playSound('mic');
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        showAppNotification("Voice Not Supported", "Speech recognition is not supported in this browser. Please use Chrome or Edge.", true);
+        alert("Your browser does not support voice recognition. Please use Google Chrome or Safari.");
         return;
       }
       const recognition = new SpeechRecognition();
@@ -1319,9 +1372,30 @@
 
     window.deleteCustomer = async () => {
       playSound('delete');
-      if (!confirm(`Are you sure you want to delete ${toTitleCase(selectedCustomer.name)}'s account? All records will be removed.`)) return;
+      if (!confirm(`Are you sure you want to delete ${selectedCustomer.name}'s account? All records will be removed.`)) return;
       try {
-        await deleteDoc(doc(db, "customers", selectedCustomer.id));
+        const customerId = selectedCustomer.id;
+        const customerRef = doc(db, "customers", customerId);
+        const customerSnap = await getDoc(customerRef);
+        if (!customerSnap.exists() || customerSnap.data().userId !== currentUser.uid) {
+          throw new Error('Customer account not found or access denied.');
+        }
+
+        const txQuery = query(
+          collection(db, "transactions"),
+          where("userId", "==", currentUser.uid),
+          where("customerId", "==", customerId)
+        );
+        const txSnapshot = await getDocs(txQuery);
+        const refsToDelete = txSnapshot.docs.map(item => item.ref);
+        refsToDelete.push(customerRef);
+
+        for (let i = 0; i < refsToDelete.length; i += 450) {
+          const batch = writeBatch(db);
+          refsToDelete.slice(i, i + 450).forEach(itemRef => batch.delete(itemRef));
+          await batch.commit();
+        }
+
         selectedCustomer = null;
         closeModal();
         const dPlaceholder = document.getElementById('desktop-no-customer-pane');
@@ -1330,16 +1404,15 @@
           dPlaceholder.classList.remove('hidden');
           dDetailPane.classList.add('hidden');
         }
-        showAppNotification("Account Deleted", "Customer ledger has been permanently deleted.");
       } catch (err) {
-        showAppNotification("Error", err.message, true);
+        alert("Error: " + err.message);
       }
     };
 
     window.sendWhatsApp = () => {
       playSound('tap');
       if (!selectedCustomer || !selectedCustomer.phone) {
-        showAppNotification("No Phone", "Customer phone number is not available.", true);
+        alert("Customer phone number is not available.");
         return;
       }
       let phone = selectedCustomer.phone.replace(/[^0-9]/g, '');
@@ -1351,29 +1424,18 @@
     };
   </script>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 antialiased selection:bg-emerald-500 selection:text-white flex flex-col">
-
-  <!-- NOTIFICATION TOAST -->
-  <div id="notification-toast" class="fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-slate-900/95 text-white px-5 py-4 rounded-2xl shadow-2xl border border-emerald-500/50 backdrop-blur-md transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none max-w-md">
-    <div id="toast-icon" class="text-2xl">✅</div>
-    <div>
-      <h4 id="toast-title" class="text-xs font-black tracking-wide uppercase text-emerald-400">Notification</h4>
-      <p id="toast-message" class="text-xs text-slate-200 mt-0.5 font-medium"></p>
-    </div>
-  </div>
+<body class="bg-slate-100 min-h-screen text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
 
   <!-- 1. LOGIN SCREEN -->
-  <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-5 bg-gradient-to-br from-emerald-50 via-slate-50 to-emerald-100/40">
-    <div class="glass-card p-10 rounded-3xl shadow-2xl max-w-md w-full text-center border border-white">
-      <div class="relative inline-block mb-6">
-        <div class="w-24 h-24 rounded-full mx-auto bg-emerald-600 text-white flex items-center justify-center font-black text-3xl shadow-xl ring-8 ring-emerald-100">
-          GG
-        </div>
+  <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-5 bg-gradient-to-b from-emerald-50/60 to-slate-100">
+    <div class="glass-card p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-white">
+      <div class="relative inline-block mb-4">
+        <img src="logo.png" alt="GG Digi Book" class="w-24 h-24 rounded-full mx-auto object-contain shadow-lg bg-white p-1 ring-4 ring-emerald-50">
       </div>
-      <h2 class="text-3xl font-black text-slate-900 tracking-tight">GG Digi Book</h2>
-      <p class="text-xs text-slate-500 font-semibold mt-1 mb-8">Professional Cloud Digital Ledger & Cash Book</p>
+      <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">GG Digi Book</h2>
+      <p class="text-xs text-slate-500 font-medium mt-1 mb-8">Your Secure Cloud Ledger Book</p>
       
-      <button onclick="loginGoogle()" class="w-full py-4 px-5 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-800 font-extrabold rounded-2xl shadow-sm flex items-center justify-center gap-3 transition text-sm">
+      <button onclick="loginGoogle()" class="w-full py-3.5 px-4 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-200 text-slate-700 font-bold rounded-2xl shadow-sm flex items-center justify-center gap-3 transition">
         <svg class="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -1382,71 +1444,66 @@
         </svg>
         Sign in with Google
       </button>
-
-      <p class="text-[11px] font-bold text-slate-400 mt-8">Powered by Global Guru • Enterprise Edition</p>
     </div>
   </div>
 
-  <!-- 2. MAIN APP FULL-SCREEN LAYOUT -->
-  <div id="app-screen" class="hidden flex-1 min-h-screen flex flex-col md:flex-row bg-slate-100">
+  <!-- 2. MAIN APP RESPONSIVE WRAPPER -->
+  <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row bg-slate-100">
     
-    <!-- DESKTOP SIDEBAR -->
-    <aside class="hidden md:flex flex-col w-64 lg:w-72 bg-white border-r border-slate-200 h-screen sticky top-0 z-30 p-5 justify-between shadow-sm flex-shrink-0">
+    <!-- DESKTOP LEFT SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-64 lg:w-72 bg-white border-r border-slate-200 h-screen sticky top-0 z-30 p-5 justify-between shadow-sm">
       <div class="space-y-6">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-lg shadow-md ring-2 ring-emerald-500/20">
-            GG
-          </div>
+          <img src="logo.png" alt="GG Logo" class="w-11 h-11 rounded-full bg-white p-0.5 object-contain shadow-md ring-2 ring-emerald-500/20">
           <div>
-            <h2 class="text-base font-black text-slate-900 tracking-tight leading-tight">GG Digi Book</h2>
-            <span class="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full inline-block mt-0.5 border border-emerald-200">Cloud Sync 🟢</span>
+            <h2 class="text-base font-extrabold text-slate-900 tracking-tight leading-tight">GG Digi Book</h2>
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-0.5">Cloud Sync 🟢</span>
           </div>
         </div>
 
-        <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-sm shadow-inner">
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-black text-xs shadow-inner">
             👤
           </div>
           <div class="overflow-hidden">
-            <h4 id="desktop-user-name" class="text-xs font-extrabold text-slate-900 truncate"></h4>
-            <p id="desktop-user-email" class="text-[11px] text-slate-400 font-medium truncate"></p>
+            <h4 id="desktop-user-name" class="text-xs font-bold text-slate-900 truncate"></h4>
+            <p id="desktop-user-email" class="text-[11px] text-slate-400 truncate"></p>
           </div>
         </div>
 
-        <nav class="space-y-2">
-          <button id="d-tab-btn-ledger" onclick="switchTab('ledger')" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-emerald-50 text-emerald-800 font-extrabold text-sm shadow-sm transition border border-emerald-200/50">
-            <span class="text-xl">📖</span> Khata / Customers
+        <nav class="space-y-1.5">
+          <button id="d-tab-btn-ledger" onclick="switchTab('ledger')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-emerald-50 text-emerald-800 font-extrabold text-sm shadow-sm transition">
+            <span class="text-lg">📖</span> Khata / Customers
           </button>
-          <button id="d-tab-btn-accounts" onclick="switchTab('accounts')" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-slate-600 font-bold text-sm hover:bg-slate-100 hover:text-slate-900 transition">
-            <span class="text-xl">💰</span> Accounts / Galla
+          <button id="d-tab-btn-accounts" onclick="switchTab('accounts')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 font-bold text-sm hover:bg-slate-100 transition">
+            <span class="text-lg">💰</span> Accounts / Galla
           </button>
-          <button id="d-tab-btn-settings" onclick="switchTab('settings')" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-slate-600 font-bold text-sm hover:bg-slate-100 hover:text-slate-900 transition">
-            <span class="text-xl">⚙️</span> Settings & Backup
+          <button id="d-tab-btn-settings" onclick="switchTab('settings')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 font-bold text-sm hover:bg-slate-100 transition">
+            <span class="text-lg">⚙️</span> Settings & Backup
           </button>
         </nav>
       </div>
 
       <div class="pt-4 border-t border-slate-100">
-        <button onclick="logout()" class="w-full py-3 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold rounded-2xl text-xs transition flex items-center justify-center gap-2 mb-3">
+        <button onclick="logout()" class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-2xl text-xs transition flex items-center justify-center gap-2 mb-3">
           <span>🚪</span> Sign Out
         </button>
         <div class="flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-400 text-center">
+          <img src="logo.png" alt="GG" class="w-3.5 h-3.5 rounded-full object-contain">
           <span>GG Digi Book • Powered by Global Guru</span>
         </div>
       </div>
     </aside>
 
-    <!-- MAIN FLUID CONTENT CONTAINER -->
-    <main class="flex-1 flex flex-col min-h-screen w-full bg-slate-50 overflow-x-hidden">
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col min-h-screen max-w-md md:max-w-none mx-auto md:mx-0 w-full bg-white md:bg-slate-50 border-x md:border-x-0 border-slate-200">
       
       <!-- Mobile Top Header -->
       <header class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-700 text-white p-4 flex justify-between items-center shadow-lg sticky top-0 z-20">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-white text-emerald-800 flex items-center justify-center font-black text-sm shadow">
-            GG
-          </div>
+          <img src="logo.png" alt="GG Logo" class="w-10 h-10 rounded-full bg-white p-0.5 object-contain shadow-md ring-2 ring-emerald-400/30">
           <div>
-            <h1 class="text-sm font-black tracking-tight leading-tight">GG Digi Book</h1>
+            <h1 class="text-sm font-extrabold tracking-tight leading-tight">GG Digi Book</h1>
             <p id="user-name" class="text-[11px] text-emerald-200/90 font-medium truncate max-w-[170px]"></p>
           </div>
         </div>
@@ -1455,261 +1512,239 @@
         </span>
       </header>
 
-      <!-- VIEW 1: KHATA / CUSTOMER LEDGER VIEW -->
-      <div id="view-ledger" class="flex-1 flex flex-col md:flex-row pb-20 md:pb-0 h-full w-full">
-        
-        <!-- Left Customers Pane -->
-        <div class="w-full md:w-[380px] lg:w-[420px] md:border-r border-slate-200 flex flex-col bg-white flex-shrink-0">
+      <!-- PAGE 1: LEDGER VIEW -->
+      <div id="view-ledger" class="flex-1 flex flex-col md:flex-row pb-20 md:pb-0 h-full">
+        <div class="w-full md:w-[380px] lg:w-[420px] md:border-r border-slate-200 flex flex-col bg-white">
           <div class="p-4 bg-gradient-to-b from-emerald-50/60 to-transparent border-b border-slate-100 space-y-3">
-            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
               <div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Net Balance</p>
-                <h2 id="net-balance" class="text-2xl font-black text-slate-800 tracking-tight">Rs. 0</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Net Balance</p>
+                <h2 id="net-balance" class="text-xl font-black text-slate-800 tracking-tight">Rs. 0</h2>
               </div>
               <div class="text-right">
-                <span id="customer-total-count" class="inline-block text-[11px] font-black px-3 py-1 rounded-full bg-slate-100 text-slate-700">0 Customers</span>
-                <p id="net-status" class="text-[10px] font-bold text-emerald-600 mt-1">Settled</p>
+                <span id="customer-total-count" class="inline-block text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">0 Customers</span>
+                <p id="net-status" class="text-[10px] font-bold text-emerald-600 mt-0.5">Settled</p>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div class="bg-white p-3.5 rounded-2xl border border-rose-100/80 shadow-sm">
                 <div class="flex items-center justify-between mb-1">
-                  <span class="text-[10px] font-extrabold text-slate-500 uppercase">You Will Get</span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase">You Will Get</span>
+                  <span class="w-2 h-2 rounded-full bg-rose-500"></span>
                 </div>
-                <h3 id="total-receivable" class="text-lg font-black text-rose-600 tracking-tight">Rs. 0</h3>
+                <h3 id="total-receivable" class="text-base font-black text-rose-600 tracking-tight">Rs. 0</h3>
               </div>
               <div class="bg-white p-3.5 rounded-2xl border border-emerald-100/80 shadow-sm">
                 <div class="flex items-center justify-between mb-1">
-                  <span class="text-[10px] font-extrabold text-slate-500 uppercase">You Will Give</span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase">You Will Give</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                 </div>
-                <h3 id="total-payable" class="text-lg font-black text-emerald-600 tracking-tight">Rs. 0</h3>
+                <h3 id="total-payable" class="text-base font-black text-emerald-600 tracking-tight">Rs. 0</h3>
               </div>
             </div>
           </div>
 
-          <div class="px-4 py-3.5 bg-white border-b border-slate-100 space-y-2.5">
+          <div class="px-4 py-3 bg-white border-b border-slate-100 space-y-2.5">
             <div class="relative">
-              <input type="text" id="search-input" oninput="renderCustomers()" placeholder="Search customer by name or phone..." class="w-full bg-slate-50 pl-9 pr-4 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+              <input type="text" id="search-input" oninput="renderCustomers()" placeholder="Search customer by name or phone..." class="w-full bg-slate-50 pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200/80 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
               <span class="absolute left-3 top-3 text-slate-400 text-xs">🔍</span>
             </div>
             <div class="flex gap-2">
-              <button id="filter-all" onclick="setFilter('all')" class="px-4 py-2 rounded-full text-xs font-black bg-emerald-700 text-white shadow-sm transition">All</button>
-              <button id="filter-receivable" onclick="setFilter('receivable')" class="px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">You Will Get</button>
-              <button id="filter-payable" onclick="setFilter('payable')" class="px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">You Will Give</button>
+              <button id="filter-all" onclick="setFilter('all')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-700 text-white shadow-sm transition">All</button>
+              <button id="filter-receivable" onclick="setFilter('receivable')" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">You Will Get</button>
+              <button id="filter-payable" onclick="setFilter('payable')" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">You Will Give</button>
             </div>
           </div>
 
-          <div id="customer-list" class="flex-1 overflow-y-auto divide-y divide-slate-100 max-h-[calc(100vh-380px)] md:max-h-none"></div>
+          <div id="customer-list" class="flex-1 overflow-y-auto divide-y divide-slate-100 max-h-[calc(100vh-360px)] md:max-h-none"></div>
 
-          <div class="p-3.5 bg-white/95 border-t border-slate-100 sticky bottom-14 md:bottom-0 z-10 backdrop-blur-md">
-            <button onclick="addNewCustomer()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-extrabold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition text-sm">
-              <span class="text-xl leading-none font-black">+</span> Add New Customer
+          <div class="p-3 bg-white/95 border-t border-slate-100 sticky bottom-14 md:bottom-0 z-10 backdrop-blur-md">
+            <button onclick="addNewCustomer()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition text-sm">
+              <span class="text-lg leading-none font-black">+</span> Add New Customer
             </button>
           </div>
         </div>
 
-        <!-- Right Detailed Ledger Split Pane (Desktop Full Width) -->
-        <div class="hidden md:flex flex-1 flex-col bg-slate-50 h-screen overflow-y-auto p-6 lg:p-8">
+        <!-- Desktop Split Pane -->
+        <div class="hidden md:flex flex-1 flex-col bg-slate-50 h-screen overflow-y-auto p-6">
           <div id="desktop-no-customer-pane" class="flex-1 flex flex-col items-center justify-center text-center p-8 text-slate-400">
-            <div class="w-24 h-24 bg-white rounded-3xl shadow-sm border border-slate-200/80 flex items-center justify-center text-4xl mb-4">
+            <div class="w-20 h-20 bg-white rounded-3xl shadow-sm border border-slate-200/80 flex items-center justify-center text-3xl mb-4">
               📖
             </div>
-            <h3 class="text-lg font-black text-slate-700">No Customer Selected</h3>
-            <p class="text-xs text-slate-400 mt-1 max-w-sm font-medium">Left side list se kisi bhi customer ya account par click karein taake complete ledger open ho sake.</p>
+            <h3 class="text-base font-extrabold text-slate-700">No Customer Selected</h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-xs">Left side list se kisi bhi customer ya account par click karein taake ledger open ho sake.</p>
           </div>
 
-          <div id="desktop-customer-detail-pane" class="hidden flex-1 flex flex-col space-y-5">
-            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+          <div id="desktop-customer-detail-pane" class="hidden flex-1 flex flex-col space-y-4">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
               <div>
-                <h3 id="d-cust-name" class="text-2xl font-black text-slate-900 leading-tight"></h3>
-                <p id="d-cust-phone" class="text-xs text-slate-400 mt-1 font-semibold"></p>
-                <div id="d-cust-balance" class="mt-2.5"></div>
+                <h3 id="d-cust-name" class="text-xl font-black text-slate-900 leading-tight"></h3>
+                <p id="d-cust-phone" class="text-xs text-slate-400 mt-0.5 font-medium"></p>
+                <div id="d-cust-balance" class="mt-2"></div>
               </div>
-              <div class="flex items-center gap-2.5">
-                <button onclick="sendWhatsApp()" class="px-4 py-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold rounded-xl flex items-center gap-1.5 text-xs hover:bg-emerald-100 transition shadow-sm">
+              <div class="flex items-center gap-2">
+                <button onclick="sendWhatsApp()" class="px-3.5 py-2 bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold rounded-xl flex items-center gap-1.5 text-xs hover:bg-emerald-100 transition shadow-sm">
                   <span>💬</span> WhatsApp
                 </button>
-                <button onclick="downloadPDF()" class="px-4 py-2.5 bg-white text-slate-700 border border-slate-200 font-extrabold rounded-xl flex items-center gap-1.5 text-xs hover:bg-slate-100 transition shadow-sm">
+                <button onclick="downloadPDF()" class="px-3.5 py-2 bg-white text-slate-700 border border-slate-200 font-bold rounded-xl flex items-center gap-1.5 text-xs hover:bg-slate-100 transition shadow-sm">
                   <span>📄</span> PDF
                 </button>
-                <button onclick="deleteCustomer()" title="Delete Customer" class="p-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition border border-rose-100">
+                <button onclick="deleteCustomer()" title="Delete Customer" class="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition border border-rose-100">
                   🗑️
                 </button>
               </div>
             </div>
 
-            <!-- Transaction Entry Form -->
-            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-3.5">
-              <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Quick Transaction Entry (Khata Book Only)</h4>
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Quick Transaction Entry (Khata Book Only)</h4>
               
-              <div id="d-photo-preview-container" class="hidden flex items-center justify-between bg-slate-50 border border-emerald-200 p-3 rounded-xl">
-                <div class="flex items-center gap-2.5">
-                  <img id="d-photo-preview-thumb" class="w-10 h-10 rounded-lg object-cover border border-emerald-300" src="">
-                  <span class="text-xs font-black text-emerald-800">Bill Photo Attached ✅</span>
+              <div id="d-photo-preview-container" class="hidden flex items-center justify-between bg-slate-50 border border-emerald-200 p-2.5 rounded-xl">
+                <div class="flex items-center gap-2">
+                  <img id="d-photo-preview-thumb" class="w-8 h-8 rounded-lg object-cover border border-emerald-300" src="">
+                  <span class="text-xs font-bold text-emerald-800">Bill Photo Attached ✅</span>
                 </div>
-                <button onclick="clearPhotoAttachment()" class="text-xs text-rose-600 font-bold hover:bg-rose-50 px-2 py-1 rounded-lg">Remove</button>
+                <button onclick="clearPhotoAttachment()" class="text-xs text-rose-600 font-bold hover:bg-rose-50 px-2 py-1 rounded">Remove</button>
               </div>
 
-              <div class="grid grid-cols-12 gap-3.5">
+              <div class="grid grid-cols-12 gap-3">
                 <div class="col-span-5">
-                  <input type="text" id="d-tx-amount" onkeydown="handleFormulaInput(event, 'diye', true)" placeholder="Amount (e.g. 500+6000)" class="w-full text-xs font-bold p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
-                  <span class="text-[9px] text-slate-400 mt-1 block font-medium">Type math formula & Press Enter</span>
+                  <input type="text" id="d-tx-amount" onkeydown="handleFormulaInput(event, 'diye', true)" placeholder="Amount (e.g. 500+6000)" class="w-full text-xs font-bold p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
+                  <span class="text-[9px] text-slate-400 mt-0.5 block font-medium">Type formula & Press Enter</span>
                 </div>
                 
                 <div class="col-span-7 relative flex items-center">
-                  <input type="text" id="d-tx-note" onkeydown="if(event.key==='Enter') addTransaction('diye', true)" placeholder="Note / Description (e.g. Bill, Payment, Chai)" class="w-full text-xs font-semibold p-3.5 pr-20 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
+                  <input type="text" id="d-tx-note" onkeydown="if(event.key==='Enter') addTransaction('diye', true)" placeholder="Note / Description" class="w-full text-xs p-3 pr-16 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
                   <div class="absolute right-2 flex items-center gap-1.5">
-                    <button id="d-mic-btn" onclick="startSpeechRecognition(true)" title="Voice to Text" class="p-2 rounded-lg text-slate-400 hover:text-emerald-700 text-sm transition">🎙️</button>
-                    <label for="d-receipt-camera-input" title="Attach Receipt/Bill" class="p-2 rounded-lg text-slate-400 hover:text-emerald-700 text-sm cursor-pointer transition">📸</label>
+                    <button id="d-mic-btn" onclick="startSpeechRecognition(true)" title="Voice to Text" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-700 text-sm transition">🎙️</button>
+                    <label for="d-receipt-camera-input" title="Attach Receipt/Bill" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-700 text-sm cursor-pointer transition">📸</label>
                     <input id="d-receipt-camera-input" type="file" accept="image/*" onchange="handleReceiptUpload(event)" class="hidden">
                   </div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-3.5 pt-1">
-                <button onclick="addTransaction('diye', true)" class="py-3.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex items-center justify-center gap-2">
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <button onclick="addTransaction('diye', true)" class="py-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
                   <span>🔴</span> CASH OUT (You Gave)
                 </button>
-                <button onclick="addTransaction('liye', true)" class="py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <button onclick="addTransaction('liye', true)" class="py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
                   <span>🟢</span> CASH IN (You Got)
                 </button>
               </div>
             </div>
 
-            <!-- Ledger History Card -->
-            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex-1 flex flex-col space-y-3.5">
-              <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Transaction Ledger History</h4>
-              <div id="d-tx-history-list" class="space-y-2.5 flex-1 overflow-y-auto max-h-[420px]"></div>
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex-1 flex flex-col space-y-3">
+              <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Transaction History</h4>
+              <div id="d-tx-history-list" class="space-y-2 flex-1 overflow-y-auto max-h-[350px]"></div>
             </div>
           </div>
         </div>
 
       </div>
 
-      <!-- VIEW 2: ACCOUNTS / GALLA VIEW (ULTRA-WIDE 100% FLUID FULL-SCREEN) -->
-      <div id="view-accounts" class="hidden flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 space-y-6 overflow-y-auto bg-slate-50 w-full">
+      <!-- PAGE 2: ACCOUNTS / GALLA VIEW -->
+      <div id="view-accounts" class="hidden flex-1 p-4 md:p-6 pb-20 md:pb-6 space-y-4 overflow-y-auto bg-slate-50">
         
-        <!-- Live Galla Strip (Stretches 100% Full Width) -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 w-full">
+        <!-- Live Galla Strip -->
+        <div class="bg-white p-4 md:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-3 w-full">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-xs font-black text-slate-700 uppercase tracking-wider">Live Galla Cash Flow</span>
-            </div>
-            <span class="text-[11px] font-black bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5 shadow-xs">
-              <span>🔄</span> Daily Auto Cutoff
+            <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Live Galla Cash Flow</span>
+            <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              Daily Auto Cutoff 🔄
             </span>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-center">
-            <!-- Day's Opening -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col justify-between">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-center">
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex flex-col justify-between">
               <div class="flex items-center justify-center gap-1.5">
-                <span class="text-[11px] font-black text-slate-500 uppercase tracking-wide">Day's Opening</span>
-                <button onclick="editOpeningBalance()" title="Set/Edit Base Opening Balance" class="text-xs text-emerald-700 hover:text-emerald-900 transition p-0.5">✏️</button>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Day's Opening</span>
+                <button onclick="editOpeningBalance()" title="Set/Edit Base Opening Balance" class="text-xs text-emerald-700 hover:text-emerald-900 transition">✏️</button>
               </div>
-              <h5 id="galla-strip-opening" class="text-lg sm:text-xl font-black text-slate-900 mt-2">Rs. 0</h5>
+              <h5 id="galla-strip-opening" class="text-sm md:text-base font-black text-slate-800 mt-1.5">Rs. 0</h5>
             </div>
 
-            <!-- Today Cash In -->
-            <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200/80 flex flex-col justify-between">
-              <span class="text-[11px] font-black text-emerald-800 uppercase tracking-wide">Today Cash In (+)</span>
-              <h5 id="galla-strip-in" class="text-lg sm:text-xl font-black text-emerald-600 mt-2">Rs. 0</h5>
+            <div class="bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100 flex flex-col justify-between">
+              <span class="text-[10px] font-bold text-emerald-700 uppercase">Today Cash In (+)</span>
+              <h5 id="galla-strip-in" class="text-sm md:text-base font-black text-emerald-600 mt-1.5">Rs. 0</h5>
             </div>
 
-            <!-- Today Cash Out -->
-            <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 flex flex-col justify-between">
-              <span class="text-[11px] font-black text-rose-800 uppercase tracking-wide">Today Cash Out (-)</span>
-              <h5 id="galla-strip-out" class="text-lg sm:text-xl font-black text-rose-600 mt-2">Rs. 0</h5>
+            <div class="bg-rose-50/60 p-3.5 rounded-2xl border border-rose-100 flex flex-col justify-between">
+              <span class="text-[10px] font-bold text-rose-700 uppercase">Today Cash Out (-)</span>
+              <h5 id="galla-strip-out" class="text-sm md:text-base font-black text-rose-600 mt-1.5">Rs. 0</h5>
             </div>
 
-            <!-- Closing Cash -->
-            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md flex flex-col justify-between">
-              <span class="text-[11px] font-black text-emerald-400 uppercase tracking-wide">Closing Cash</span>
-              <h5 id="galla-strip-closing" class="text-lg sm:text-xl font-black text-white mt-2">Rs. 0</h5>
+            <div class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-sm flex flex-col justify-between">
+              <span class="text-[10px] font-bold text-emerald-400 uppercase">Closing Cash</span>
+              <h5 id="galla-strip-closing" class="text-sm md:text-base font-black text-white mt-1.5">Rs. 0</h5>
             </div>
           </div>
         </div>
 
-        <!-- 2 Column Responsive Layout - Spanning Full Width of Screen -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+        <!-- 2 Column Responsive Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
           
-          <!-- Left Column: Galla Entry Box (4 cols) -->
-          <div class="lg:col-span-4 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-              <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider">Galla Entry (Counter / Accounts)</h4>
-              <span class="text-[10px] font-black bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-lg border border-emerald-200">Live Sync</span>
+          <!-- Left: Galla Entry Form -->
+          <div class="lg:col-span-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3.5">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Galla Entry (Counter / Accounts)</h4>
+              <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">Live Sync</span>
             </div>
-            
-            <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              Party select karna optional hai. Khali chhorne par counter cash entry hogi:
-            </p>
+            <p class="text-[11px] text-slate-400">Party select karna optional hai. Khali chhorne par direct counter entry hogi:</p>
 
             <div>
-              <label class="text-[11px] font-black text-slate-600 block mb-1.5 uppercase">Select Account / Party (Optional):</label>
+              <label class="text-[10px] font-bold text-slate-500 block mb-1">Select Account / Party (Optional):</label>
               <select id="galla-party-select" class="w-full text-xs font-bold p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"></select>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-2.5">
               <div>
-                <label class="text-[11px] font-black text-slate-600 block mb-1 uppercase">Amount or Formula:</label>
-                <input type="text" id="galla-entry-amount" onkeydown="handleGallaFormulaInput(event, 'in')" placeholder="Amount or e.g. 500+6000" class="w-full text-xs font-black p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
-                <span class="text-[10px] text-slate-400 mt-1 block font-medium">Supports +, -, *, /, parenthesis & Enter key</span>
+                <input type="text" id="galla-entry-amount" onkeydown="handleGallaFormulaInput(event, 'in')" placeholder="Amount or 500+6000" class="w-full text-xs font-bold p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
+                <span class="text-[9px] text-slate-400 mt-0.5 block font-medium">Supports +, -, *, / & Enter</span>
               </div>
-              
-              <div>
-                <label class="text-[11px] font-black text-slate-600 block mb-1 uppercase">Note / Description:</label>
-                <input type="text" id="galla-entry-note" onkeydown="if(event.key==='Enter') processGallaAccountEntry('in')" placeholder="Description / Note (e.g. Chai, Sale, Bill)" class="w-full text-xs font-semibold p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
-              </div>
+              <input type="text" id="galla-entry-note" onkeydown="if(event.key==='Enter') processGallaAccountEntry('in')" placeholder="Description / Note (e.g. Chai, Sale, Bill)" class="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
             </div>
 
-            <div class="grid grid-cols-2 gap-3 pt-2">
-              <button onclick="processGallaAccountEntry('in')" class="py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-2xl shadow-lg shadow-emerald-600/20 transition flex flex-col items-center">
-                <span class="text-sm">+ CASH IN (Aaya)</span>
-                <span class="text-[10px] font-semibold text-emerald-100">Galla Balance +</span>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="processGallaAccountEntry('in')" class="py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex flex-col items-center">
+                <span>+ CASH IN (Aaya)</span>
+                <span class="text-[9px] font-normal text-emerald-100">Galla +</span>
               </button>
-              <button onclick="processGallaAccountEntry('out')" class="py-3.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-2xl shadow-lg shadow-rose-600/20 transition flex flex-col items-center">
-                <span class="text-sm">- CASH OUT (Gaya)</span>
-                <span class="text-[10px] font-semibold text-rose-100">Galla Balance -</span>
+              <button onclick="processGallaAccountEntry('out')" class="py-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex flex-col items-center">
+                <span>- CASH OUT (Gaya)</span>
+                <span class="text-[9px] font-normal text-rose-100">Galla -</span>
               </button>
             </div>
           </div>
 
-          <!-- Right Column: Full Width Cash Book Activity History (8 cols) -->
-          <div class="lg:col-span-8 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div>
-                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Cash Book Activity (History)</h4>
-                <p class="text-[11px] text-slate-400 font-medium">Showing all live chronological entries with running balance</p>
-              </div>
-              <button onclick="downloadGallaPDF()" class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-black border border-emerald-200 transition active:scale-95 flex items-center gap-1.5 shadow-sm">
+          <!-- Right: Full Width History Table with Note & Balance -->
+          <div class="lg:col-span-8 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
+            <div class="flex items-center justify-between pb-1">
+              <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Cash Book Activity (History)</h4>
+              <button onclick="downloadGallaPDF()" class="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200 transition active:scale-95 flex items-center gap-1.5 shadow-sm">
                 <span>📄</span> Download PDF
               </button>
             </div>
             
-            <!-- 6 Columns Table Container -->
-            <div class="overflow-x-auto rounded-2xl border border-slate-200/80 shadow-xs max-h-[580px]">
-              <table class="w-full text-left border-collapse table-auto">
+            <div class="overflow-x-auto rounded-2xl border border-slate-100">
+              <table class="w-full min-w-[820px] text-left border-collapse table-auto">
                 <thead>
-                  <tr class="bg-slate-100/90 border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-wider sticky top-0 z-10 backdrop-blur-sm">
-                    <th class="p-3.5 whitespace-nowrap">Date & Time</th>
-                    <th class="p-3.5 whitespace-nowrap">Account / Party</th>
-                    <th class="p-3.5 min-w-[180px]">Note / Description</th>
-                    <th class="p-3.5 whitespace-nowrap text-center">Type</th>
-                    <th class="p-3.5 text-right whitespace-nowrap">Amount</th>
-                    <th class="p-3.5 text-right whitespace-nowrap">Balance</th>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                    <th class="p-3 min-w-[145px]">Date & Time</th>
+                    <th class="p-3 min-w-[120px]">Account</th>
+                    <th class="p-3 text-center w-24">Type</th>
+                    <th class="p-3 min-w-[180px]">Description / Note</th>
+                    <th class="p-3 text-right min-w-[110px]">Amount</th>
+                    <th class="p-3 text-right min-w-[110px]">Balance</th>
                   </tr>
                 </thead>
-                <tbody id="galla-history-tbody" class="divide-y divide-slate-100 bg-white"></tbody>
-                <tfoot class="border-t-2 border-slate-300 bg-slate-900 text-white text-xs font-black sticky bottom-0 z-10 shadow-lg">
+                <tbody id="galla-history-tbody"></tbody>
+                <tfoot class="border-t-2 border-slate-300 bg-slate-900 text-white text-xs font-bold">
                   <tr>
-                    <td class="p-4" colspan="3">GRAND TOTAL (MEEZAN)</td>
-                    <td class="p-4 text-center text-emerald-400 font-black text-xs" id="footer-total-in">+ Rs. 0</td>
-                    <td class="p-4 text-right text-rose-400 font-black text-xs" id="footer-total-out">- Rs. 0</td>
-                    <td class="p-4 text-right text-emerald-300 font-black text-sm" id="footer-grand-closing">Rs. 0</td>
+                    <td class="p-3" colspan="2">GRAND TOTAL (MEEZAN)</td>
+                    <td class="p-3 text-center text-emerald-300 font-extrabold text-[10px]">TODAY FLOW</td>
+                    <td class="p-3 text-center text-emerald-400 font-extrabold text-[10px] whitespace-nowrap" id="footer-today-flow">In: Rs. 0 | Out: Rs. 0</td>
+                    <td class="p-3 text-right text-white font-extrabold text-[10px] whitespace-nowrap" id="footer-day-net">Day Net: Rs. 0</td>
+                    <td class="p-3 text-right text-emerald-300 font-black whitespace-nowrap" id="footer-grand-closing">Closing: Rs. 0</td>
                   </tr>
                 </tfoot>
               </table>
@@ -1719,47 +1754,44 @@
 
       </div>
 
-      <!-- VIEW 3: SETTINGS VIEW -->
-      <div id="view-settings" class="hidden flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 space-y-5 overflow-y-auto bg-slate-50 w-full">
-        <div class="max-w-3xl mx-auto space-y-5">
-          <!-- Profile Card -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-xl shadow-inner">
+      <!-- PAGE 3: SETTINGS VIEW -->
+      <div id="view-settings" class="hidden flex-1 p-4 md:p-6 pb-20 md:pb-6 space-y-4 overflow-y-auto bg-slate-50">
+        <div class="max-w-2xl mx-auto space-y-4">
+          <div class="bg-white p-4 md:p-5 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-extrabold text-base shadow-inner">
                 👤
               </div>
               <div>
-                <h3 id="settings-user-name" class="font-black text-slate-900 text-base"></h3>
-                <p id="settings-user-email" class="text-xs text-slate-400 font-semibold"></p>
-                <span class="inline-block mt-1 text-[10px] font-black bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">Google Verified</span>
+                <h3 id="settings-user-name" class="font-extrabold text-slate-900 text-sm"></h3>
+                <p id="settings-user-email" class="text-xs text-slate-400 font-medium"></p>
               </div>
             </div>
-            <button onclick="logout()" class="text-xs font-black text-rose-600 hover:bg-rose-50 px-4 py-2.5 rounded-xl border border-rose-200 transition active:scale-95">
+            <button onclick="logout()" class="text-xs font-bold text-rose-600 hover:bg-rose-50 px-3.5 py-2 rounded-xl border border-rose-200 transition active:scale-95">
               Logout
             </button>
           </div>
 
-          <!-- Backup & Migration -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Backup & Account Migration</h4>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+            <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Backup & Account Transfer</h4>
             
-            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <div>
-                <h5 class="text-xs font-black text-slate-800">Export Full Backup</h5>
-                <p class="text-[11px] text-slate-400 font-medium">Download Excel Sheet (.CSV) or JSON archive</p>
+                <h5 class="text-xs font-bold text-slate-800">Export Backup</h5>
+                <p class="text-[11px] text-slate-400">Download Excel (.CSV) or JSON</p>
               </div>
-              <button onclick="downloadBackup()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95 flex items-center gap-1.5">
+              <button onclick="downloadBackup()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1.5">
                 📥 Download
               </button>
             </div>
 
-            <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <div>
-                <h5 class="text-xs font-black text-slate-800">Import / Restore Ledger</h5>
-                <p class="text-[11px] text-slate-400 font-medium">Shift or restore data from another Google Account</p>
+                <h5 class="text-xs font-bold text-slate-800">Import / Restore Ledger</h5>
+                <p class="text-[11px] text-slate-400">Shift data from another Gmail</p>
               </div>
               <div>
-                <button onclick="triggerImportBackup()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95 flex items-center gap-1.5">
+                <button onclick="triggerImportBackup()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1.5">
                   📤 Import JSON
                 </button>
                 <input type="file" id="import-json-input" accept=".json" onchange="handleImportBackupFile(event)" class="hidden">
@@ -1767,81 +1799,81 @@
             </div>
           </div>
 
-          <!-- Official Links & Contact -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Contact & Support</h4>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3.5">
+            <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Contact Us</h4>
             
-            <a href="https://wa.me/923027374880?text=Hello%20GG%20Digi%20Book%20Support" target="_blank" class="w-full flex items-center justify-between p-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md shadow-emerald-500/20">
-              <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl">
+            <a href="https://wa.me/923027374880?text=Hello%20GG%20Digi%20Book%20Support" target="_blank" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md shadow-emerald-500/20">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">
                   💬
                 </div>
                 <div>
-                  <p class="text-xs font-black tracking-wide">WhatsApp Official Support</p>
+                  <p class="text-xs font-black tracking-wide">WhatsApp Support</p>
                   <p class="text-[11px] text-emerald-100 font-medium">0302-7374880</p>
                 </div>
               </div>
-              <span class="text-xs font-black bg-white text-emerald-800 px-3.5 py-2 rounded-xl shadow-sm">
+              <span class="text-[11px] font-black bg-white text-emerald-800 px-3 py-1.5 rounded-xl shadow-sm">
                 Chat Now →
               </span>
             </a>
 
             <div>
-              <p class="text-[11px] font-black text-slate-500 mb-3">Connect Across Platforms</p>
-              <div class="grid grid-cols-5 gap-2.5">
-                <a href="https://www.youtube.com/@globalguruofficial1" target="_blank" title="YouTube" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/80 hover:border-red-500 hover:shadow-md transition active:scale-95 shadow-sm">
+              <p class="text-[11px] font-bold text-slate-500 mb-2.5">Connect Across Platforms</p>
+              <div class="grid grid-cols-5 gap-2">
+                <a href="https://www.youtube.com/@globalguruofficial1" target="_blank" title="YouTube" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-red-500 hover:shadow-md transition active:scale-95 shadow-sm">
                   <svg class="w-6 h-6 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                  <span class="text-[9px] font-extrabold text-slate-700 mt-1.5">YouTube</span>
+                  <span class="text-[9px] font-bold text-slate-700 mt-1.5">YouTube</span>
                 </a>
-                <a href="https://web.facebook.com/globalguruofficial1" target="_blank" title="Facebook" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/80 hover:border-blue-600 hover:shadow-md transition active:scale-95 shadow-sm">
+                <a href="https://web.facebook.com/globalguruofficial1" target="_blank" title="Facebook" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-blue-600 hover:shadow-md transition active:scale-95 shadow-sm">
                   <svg class="w-6 h-6 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                  <span class="text-[9px] font-extrabold text-slate-700 mt-1.5">Facebook</span>
+                  <span class="text-[9px] font-bold text-slate-700 mt-1.5">Facebook</span>
                 </a>
-                <a href="https://instagram.com/globalguruofficial1" target="_blank" title="Instagram" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/80 hover:border-pink-500 hover:shadow-md transition active:scale-95 shadow-sm">
+                <a href="https://instagram.com/globalguruofficial1" target="_blank" title="Instagram" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-pink-500 hover:shadow-md transition active:scale-95 shadow-sm">
                   <svg class="w-6 h-6 text-[#E4405F]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                  <span class="text-[9px] font-extrabold text-slate-700 mt-1.5">Instagram</span>
+                  <span class="text-[9px] font-bold text-slate-700 mt-1.5">Instagram</span>
                 </a>
-                <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" title="TikTok" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/80 hover:border-black hover:shadow-md transition active:scale-95 shadow-sm">
+                <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" title="TikTok" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-black hover:shadow-md transition active:scale-95 shadow-sm">
                   <svg class="w-6 h-6 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v9.09c-.03 2.01-.84 4.02-2.34 5.37-1.63 1.49-3.92 2.16-6.09 1.81-2.2-.33-4.22-1.67-5.35-3.58-1.16-1.92-1.34-4.37-.5-6.38.86-2.02 2.72-3.53 4.88-3.99.78-.17 1.58-.2 2.37-.12v4.22c-.61-.08-1.25-.01-1.83.21-.82.3-1.49.95-1.83 1.76-.36.85-.31 1.84.14 2.64.44.8 1.25 1.36 2.15 1.49.99.16 2.04-.15 2.77-.85.66-.63 1.05-1.53 1.05-2.45V.02h.65z"/></svg>
-                  <span class="text-[9px] font-extrabold text-slate-700 mt-1.5">TikTok</span>
+                  <span class="text-[9px] font-bold text-slate-700 mt-1.5">TikTok</span>
                 </a>
-                <a href="https://www.threads.net/@globalguruofficial1" target="_blank" title="Threads" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/80 hover:border-black hover:shadow-md transition active:scale-95 shadow-sm">
+                <a href="https://www.threads.net/@globalguruofficial1" target="_blank" title="Threads" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white border border-slate-200/80 hover:border-black hover:shadow-md transition active:scale-95 shadow-sm">
                   <svg class="w-6 h-6 text-black" viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2109 139.019 87.8456C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.5727 72.8138C81.0827 64.4538 89.2612 60.7788 97.2341 60.7788C110.748 60.7788 119.537 69.6013 120.487 84.1506C113.626 83.1756 106.376 82.8093 98.7188 83.0569C72.0625 83.9169 55.4544 98.2431 56.0969 119.349C56.7088 139.467 73.0688 152.012 94.0625 152.012C108.799 152.012 119.981 145.474 126.791 133.029C132.846 144.159 143.141 150.144 157.069 150.144C174.197 150.144 186.281 138.834 186.281 118.892C186.281 83.2181 158.469 64.9125 120.891 64.9125C78.435 64.9125 47.9625 87.9712 47.9625 125.683C47.9625 152.128 66.525 170.835 96.0938 170.835C112.575 170.835 126.338 165.176 135.038 154.512L147.244 165.816C134.906 180.705 116.794 187.688 96.0938 187.688C56.2875 187.688 30.7125 162.248 30.7125 125.683C30.7125 76.5412 69.4125 48.0675 120.891 48.0675C170.775 48.0675 203.531 73.7437 203.531 118.892C203.531 148.164 184.95 166.995 157.069 166.995C139.631 166.995 127.144 158.625 121.284 144.188C114.712 153.281 104.981 157.942 93.6844 157.942C77.475 157.942 65.5125 147.536 64.9969 131.627C64.4469 114.675 77.2969 103.568 98.2406 102.898C105.797 102.656 113.128 103.181 120.084 104.426C118.912 95.8425 112.444 89.9625 101.466 89.9625C95.4281 89.9625 89.8781 92.205 85.9406 96.225L75.6094 84.8812C81.8531 78.4725 90.75 74.8725 101.466 74.8725C119.869 74.8725 133.725 84.7725 136.003 103.886C137.944 104.839 139.791 105.889 141.537 107.031V88.9883ZM120.084 117.892C113.888 116.897 107.381 116.488 100.678 116.702C88.2469 117.098 79.9594 122.951 80.2875 131.957C80.6062 140.719 88.7531 146.104 99.4594 146.104C108.975 146.104 116.634 140.404 120.084 130.414V117.892Z"/></svg>
-                  <span class="text-[9px] font-extrabold text-slate-700 mt-1.5">Threads</span>
+                  <span class="text-[9px] font-bold text-slate-700 mt-1.5">Threads</span>
                 </a>
               </div>
             </div>
 
-            <a href="https://linktr.ee/Globalguruofficial1" target="_blank" class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 transition">
-              <div class="flex items-center gap-3">
-                <span class="text-xl">🌲</span>
+            <a href="https://linktr.ee/Globalguruofficial1" target="_blank" class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 transition">
+              <div class="flex items-center gap-2.5">
+                <span class="text-base">🌲</span>
                 <div>
-                  <p class="text-xs font-black text-slate-800">All Official Links (Linktree)</p>
-                  <p class="text-[10px] text-slate-400 font-medium">linktr.ee/Globalguruofficial1</p>
+                  <p class="text-xs font-bold text-slate-800">All Official Links (Linktree)</p>
+                  <p class="text-[10px] text-slate-400">linktr.ee/Globalguruofficial1</p>
                 </div>
               </div>
-              <span class="text-xs font-black text-emerald-700">Open Official Hub →</span>
+              <span class="text-xs font-bold text-emerald-700">Open →</span>
             </a>
           </div>
 
-          <div class="flex items-center justify-center gap-2 py-6 text-slate-400 text-xs font-bold">
+          <div class="flex items-center justify-center gap-2 py-4 text-slate-400 text-xs font-bold">
+            <img src="logo.png" alt="GG" class="w-4 h-4 rounded-full object-contain">
             <span>GG Digi Book • Powered by Global Guru</span>
           </div>
         </div>
       </div>
 
-    </main>
+    </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
-    <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex z-30 shadow-2xl">
-      <button id="tab-btn-ledger" onclick="switchTab('ledger')" class="flex-1 py-3 text-center text-emerald-700 font-black text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600 transition">
-        <span class="text-lg">📖</span> Khata
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden fixed bottom-0 max-w-md w-full bg-white border-t border-slate-200 flex z-30 shadow-lg">
+      <button id="tab-btn-ledger" onclick="switchTab('ledger')" class="flex-1 py-2.5 text-center text-emerald-700 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600 transition">
+        <span class="text-base">📖</span> Khata
       </button>
-      <button id="tab-btn-accounts" onclick="switchTab('accounts')" class="flex-1 py-3 text-center text-slate-400 font-bold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
-        <span class="text-lg">💰</span> Accounts / Galla
+      <button id="tab-btn-accounts" onclick="switchTab('accounts')" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
+        <span class="text-base">💰</span> Accounts / Galla
       </button>
-      <button id="tab-btn-settings" onclick="switchTab('settings')" class="flex-1 py-3 text-center text-slate-400 font-bold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
-        <span class="text-lg">⚙️</span> Settings
+      <button id="tab-btn-settings" onclick="switchTab('settings')" class="flex-1 py-2.5 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent hover:text-slate-600 transition">
+        <span class="text-base">⚙️</span> Settings
       </button>
     </nav>
 
@@ -1849,66 +1881,66 @@
 
   <!-- 4. CUSTOMER LEDGER MODAL (Mobile Only) -->
   <div id="tx-modal" onclick="closeModal()" class="md:hidden hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center p-0">
-    <div onclick="event.stopPropagation()" class="bg-white w-full max-h-[92vh] rounded-t-3xl p-5 shadow-2xl flex flex-col overflow-hidden">
+    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-md max-h-[92vh] rounded-t-3xl p-5 shadow-2xl flex flex-col overflow-hidden">
       <div class="flex justify-between items-start pb-3 border-b border-slate-100">
         <div>
-          <h3 id="modal-cust-name" class="text-base font-black text-slate-900 leading-tight"></h3>
-          <p id="modal-cust-phone" class="text-xs text-slate-400 mt-0.5 font-semibold"></p>
+          <h3 id="modal-cust-name" class="text-base font-extrabold text-slate-900 leading-tight"></h3>
+          <p id="modal-cust-phone" class="text-xs text-slate-400 mt-0.5 font-medium"></p>
           <div id="modal-cust-balance"></div>
         </div>
         <div class="flex items-center gap-1.5">
           <button onclick="deleteCustomer()" title="Delete Customer Ledger" class="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition">🗑️</button>
-          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-black leading-none p-2">&times;</button>
+          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none p-2">&times;</button>
         </div>
       </div>
 
       <div class="flex-1 overflow-y-auto my-3 pr-1">
         <div class="flex justify-between items-center mb-2.5">
-          <h5 class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Transaction History</h5>
+          <h5 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Transaction History</h5>
         </div>
-        <div id="tx-history-list" class="space-y-2"></div>
+        <div id="tx-history-list" class="space-y-1.5"></div>
       </div>
 
       <div class="pt-3 border-t border-slate-100 bg-slate-50/80 -mx-5 -mb-5 p-5 rounded-b-3xl space-y-3">
-        <div id="photo-preview-container" class="hidden flex items-center justify-between bg-white border border-emerald-200 p-2.5 rounded-xl shadow-sm">
+        <div id="photo-preview-container" class="hidden flex items-center justify-between bg-white border border-emerald-200 p-2 rounded-xl shadow-sm">
           <div class="flex items-center gap-2">
-            <img id="photo-preview-thumb" class="w-9 h-9 rounded-lg object-cover border border-emerald-300" src="">
-            <span class="text-xs font-black text-emerald-800">Bill Photo Attached ✅</span>
+            <img id="photo-preview-thumb" class="w-8 h-8 rounded-lg object-cover border border-emerald-300" src="">
+            <span class="text-xs font-bold text-emerald-800">Bill Photo Attached ✅</span>
           </div>
-          <button onclick="clearPhotoAttachment()" class="text-xs text-rose-600 font-bold px-2 py-1 hover:bg-rose-50 rounded-lg">Remove</button>
+          <button onclick="clearPhotoAttachment()" class="text-xs text-rose-600 font-bold px-2 py-1 hover:bg-rose-50 rounded">Remove</button>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <input type="text" id="tx-amount" onkeydown="handleFormulaInput(event, 'diye')" placeholder="Amount or 500+6000" class="w-full text-xs font-bold p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
+            <input type="text" id="tx-amount" onkeydown="handleFormulaInput(event, 'diye')" placeholder="Amount or 500+6000" class="w-full text-xs font-bold p-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
             <span class="text-[9px] text-slate-400 mt-0.5 block font-medium">Type formula & Enter</span>
           </div>
           
           <div class="relative flex items-center">
-            <input type="text" id="tx-note" onkeydown="if(event.key==='Enter') addTransaction('diye')" placeholder="Note / Description" class="w-full text-xs font-semibold p-3 pr-16 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
+            <input type="text" id="tx-note" onkeydown="if(event.key==='Enter') addTransaction('diye')" placeholder="Note / Description" class="w-full text-xs p-2.5 pr-14 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
             <div class="absolute right-1.5 flex items-center gap-1">
-              <button id="mic-btn" onclick="startSpeechRecognition(false)" title="Voice to Text" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-700 text-sm transition">🎙️</button>
-              <label for="receipt-camera-input" title="Attach Receipt/Bill" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-700 text-sm cursor-pointer transition">📸</label>
+              <button id="mic-btn" onclick="startSpeechRecognition(false)" title="Voice to Text" class="p-1 rounded-lg text-slate-400 hover:text-emerald-700 text-sm transition">🎙️</button>
+              <label for="receipt-camera-input" title="Attach Receipt/Bill" class="p-1 rounded-lg text-slate-400 hover:text-emerald-700 text-sm cursor-pointer transition">📸</label>
               <input id="receipt-camera-input" type="file" accept="image/*" capture="environment" onchange="handleReceiptUpload(event)" class="hidden">
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="addTransaction('diye')" class="py-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
+          <button onclick="addTransaction('diye')" class="py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
             <span>🔴</span> CASH OUT
           </button>
-          <button onclick="addTransaction('liye')" class="py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
+          <button onclick="addTransaction('liye')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
             <span>🟢</span> CASH IN
           </button>
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
-          <button onclick="sendWhatsApp()" class="py-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-black rounded-xl flex items-center justify-center gap-1.5 text-xs hover:bg-emerald-100 transition">
-            <span>💬</span> WhatsApp
+          <button onclick="sendWhatsApp()" class="py-2 bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold rounded-xl flex items-center justify-center gap-1.5 text-xs hover:bg-emerald-100 transition">
+            <span>💬</span> WhatsApp Reminder
           </button>
-          <button onclick="downloadPDF()" class="py-2.5 bg-white text-slate-700 border border-slate-200 font-black rounded-xl flex items-center justify-center gap-1.5 text-xs hover:bg-slate-100 transition shadow-sm">
-            <span>📄</span> PDF
+          <button onclick="downloadPDF()" class="py-2 bg-white text-slate-700 border border-slate-200 font-bold rounded-xl flex items-center justify-center gap-1.5 text-xs hover:bg-slate-100 transition shadow-sm">
+            <span>📄</span> PDF Statement
           </button>
         </div>
       </div>
