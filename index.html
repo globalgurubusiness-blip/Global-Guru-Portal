@@ -184,6 +184,11 @@
       }
     };
 
+    function toTitleCase(str) {
+      if (!str) return '';
+      return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    }
+
     function getTodayDateString() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -455,7 +460,7 @@
               ${firstLetter}
             </div>
             <div>
-              <h4 class="font-bold text-gray-900 text-sm leading-tight">${cust.name}</h4>
+              <h4 class="font-bold text-gray-900 text-sm leading-tight">${toTitleCase(cust.name)}</h4>
               <p class="text-[11px] text-gray-400 font-medium mt-0.5">${cust.phone || 'No phone number'}</p>
             </div>
           </div>
@@ -479,7 +484,7 @@
       customersList.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.innerText = `${c.name} (Balance: Rs. ${Number(c.balance || 0).toLocaleString()})`;
+        opt.innerText = `${toTitleCase(c.name)} (Balance: Rs. ${Number(c.balance || 0).toLocaleString()})`;
         select.appendChild(opt);
       });
     }
@@ -537,7 +542,7 @@
       const statusText = bal > 0 ? 'You Will Get' : bal < 0 ? 'You Will Give' : 'Settled';
       const balClass = `text-xs font-bold px-2.5 py-1 rounded-md inline-block ${bal > 0 ? 'bg-rose-50 text-rose-600' : bal < 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-600'}`;
 
-      document.getElementById('modal-cust-name').innerText = selectedCustomer.name;
+      document.getElementById('modal-cust-name').innerText = toTitleCase(selectedCustomer.name);
       document.getElementById('modal-cust-phone').innerText = selectedCustomer.phone || 'No phone available';
       const mBalEl = document.getElementById('modal-cust-balance');
       mBalEl.innerText = `Rs. ${Math.abs(bal).toLocaleString()} (${statusText})`;
@@ -548,7 +553,7 @@
       if (dPlaceholder && dDetailPane) {
         dPlaceholder.classList.add('hidden');
         dDetailPane.classList.remove('hidden');
-        document.getElementById('d-cust-name').innerText = selectedCustomer.name;
+        document.getElementById('d-cust-name').innerText = toTitleCase(selectedCustomer.name);
         document.getElementById('d-cust-phone').innerText = selectedCustomer.phone || 'No phone available';
         const dBalEl = document.getElementById('d-cust-balance');
         dBalEl.innerText = `Rs. ${Math.abs(bal).toLocaleString()} (${statusText})`;
@@ -589,7 +594,7 @@
         txWithBalMap[t.id] = running;
       });
 
-      const renderHtml = (isDesktop = false) => {
+      const renderHtml = () => {
         if (currentTransactions.length === 0) {
           return '<p class="text-xs text-gray-400 text-center py-8">No transactions recorded yet.</p>';
         }
@@ -622,8 +627,8 @@
         }).join('');
       };
 
-      if (txListEl) txListEl.innerHTML = renderHtml(false);
-      if (dTxListEl) dTxListEl.innerHTML = renderHtml(true);
+      if (txListEl) txListEl.innerHTML = renderHtml();
+      if (dTxListEl) dTxListEl.innerHTML = renderHtml();
     }
 
     window.closeModal = () => {
@@ -731,7 +736,7 @@
       }
 
       const defaultNote = partyObj 
-        ? (actionType === 'in' ? `Cash In from ${partyObj.name}` : `Cash Out to ${partyObj.name}`)
+        ? (actionType === 'in' ? `Cash In from ${toTitleCase(partyObj.name)}` : `Cash Out to ${toTitleCase(partyObj.name)}`)
         : (actionType === 'in' ? `Counter Cash In` : `Counter Cash Out`);
 
       try {
@@ -756,18 +761,16 @@
       }
     };
 
-    // CASH BOOK TABLE RENDER - WITH VISIBLE NOTE & RUNNING REAL-TIME BALANCE
     function renderGallaTransactionsTable() {
       const listEl = document.getElementById('galla-history-tbody');
       if (!listEl) return;
       listEl.innerHTML = '';
 
       if (gallaTxHistory.length === 0) {
-        listEl.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-xs text-slate-400">No cash entries recorded yet.</td></tr>';
+        listEl.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-xs text-slate-400">No cash entries recorded yet.</td></tr>';
         return;
       }
 
-      // Calculate running balance in chronological order (Oldest to Newest)
       const chronological = [...gallaTxHistory].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       let running = gallaOpeningBalance;
       const runningMap = {};
@@ -779,27 +782,27 @@
         runningMap[t.id] = running;
       });
 
-      // Render rows (Newest on top)
-      gallaTxHistory.slice(0, 50).forEach(t => {
+      gallaTxHistory.slice(0, 60).forEach(t => {
         const row = document.createElement('tr');
-        row.className = "border-b border-slate-100 hover:bg-slate-50 text-xs";
+        row.className = "border-b border-slate-100 hover:bg-slate-50/80 transition text-xs";
         const isCashIn = (t.gallaAction === 'in') || (t.type === 'liye');
         const dateStr = new Date(t.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
         const entryBal = runningMap[t.id] !== undefined ? runningMap[t.id] : 0;
+        const formattedAccountName = toTitleCase(t.customerName || 'Direct Cash');
 
         row.innerHTML = `
-          <td class="p-2.5 text-slate-500 font-medium whitespace-nowrap">${dateStr}</td>
-          <td class="p-2.5 font-bold text-slate-800 whitespace-nowrap">${t.customerName || 'Direct Cash'}</td>
-          <td class="p-2.5 text-slate-600 font-medium max-w-[150px] truncate" title="${t.note || '-'}">${t.note || '-'}</td>
-          <td class="p-2.5 whitespace-nowrap">
-            <span class="px-2 py-0.5 rounded-md text-[10px] font-black ${isCashIn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+          <td class="p-3 text-slate-500 font-semibold whitespace-nowrap">${dateStr}</td>
+          <td class="p-3 font-bold text-slate-800 whitespace-nowrap">${formattedAccountName}</td>
+          <td class="p-3 text-slate-600 font-medium max-w-[200px] truncate" title="${t.note || '-'}">${t.note || '-'}</td>
+          <td class="p-3 whitespace-nowrap text-center">
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-wide ${isCashIn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
               ${isCashIn ? 'CASH IN' : 'CASH OUT'}
             </span>
           </td>
-          <td class="p-2.5 text-right font-black whitespace-nowrap ${isCashIn ? 'text-emerald-600' : 'text-rose-600'}">
+          <td class="p-3 text-right font-black whitespace-nowrap ${isCashIn ? 'text-emerald-600' : 'text-rose-600'}">
             ${isCashIn ? '+' : '-'} Rs. ${Number(t.amount).toLocaleString()}
           </td>
-          <td class="p-2.5 text-right font-black whitespace-nowrap text-slate-900 bg-slate-50/50">
+          <td class="p-3 text-right font-black whitespace-nowrap text-slate-900 bg-slate-50/70">
             Rs. ${entryBal.toLocaleString()}
           </td>
         `;
@@ -874,7 +877,7 @@
 
         return [
           dateStr,
-          t.customerName || 'Direct Cash',
+          toTitleCase(t.customerName || 'Direct Cash'),
           t.note || '-',
           isCashIn ? 'CASH IN (+)' : 'CASH OUT (-)',
           `${isCashIn ? '+' : '-'} Rs. ${amt.toLocaleString()}`,
@@ -884,12 +887,12 @@
 
       const footRow = [
         [
-          'GRAND TOTAL (MEEZAN)',
-          `Total Entries: ${sortedHistory.length}`,
-          'TODAY FLOW',
+          'GRAND TOTAL',
+          `Entries: ${sortedHistory.length}`,
+          '-',
+          'FLOW',
           `In: Rs. ${gallaTodayIn.toLocaleString()} | Out: Rs. ${gallaTodayOut.toLocaleString()}`,
-          `Net: Rs. ${(gallaTodayIn - gallaTodayOut).toLocaleString()}`,
-          `Closing: Rs. ${gallaClosingCash.toLocaleString()}`
+          `Rs. ${gallaClosingCash.toLocaleString()}`
         ]
       ];
 
@@ -929,7 +932,7 @@
 
       pdf.setFontSize(9);
       pdf.setTextColor(100, 116, 139);
-      pdf.text(`Customer Name: ${selectedCustomer.name}`, 32, 26);
+      pdf.text(`Customer Name: ${toTitleCase(selectedCustomer.name)}`, 32, 26);
       pdf.text(`Phone: ${selectedCustomer.phone || 'N/A'}  |  Date: ${new Date().toLocaleDateString('en-GB')}`, 32, 31);
 
       const balStatus = selectedCustomer.balance >= 0 ? 'Receivable' : 'Payable';
@@ -1242,7 +1245,7 @@
       if (phone.startsWith('0')) phone = '92' + phone.substring(1);
       const bal = selectedCustomer.balance || 0;
       const statusText = bal >= 0 ? 'Pending to pay' : 'Advance balance';
-      const msg = `Dear ${selectedCustomer.name},\nAccording to GG Digi Book records, your current ledger balance is Rs. ${Math.abs(bal).toLocaleString()} (${statusText}).\nPlease review and confirm. Thank you!`;
+      const msg = `Dear ${toTitleCase(selectedCustomer.name)},\nAccording to GG Digi Book records, your current ledger balance is Rs. ${Math.abs(bal).toLocaleString()} (${statusText}).\nPlease review and confirm. Thank you!`;
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
   </script>
@@ -1456,7 +1459,6 @@
               </div>
             </div>
 
-            <!-- TRANSACTION HISTORY CARD -->
             <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex-1 flex flex-col space-y-3">
               <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Transaction History</h4>
               <div id="d-tx-history-list" class="space-y-2 flex-1 overflow-y-auto max-h-[350px]"></div>
@@ -1468,7 +1470,9 @@
 
       <!-- PAGE 2: ACCOUNTS / GALLA VIEW -->
       <div id="view-accounts" class="hidden flex-1 p-4 md:p-6 pb-20 md:pb-6 space-y-4 overflow-y-auto bg-slate-50">
-        <div class="bg-white p-4 md:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-3 max-w-5xl mx-auto">
+        
+        <!-- Live Galla Strip -->
+        <div class="bg-white p-4 md:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-3 w-full">
           <div class="flex items-center justify-between">
             <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Live Galla Cash Flow</span>
             <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
@@ -1476,8 +1480,8 @@
             </span>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 text-center">
-            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col justify-between">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-center">
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex flex-col justify-between">
               <div class="flex items-center justify-center gap-1.5">
                 <span class="text-[10px] font-bold text-slate-500 uppercase">Day's Opening</span>
                 <button onclick="editOpeningBalance()" title="Set/Edit Base Opening Balance" class="text-xs text-emerald-700 hover:text-emerald-900 transition">✏️</button>
@@ -1485,90 +1489,94 @@
               <h5 id="galla-strip-opening" class="text-sm md:text-base font-black text-slate-800 mt-1.5">Rs. 0</h5>
             </div>
 
-            <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100 flex flex-col justify-between">
+            <div class="bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100 flex flex-col justify-between">
               <span class="text-[10px] font-bold text-emerald-700 uppercase">Today Cash In (+)</span>
               <h5 id="galla-strip-in" class="text-sm md:text-base font-black text-emerald-600 mt-1.5">Rs. 0</h5>
             </div>
 
-            <div class="bg-rose-50/60 p-3 rounded-2xl border border-rose-100 flex flex-col justify-between">
+            <div class="bg-rose-50/60 p-3.5 rounded-2xl border border-rose-100 flex flex-col justify-between">
               <span class="text-[10px] font-bold text-rose-700 uppercase">Today Cash Out (-)</span>
               <h5 id="galla-strip-out" class="text-sm md:text-base font-black text-rose-600 mt-1.5">Rs. 0</h5>
             </div>
 
-            <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-sm flex flex-col justify-between">
+            <div class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-sm flex flex-col justify-between">
               <span class="text-[10px] font-bold text-emerald-400 uppercase">Closing Cash</span>
               <h5 id="galla-strip-closing" class="text-sm md:text-base font-black text-white mt-1.5">Rs. 0</h5>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-5xl mx-auto">
-          <!-- Galla Entry Box -->
-          <div class="md:col-span-5 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3.5">
+        <!-- 2 Column Responsive Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
+          
+          <!-- Left: Galla Entry Form -->
+          <div class="lg:col-span-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3.5">
             <div class="flex items-center justify-between">
               <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Galla Entry (Counter / Accounts)</h4>
               <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">Live Sync</span>
             </div>
-            <p class="text-[11px] text-slate-400">Party select karna optional hai. Khali chhorne par direct cash entry hogi:</p>
+            <p class="text-[11px] text-slate-400">Party select karna optional hai. Khali chhorne par direct counter entry hogi:</p>
 
             <div>
               <label class="text-[10px] font-bold text-slate-500 block mb-1">Select Account / Party (Optional):</label>
-              <select id="galla-party-select" class="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"></select>
+              <select id="galla-party-select" class="w-full text-xs font-bold p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"></select>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y-2.5">
               <div>
-                <input type="text" id="galla-entry-amount" onkeydown="handleGallaFormulaInput(event, 'in')" placeholder="Amount or 500+6000" class="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
+                <input type="text" id="galla-entry-amount" onkeydown="handleGallaFormulaInput(event, 'in')" placeholder="Amount or 500+6000" class="w-full text-xs font-bold p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
                 <span class="text-[9px] text-slate-400 mt-0.5 block font-medium">Supports +, -, *, / & Enter</span>
               </div>
-              <input type="text" id="galla-entry-note" onkeydown="if(event.key==='Enter') processGallaAccountEntry('in')" placeholder="Description / Note (e.g. Chai, Sale, Bill)" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
+              <input type="text" id="galla-entry-note" onkeydown="if(event.key==='Enter') processGallaAccountEntry('in')" placeholder="Description / Note (e.g. Chai, Sale, Bill)" class="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500">
             </div>
 
             <div class="grid grid-cols-2 gap-2 pt-1">
-              <button onclick="processGallaAccountEntry('in')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex flex-col items-center">
+              <button onclick="processGallaAccountEntry('in')" class="py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex flex-col items-center">
                 <span>+ CASH IN (Aaya)</span>
                 <span class="text-[9px] font-normal text-emerald-100">Galla +</span>
               </button>
-              <button onclick="processGallaAccountEntry('out')" class="py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex flex-col items-center">
+              <button onclick="processGallaAccountEntry('out')" class="py-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex flex-col items-center">
                 <span>- CASH OUT (Gaya)</span>
                 <span class="text-[9px] font-normal text-rose-100">Galla -</span>
               </button>
             </div>
           </div>
 
-          <!-- History Table with Description/Note & Real-Time Balance Column -->
-          <div class="md:col-span-7 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
-            <div class="flex items-center justify-between">
+          <!-- Right: Full Width History Table with Note & Balance -->
+          <div class="lg:col-span-8 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
+            <div class="flex items-center justify-between pb-1">
               <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Cash Book Activity (History)</h4>
-              <button onclick="downloadGallaPDF()" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200 transition active:scale-95 flex items-center gap-1 shadow-sm">
+              <button onclick="downloadGallaPDF()" class="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200 transition active:scale-95 flex items-center gap-1.5 shadow-sm">
                 <span>📄</span> Download PDF
               </button>
             </div>
-            <div class="overflow-x-auto max-h-[380px]">
-              <table class="w-full text-left border-collapse">
+            
+            <div class="overflow-x-auto rounded-2xl border border-slate-100">
+              <table class="w-full text-left border-collapse table-auto">
                 <thead>
-                  <tr class="border-b border-slate-200 text-[10px] font-extrabold text-slate-400 uppercase">
-                    <th class="p-2.5">Date</th>
-                    <th class="p-2.5">Account</th>
-                    <th class="p-2.5">Note / Description</th>
-                    <th class="p-2.5">Type</th>
-                    <th class="p-2.5 text-right">Amount</th>
-                    <th class="p-2.5 text-right">Balance</th>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                    <th class="p-3 w-20">Date</th>
+                    <th class="p-3 min-w-[120px]">Account</th>
+                    <th class="p-3 min-w-[160px]">Note / Description</th>
+                    <th class="p-3 text-center w-24">Type</th>
+                    <th class="p-3 text-right min-w-[110px]">Amount</th>
+                    <th class="p-3 text-right min-w-[110px]">Balance</th>
                   </tr>
                 </thead>
                 <tbody id="galla-history-tbody"></tbody>
                 <tfoot class="border-t-2 border-slate-300 bg-slate-900 text-white text-xs font-bold">
                   <tr>
-                    <td class="p-2.5" colspan="3">GRAND TOTAL (MEEZAN)</td>
-                    <td class="p-2.5 text-emerald-400 font-extrabold text-[11px]" id="footer-total-in">+ Rs. 0</td>
-                    <td class="p-2.5 text-rose-400 font-extrabold text-[11px] text-right" id="footer-total-out">- Rs. 0</td>
-                    <td class="p-2.5 text-right text-emerald-300 font-black" id="footer-grand-closing">Rs. 0</td>
+                    <td class="p-3" colspan="3">GRAND TOTAL (MEEZAN)</td>
+                    <td class="p-3 text-center text-emerald-400 font-extrabold text-[11px]" id="footer-total-in">+ Rs. 0</td>
+                    <td class="p-3 text-right text-rose-400 font-extrabold text-[11px]" id="footer-total-out">- Rs. 0</td>
+                    <td class="p-3 text-right text-emerald-300 font-black" id="footer-grand-closing">Rs. 0</td>
                   </tr>
                 </tfoot>
               </table>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- PAGE 3: SETTINGS VIEW -->
