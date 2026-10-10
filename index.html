@@ -1,1943 +1,256 @@
-<!DOCTYPE html>
-<html lang="en" class="h-full">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Guru Ecosystem Portal</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            brand: {
-              gold: '#F59E0B',
-              amber: '#D97706',
-              dark: '#070B12',
-              cardDark: '#0E131F',
-              borderDark: '#1E2638'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#651c2b">
+  <title>Global Guru Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    html, body {
-      min-height: 100%;
-    }
-    .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.05);
-    }
-    .dark .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.3);
-      border-radius: 9999px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: rgba(245, 158, 11, 0.6);
-    }
+    :root{--brand:#651c2b;--brand2:#8c2f43;--brandSoft:#f8eef0;--ink:#172033;--muted:#667085;--line:#e5e9f0;--bg:#f5f7fb;--card:#fff;--good:#087443;--warn:#b54708;--bad:#b42318;--blue:#175cd3;--side:244px;--top:64px;--radius:14px;--shadow:0 8px 28px rgba(16,24,40,.07)}
+    *{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;overflow:hidden}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:11px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.danger{color:var(--bad)}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 12px;font-weight:700;display:inline-flex;gap:7px;align-items:center;justify-content:center;min-height:34px}.btn:hover{background:#f8fafc}.btn.primary{background:var(--brand);border-color:var(--brand);color:white}.btn.primary:hover{background:#501521}.btn.good{background:var(--good);border-color:var(--good);color:white}.btn.bad{background:#fff4f2;border-color:#fecdca;color:var(--bad)}.btn.sm{padding:6px 9px;min-height:29px;font-size:11px}.icon-btn{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+    .field{display:grid;gap:6px}.field label{font-size:11px;font-weight:700;color:#475467}.input{width:100%;border:1px solid #d0d5dd;background:#fff;border-radius:9px;padding:9px 11px;color:var(--ink);outline:none;min-height:38px}.input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(101,28,43,.1)}textarea.input{resize:vertical;min-height:74px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.span-2{grid-column:1/-1}
+    .auth{min-height:100dvh;overflow:auto;padding:24px;display:grid;place-items:center;background:radial-gradient(circle at 15% 10%,#f4dfe4 0,transparent 32%),radial-gradient(circle at 90% 90%,#e6ecf8 0,transparent 30%),#f7f8fb}.auth-card{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 24px 70px rgba(32,20,24,.13)}.brand-lockup{display:flex;align-items:center;gap:12px;margin-bottom:20px}.logo{width:52px;height:52px;border-radius:50%;object-fit:contain;background:#fff;border:1px solid #eadadd}.logo-fallback{width:52px;height:52px;border-radius:50%;display:none;place-items:center;background:var(--brand);color:#fff;font-weight:800;font-size:18px}.brand-lockup h1{font-size:20px;margin:0}.brand-lockup p{margin:4px 0 0;color:var(--muted);font-size:11px}.auth-note{padding:11px;border-radius:10px;background:var(--brandSoft);color:#61202d;line-height:1.55;margin:12px 0}.auth-actions{display:grid;gap:10px;margin-top:16px}.security-line{display:flex;align-items:center;gap:8px;margin-top:15px;color:var(--muted);font-size:11px;justify-content:center}
+    #shell{height:100dvh;display:grid;grid-template-columns:var(--side) 1fr;grid-template-rows:var(--top) 1fr}.sidebar{grid-row:1/3;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0;z-index:30}.side-brand{height:var(--top);display:flex;align-items:center;gap:10px;padding:8px 15px;border-bottom:1px solid var(--line)}.side-brand .logo,.side-brand .logo-fallback{width:38px;height:38px}.side-brand strong{font-size:13px}.side-brand span{display:block;font-size:9px;color:var(--muted);margin-top:2px}.nav{padding:10px;overflow:auto;flex:1}.nav-group{font-size:9px;font-weight:800;letter-spacing:.12em;color:#98a2b3;padding:10px 9px 6px}.nav button{width:100%;border:0;background:transparent;border-radius:9px;padding:9px 10px;display:flex;align-items:center;gap:10px;text-align:left;color:#475467;font-weight:650;margin:2px 0}.nav button i{width:17px;text-align:center}.nav button:hover,.nav button.active{background:var(--brandSoft);color:var(--brand)}.side-user{border-top:1px solid var(--line);padding:11px 12px;display:flex;align-items:center;gap:9px}.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:#fff;font-weight:800;flex:0 0 auto}.side-user .grow{min-width:0;flex:1}.ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .topbar{grid-column:2;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:20}.top-title h2{font-size:16px;margin:0}.top-title p{font-size:10px;margin:3px 0 0;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:7px}.owner-chip{font-size:10px;font-weight:800;color:var(--brand);background:var(--brandSoft);padding:6px 9px;border-radius:999px}.mobile-menu{display:none}
+    main{grid-column:2;min-width:0;overflow:auto;padding:16px 18px 24px}.page{display:none;animation:fade .18s ease}.page.active{display:block}@keyframes fade{from{opacity:.3;transform:translateY(3px)}}.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}.page-head h3{font-size:18px;margin:0 0 4px}.page-head p{margin:0;color:var(--muted);font-size:11px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+    .grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:12px}.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:13px;box-shadow:0 2px 10px rgba(16,24,40,.03)}.stat-top{display:flex;align-items:center;justify-content:space-between}.stat i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--brandSoft);color:var(--brand)}.stat strong{display:block;font-size:21px;margin-top:8px}.stat span{font-size:10px;color:var(--muted)}.two{grid-template-columns:1.35fr .65fr}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 2px 10px rgba(16,24,40,.03);min-width:0}.card-head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}.card-head h4{font-size:13px;margin:0}.card-body{padding:14px}.compact-list{display:grid;gap:8px}.list-row{border:1px solid var(--line);border-radius:10px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}.list-row strong{font-size:11px;display:block}.list-row span{font-size:10px;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line)}.toolbar .input{min-height:34px;padding:7px 9px;max-width:260px}.table-wrap{overflow:auto;max-height:calc(100dvh - 235px)}table{width:100%;border-collapse:collapse;min-width:760px}th{position:sticky;top:0;background:#f8fafc;color:#475467;font-size:9px;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);z-index:2}td{padding:9px 11px;border-bottom:1px solid #eef1f5;font-size:11px;vertical-align:middle}tbody tr:hover{background:#fcfcfd}.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:800;background:#f2f4f7;color:#475467}.badge.good{background:#ecfdf3;color:#067647}.badge.warn{background:#fffaeb;color:#b54708}.badge.bad{background:#fef3f2;color:#b42318}.badge.brand{background:var(--brandSoft);color:var(--brand)}.amount{font-weight:750;font-variant-numeric:tabular-nums}.empty{text-align:center;padding:28px;color:var(--muted)}
+    .service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.service{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px;background:#fff}.service .service-icon{width:32px;height:32px;border-radius:9px;background:var(--brandSoft);color:var(--brand);display:grid;place-items:center}.service h5{font-size:12px;margin:0}.service p{font-size:10px;color:var(--muted);line-height:1.45;margin:0;min-height:29px}.service-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:7px}.price{font-size:11px;font-weight:800;color:var(--brand)}
+    .permission-grid{display:grid;grid-template-columns:1.1fr repeat(6,.55fr);border:1px solid var(--line);border-radius:10px;overflow:auto;min-width:640px}.permission-grid>div{padding:8px;border-bottom:1px solid var(--line);display:grid;place-items:center;font-size:10px}.permission-grid .label{place-items:center start;font-weight:700}.permission-grid .head{background:#f8fafc;font-weight:800;font-size:9px;text-transform:uppercase}.switch{width:34px;height:19px;border-radius:99px;background:#d0d5dd;border:0;position:relative;padding:0}.switch:after{content:"";position:absolute;width:15px;height:15px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.16s;box-shadow:0 1px 3px #777}.switch.on{background:var(--brand)}.switch.on:after{left:17px}
+    .progress{height:7px;background:#eef1f5;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:var(--brand);border-radius:99px}.profile-box{display:flex;gap:12px;align-items:center}.profile-box .avatar{width:48px;height:48px;font-size:16px}.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.metric{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px}.metric b{display:block;font-size:16px}.metric span{font-size:9px;color:var(--muted)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(16,24,40,.55);z-index:100;display:grid;place-items:center;padding:16px}.modal{background:#fff;border-radius:16px;width:min(680px,100%);max-height:90dvh;overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.25)}.modal-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0;font-size:15px}.modal-body{padding:16px}.modal-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.toast-stack{position:fixed;top:14px;right:14px;z-index:200;display:grid;gap:8px}.toast{background:#101828;color:#fff;border-radius:10px;padding:10px 13px;box-shadow:var(--shadow);font-size:11px;animation:fade .2s}.toast.bad{background:#7a271a}.toast.good{background:#05603a}
+    .callout{border:1px solid #f7d7dd;background:#fff8f9;border-radius:11px;padding:11px;color:#64202d;font-size:11px;line-height:1.5}.timeline{border-left:2px solid #e4e7ec;margin-left:7px;padding-left:15px;display:grid;gap:12px}.timeline-item{position:relative}.timeline-item:before{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:var(--brand);left:-20px;top:3px}.timeline-item strong{font-size:11px}.timeline-item p{margin:3px 0 0;font-size:10px;color:var(--muted)}
+    @media(max-width:1050px){:root{--side:210px}.stats{grid-template-columns:repeat(2,1fr)}.service-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:760px){body{overflow:auto}#shell{display:block;height:auto;min-height:100dvh}.sidebar{position:fixed;inset:0 auto 0 0;width:250px;transform:translateX(-105%);transition:.2s;box-shadow:20px 0 50px rgba(0,0,0,.18)}.sidebar.open{transform:none}.topbar{height:58px;position:sticky;top:0;padding:0 12px}.mobile-menu{display:inline-grid;place-items:center}.top-title p,.owner-chip{display:none}main{padding:12px;overflow:visible}.two,.three,.stats,.metric-row{grid-template-columns:1fr}.service-grid{grid-template-columns:1fr}.page-head{align-items:flex-start}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.table-wrap{max-height:none}.auth{padding:14px}.auth-card{padding:18px}.modal{max-height:94dvh}}
+    @media(min-width:1300px) and (min-height:700px){main{padding-top:15px}.stat{padding:12px}.card-body{padding:13px}}
+    @media print{.sidebar,.topbar,.page-head .actions,.toolbar,.no-print{display:none!important}body,#shell,main{display:block;height:auto;overflow:visible;background:#fff}.page{display:none!important}.page.active{display:block!important}.card{box-shadow:none}.table-wrap{max-height:none;overflow:visible}}
   </style>
 </head>
+<body>
+  <div id="toastStack" class="toast-stack"></div>
 
-<body class="min-h-screen w-full bg-slate-50 dark:bg-[#070B12] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col justify-between overflow-x-hidden transition-colors duration-200 selection:bg-amber-500 selection:text-white">
-
-  <!-- NOTIFICATION TOAST CONTAINER -->
-  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-  <!-- APPLICATION WRAPPER (Fluid & Zero Overlap) -->
-  <div id="appRoot" class="flex-1 w-full flex flex-col justify-between relative bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-[#070B12] dark:via-[#0B0F17] dark:to-[#070B12]">
-
-    <!-- ========================================== -->
-    <!-- STAGE 1 & 2: COMPACT AUTHENTICATION GATE   -->
-    <!-- ========================================== -->
-    <div id="authScreen" class="w-full flex-1 flex flex-col items-center justify-center p-4 sm:p-6 my-auto relative z-20">
-      
-      <!-- Subtle Ambient Backlight -->
-      <div class="absolute w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none -top-6"></div>
-      <div class="absolute w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-sky-500/5 blur-3xl pointer-events-none -bottom-6"></div>
-
-      <!-- Compact 100% Zoom Login Card -->
-      <div class="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#0E131F]/95 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl relative transition-all duration-300">
-        
-        <!-- PROPORTIONAL GG LOGO EMBLEM (Supports Triple Tap) -->
-        <div class="flex flex-col items-center text-center mb-5">
-          <div id="authLogoBadge" onclick="handleLogoTap()" title="Triple-click for Stealth Master PIN" class="w-14 h-14 rounded-2xl bg-[#070B12] border-2 border-[#F59E0B] shadow-md shadow-amber-500/15 cursor-pointer active:scale-95 transition-transform select-none flex items-center justify-center relative group">
-            <span class="text-xl font-extrabold tracking-wider text-[#F59E0B] font-sans">GG</span>
-            <span id="tapPulseDot" class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-400 border-2 border-white dark:border-slate-900 opacity-0 transition-opacity"></span>
-          </div>
-          
-          <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white mt-3">Global Guru Portal</h1>
-          <p class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-mono mt-0.5">AUTHORIZED GATEWAY • V5.3</p>
-        </div>
-
-        <!-- AUTH PHASE 1: Glassmorphic Google Sign In Button -->
-        <div id="authPhaseGoogle" class="space-y-3.5">
-          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 text-center leading-relaxed">
-            Please authenticate using your verified enterprise account to unlock your assigned workspace.
-          </p>
-
-          <button onclick="handleGoogleSignIn()" class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800/80 dark:hover:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-md transition-all active:scale-[0.98]">
-            <svg class="w-4 h-4" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-            </svg>
-            Sign in with Google
-          </button>
-        </div>
-
-        <!-- AUTH PHASE 2: WhatsApp Number + Batch ID / Passcode Form -->
-        <div id="authPhaseBlindForm" class="space-y-3.5 hidden">
-          <div class="bg-slate-100 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 flex items-center justify-between">
-            <div class="flex items-center gap-2 overflow-hidden">
-              <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-[10px] shrink-0">
-                <i class="fa-solid fa-user-check"></i>
-              </div>
-              <span id="activeSignedEmail" class="text-xs text-slate-700 dark:text-slate-300 font-mono truncate">globalgurubusiness@gmail.com</span>
-            </div>
-            <button onclick="handleSignOut()" class="text-xs text-rose-500 hover:underline shrink-0 font-medium">Switch</button>
-          </div>
-
-          <div class="space-y-2.5">
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">WhatsApp Number *</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs font-mono">+92</span>
-                <input type="tel" id="blindPhoneInput" placeholder="300 1234567" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl pl-12 pr-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500 font-mono">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Batch ID / Passcode *</label>
-              <input type="text" id="blindPasscodeInput" placeholder="e.g. AI-01, 7860, 4321" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500 font-mono uppercase">
-            </div>
-          </div>
-
-          <button onclick="handleBlindVerification()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all active:scale-[0.98]">
-            <i class="fa-solid fa-key text-[10px]"></i>
-            Unlock Workspace
-          </button>
-        </div>
-
-        <!-- COLLAPSIBLE DEMO CREDENTIALS HELP DRAWER -->
-        <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800/80">
-          <button onclick="toggleDemoDrawer()" class="w-full flex items-center justify-between text-[11px] font-medium text-amber-600 dark:text-amber-400 hover:underline">
-            <span class="flex items-center gap-1.5 font-mono">
-              <i class="fa-solid fa-circle-question"></i> Demo Access Guide & Auto-Fills
-            </span>
-            <i id="demoDrawerArrow" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"></i>
-          </button>
-
-          <div id="demoCredentialsDrawer" class="hidden mt-2.5 space-y-1.5 text-[10px] font-mono bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-2.5">
-            <div class="flex items-center justify-between p-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
-              <div>
-                <span class="font-bold text-slate-800 dark:text-slate-200 block">Super Admin 1 (Yasir Ali)</span>
-                <span class="text-slate-500">globalgurubusiness@gmail.com • Key: 7860</span>
-              </div>
-              <button onclick="quickFillDemo('globalgurubusiness@gmail.com', '3001234567', '7860')" class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold text-[9px]">Auto Fill</button>
-            </div>
-
-            <div class="flex items-center justify-between p-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
-              <div>
-                <span class="font-bold text-slate-800 dark:text-slate-200 block">Super Admin 2 (Sis Desk)</span>
-                <span class="text-slate-500">globalgurultd@gmail.com • Key: 7860</span>
-              </div>
-              <button onclick="quickFillDemo('globalgurultd@gmail.com', '3001234567', '7860')" class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold text-[9px]">Auto Fill</button>
-            </div>
-
-            <div class="flex items-center justify-between p-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
-              <div>
-                <span class="font-bold text-slate-800 dark:text-slate-200 block">Staff / SIS Reception Desk</span>
-                <span class="text-slate-500">staff@globalguru.com • Key: 4321</span>
-              </div>
-              <button onclick="quickFillDemo('staff@globalguru.com', '3001234567', '4321')" class="px-2 py-0.5 rounded bg-sky-500 text-white font-bold text-[9px]">Auto Fill</button>
-            </div>
-
-            <div class="flex items-center justify-between p-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
-              <div>
-                <span class="font-bold text-slate-800 dark:text-slate-200 block">Enrolled Learner (Student)</span>
-                <span class="text-slate-500">learner@globalguru.com • Batch: AI-01</span>
-              </div>
-              <button onclick="quickFillDemo('learner@globalguru.com', '3001234567', 'AI-01')" class="px-2 py-0.5 rounded bg-emerald-500 text-white font-bold text-[9px]">Auto Fill</button>
-            </div>
-
-            <div class="flex items-center justify-between p-1 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
-              <div>
-                <span class="font-bold text-slate-800 dark:text-slate-200 block">Commercial Studio Client</span>
-                <span class="text-slate-500">client@brand.com • Key: CLIENT</span>
-              </div>
-              <button onclick="quickFillDemo('client@brand.com', '3009998877', 'CLIENT')" class="px-2 py-0.5 rounded bg-purple-500 text-white font-bold text-[9px]">Auto Fill</button>
-            </div>
-          </div>
-        </div>
-
+  <section id="authScreen" class="auth">
+    <div class="auth-card">
+      <div class="brand-lockup">
+        <img class="logo" src="logo.png" alt="Global Guru logo" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+        <div class="logo-fallback">GG</div>
+        <div><h1>Global Guru Portal</h1><p>Your Digital Partner • Private Business Workspace</p></div>
       </div>
 
-      <div class="mt-4 text-center text-[11px] text-slate-500 font-mono">
-        Secured Ecosystem Terminal • End-to-End Cryptographic Sessions
+      <div id="setupPanel" class="hidden">
+        <h2 style="font-size:16px;margin:0">Create Primary Owner</h2>
+        <div class="auth-note"><b>First-time setup:</b> yahan banne wala account Root Primary Owner hoga. Is role ko portal ka koi doosra user remove, demote ya restrict nahi kar sakta.</div>
+        <form id="setupForm" class="form-grid">
+          <div class="field span-2"><label>Owner Full Name</label><input class="input" name="name" required placeholder="Your full name"></div>
+          <div class="field"><label>WhatsApp Number</label><input class="input" name="phone" required inputmode="tel" placeholder="03001234567"></div>
+          <div class="field"><label>GG User ID</label><input class="input" name="userId" required placeholder="GG-OWNER"></div>
+          <div class="field"><label>Create 6-digit PIN</label><input class="input" name="pin" required type="password" inputmode="numeric" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="••••••"></div>
+          <div class="field"><label>Confirm PIN</label><input class="input" name="confirmPin" required type="password" inputmode="numeric" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="••••••"></div>
+          <button class="btn primary span-2" type="submit"><i class="fa-solid fa-shield-halved"></i> Initialize GG Security</button>
+        </form>
       </div>
+
+      <div id="loginPanel" class="hidden">
+        <h2 style="font-size:16px;margin:0">Secure Portal Login</h2>
+        <p class="muted" style="font-size:11px;line-height:1.55">Apna WhatsApp number ya GG User ID aur personal PIN enter karein.</p>
+        <form id="loginForm" class="auth-actions">
+          <div class="field"><label>WhatsApp / GG User ID</label><input class="input" name="identity" required autocomplete="username" placeholder="03001234567 or GG-0001"></div>
+          <div class="field"><label>6-digit GG PIN</label><input class="input" name="pin" required type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" placeholder="••••••"></div>
+          <button class="btn primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Enter Portal</button>
+          <button id="activateBtn" class="btn" type="button"><i class="fa-solid fa-user-check"></i> First-time Activation</button>
+        </form>
+      </div>
+
+      <div id="activationPanel" class="hidden">
+        <h2 style="font-size:16px;margin:0">First-time Activation</h2>
+        <p class="muted" style="font-size:11px;line-height:1.55">Owner ya authorized admin se milne wala one-time activation code use karein.</p>
+        <form id="activationForm" class="auth-actions">
+          <div class="field"><label>WhatsApp Number</label><input class="input" name="phone" required inputmode="tel"></div>
+          <div class="field"><label>Activation Code</label><input class="input mono" name="code" required maxlength="12" style="text-transform:uppercase"></div>
+          <div class="field"><label>Create New 6-digit PIN</label><input class="input" name="pin" required type="password" inputmode="numeric" minlength="6" maxlength="6" pattern="[0-9]{6}"></div>
+          <button class="btn primary" type="submit">Activate Account</button>
+          <button class="btn" type="button" onclick="showAuth('login')">Back to Login</button>
+        </form>
+      </div>
+      <div class="security-line"><i class="fa-solid fa-lock"></i> GG Security Center • Session and activity monitoring</div>
     </div>
+  </section>
 
-
-    <!-- ============================================================== -->
-    <!-- MAIN WORKSPACE VIEW (FLUID, SCROLLABLE, ZERO OVERLAP)          -->
-    <!-- ============================================================== -->
-    <div id="workspaceScreen" class="w-full flex-1 flex flex-col hidden min-h-screen">
-      
-      <!-- TOP EXECUTIVE HEADER BAR -->
-      <header class="w-full bg-white/95 dark:bg-[#0E131F]/95 border-b border-slate-200 dark:border-slate-800 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-6 lg:px-8 py-3 transition-all">
-        <div class="w-full flex items-center justify-between gap-4 max-w-7xl mx-auto">
-          
-          <!-- Brand Logo & Stealth Tap Target -->
-          <div class="flex items-center gap-3">
-            <div id="headerLogoBadge" onclick="handleLogoTap()" class="w-9 h-9 rounded-xl bg-[#070B12] border-2 border-[#F59E0B] cursor-pointer active:scale-90 transition-transform select-none flex items-center justify-center shadow-md">
-              <span class="text-xs font-extrabold text-[#F59E0B] font-sans">GG</span>
-            </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight">Global Guru</span>
-                <span id="roleBadge" class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">Super Admin</span>
-              </div>
-              <p id="userStatusSub" class="text-[10px] text-slate-500 font-mono truncate max-w-[180px] sm:max-w-xs">globalgurubusiness@gmail.com</p>
-            </div>
-          </div>
-
-          <!-- Top Quick Actions -->
-          <div class="flex items-center gap-2 sm:gap-3">
-            <button id="quickPanicBtn" onclick="togglePanicState()" title="1-Click Privacy Mask" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
-              <i class="fa-solid fa-eye-slash text-amber-500 text-xs"></i>
-              <span class="hidden sm:inline">Privacy Mask</span>
-            </button>
-
-            <a id="headerWhatsappDesk" href="https://wa.me/923001234567?text=Global%20Guru%20Executive%20Support%20Desk" target="_blank" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all">
-              <i class="fa-brands fa-whatsapp text-sm"></i>
-              <span class="hidden md:inline">Desk Logs</span>
-            </a>
-
-            <button onclick="handleSignOut()" title="Sign Out Session" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 text-xs font-medium flex items-center gap-1.5 transition-all">
-              <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-              <span class="hidden sm:inline">Exit</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <!-- PERSISTENT NAVIGATION BAR -->
-      <nav id="masterNavMenu" class="w-full bg-slate-100 dark:bg-[#0B0F17] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 lg:px-8 py-2 z-30 overflow-x-auto custom-scroll">
-        <div class="w-full max-w-7xl mx-auto flex items-center gap-2 min-w-max">
-          <button onclick="switchTab('executiveHubTab')" id="tabBtn_executiveHubTab" class="tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40">
-            <i class="fa-solid fa-shield-halved text-amber-500"></i>
-            <span>Executive Hub</span>
-          </button>
-          <button onclick="switchTab('directoryTab')" id="tabBtn_directoryTab" class="tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
-            <i class="fa-solid fa-users"></i>
-            <span>Directory</span>
-          </button>
-          <button onclick="switchTab('addEntryTab')" id="tabBtn_addEntryTab" class="tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
-            <i class="fa-solid fa-square-plus"></i>
-            <span>Add Entry</span>
-          </button>
-          <button onclick="switchTab('financesTab')" id="tabBtn_financesTab" class="tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
-            <i class="fa-solid fa-wallet"></i>
-            <span>Finances</span>
-          </button>
-          <button onclick="switchTab('clientPortalTab')" id="tabBtn_clientPortalTab" class="tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
-            <i class="fa-solid fa-briefcase"></i>
-            <span>Client Desk</span>
-          </button>
-          <button onclick="switchTab('settingsTab')" id="tabBtn_settingsTab" class="tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
-            <i class="fa-solid fa-gear"></i>
-            <span>Settings</span>
-          </button>
-        </div>
-      </nav>
-
-      <!-- MAIN TAB CONTENT BODY (Natural Scroll Padding) -->
-      <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 pb-20">
-
-        <!-- ============================================== -->
-        <!-- TAB 1: EXECUTIVE HUB (11 Sliding Toggles)      -->
-        <!-- ============================================== -->
-        <section id="executiveHubTab" class="tab-content space-y-6">
-          <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-            <div>
-              <div class="flex items-center gap-3">
-                <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <i class="fa-solid fa-sliders text-amber-500"></i>
-                  Executive Hub Switchboard
-                </h2>
-                <span id="hubActiveCounter" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">
-                  8 / 11 Active
-                </span>
-              </div>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time operational safeguards, privacy curtains, and master ecosystem toggles.</p>
-            </div>
-
-            <div class="flex items-center gap-2.5">
-              <button onclick="setAllSwitches(true)" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all">
-                Activate All
-              </button>
-              <button onclick="setAllSwitches(false)" class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 text-xs font-semibold transition-all">
-                Panic Lock All
-              </button>
-              <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 text-[10px] font-mono text-emerald-500">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span id="cloudSyncStatus">Synced</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 11 Master Control Cards Grid with Sliding Pill Toggles -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            
-            <!-- Switch 1 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">1-Click Panic Mask</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300">Security</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Mask all ledger values with bullet dots.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_panicMask" onchange="handleSwitchToggle('panicMask', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 2 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Admission Gate Freeze</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-600 dark:text-sky-300">Intake</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Halt new student registration submissions.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_admissionFreeze" onchange="handleSwitchToggle('admissionFreeze', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 3 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Khata Maintenance</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-600 dark:text-violet-300">Audit</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Lock learner queries during month-end audit.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_khataMaintenance" onchange="handleSwitchToggle('khataMaintenance', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 4 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">WhatsApp Desk Channel</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300">Support</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Show/Hide instant customer desk trigger.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_whatsappDesk" onchange="handleSwitchToggle('whatsappDesk', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 5 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Studio Client Portal Desk</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-300">B2B</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Permit commercial invoices & order flows.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_clientStudio" onchange="handleSwitchToggle('clientStudio', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 6 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Backup Engine Clearance</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-600 dark:text-indigo-300">Data</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Allow instant CSV/JSON snapshot downloads.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_backupClearance" onchange="handleSwitchToggle('backupClearance', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 7 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Vault & Bank Realtime Sync</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300">Treasury</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Automatically compute inter-ledger credits.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_fundsSync" onchange="handleSwitchToggle('fundsSync', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 8 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Staff Financial Restriction</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-600 dark:text-teal-300">RBAC</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Shield ledger tabs from reception profiles.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_staffRestriction" onchange="handleSwitchToggle('staffRestriction', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 9 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Live Cohort Timers</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-600 dark:text-cyan-300">Scheduler</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Show session countdown on directory headers.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_cohortTimers" onchange="handleSwitchToggle('cohortTimers', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 10 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Auto WhatsApp Receipts</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300">Automation</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Auto-prompt payment slip on form submit.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_autoSlip" onchange="handleSwitchToggle('autoSlip', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-            <!-- Switch 11 -->
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div class="space-y-0.5 pr-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Full Audit Trace Logging</span>
-                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300">Security</span>
-                </div>
-                <p class="text-[11px] text-slate-500">Log IP stamps & session token exchanges.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" id="switch_auditTrace" onchange="handleSwitchToggle('auditTrace', this.checked)" class="sr-only peer">
-                <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-              </label>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- ============================================== -->
-        <!-- TAB 2: DIRECTORY (Student & Cohort Management) -->
-        <!-- ============================================== -->
-        <section id="directoryTab" class="tab-content space-y-6 hidden">
-          <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-            <div>
-              <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-users text-amber-500"></i>
-                Student & Learner Directory
-              </h2>
-              <p class="text-xs text-slate-500 mt-0.5">Centralized enrollments, payment history, and one-click receipts.</p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2.5">
-              <div class="relative min-w-[200px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-amber-500">
-              </div>
-
-              <select id="directoryBatchFilter" onchange="renderDirectoryTable()" class="bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-amber-500">
-                <option value="ALL">All Cohorts</option>
-                <option value="AI-01">Batch AI-01</option>
-                <option value="AI-02">Batch AI-02</option>
-                <option value="VFX-01">Batch VFX-01</option>
-              </select>
-
-              <button onclick="openBatchSchedulerModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
-                <i class="fa-solid fa-calendar-days text-amber-500"></i>
-                <span>Cohort Timings</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-            <div class="overflow-x-auto custom-scroll">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr class="bg-slate-50 dark:bg-[#070B12]/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase font-mono tracking-wider">
-                    <th class="py-3 px-4 font-semibold">Roll # / ID</th>
-                    <th class="py-3 px-4 font-semibold">Student Name</th>
-                    <th class="py-3 px-4 font-semibold">WhatsApp</th>
-                    <th class="py-3 px-4 font-semibold">Cohort</th>
-                    <th class="py-3 px-4 font-semibold text-right">Total Fee</th>
-                    <th class="py-3 px-4 font-semibold text-right">Paid</th>
-                    <th class="py-3 px-4 font-semibold text-right">Balance</th>
-                    <th class="py-3 px-4 font-semibold text-center">Status</th>
-                    <th class="py-3 px-4 font-semibold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="directoryTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-200"></tbody>
-              </table>
-            </div>
-
-            <div id="directoryTableFooter" class="p-3 bg-slate-50 dark:bg-[#070B12]/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-              <span id="directoryCountLabel">Showing 0 enrolled students</span>
-              <span class="font-mono text-[10px] text-amber-600 dark:text-amber-400">Realtime Ledger Sync Active</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================== -->
-        <!-- TAB 3: ADD ENTRY (Student Admission Engine)   -->
-        <!-- ============================================== -->
-        <section id="addEntryTab" class="tab-content space-y-6 hidden">
-          <div class="max-w-xl mx-auto bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-sm">
-            <div class="mb-5">
-              <div class="flex items-center gap-2">
-                <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-xs">
-                  <i class="fa-solid fa-user-plus"></i>
-                </span>
-                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Student Enrollment & Fee Receipt</h2>
-              </div>
-              <p class="text-xs text-slate-500 mt-1">Record admission, credit ledger, and auto-generate WhatsApp voucher.</p>
-            </div>
-
-            <form id="studentEntryForm" onsubmit="handleStudentFormSubmit(event)" class="space-y-3.5">
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Student Full Name *</label>
-                <input type="text" id="formStudentName" required placeholder="e.g. Muhammad Yasir" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500">
-              </div>
-
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">WhatsApp Contact Number *</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs font-mono">+92</span>
-                  <input type="tel" id="formStudentPhone" required placeholder="300 1234567" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl pl-12 pr-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Batch Code *</label>
-                  <select id="formBatchCode" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
-                    <option value="AI-01">AI-01 (Agentic AI Systems)</option>
-                    <option value="AI-02">AI-02 (Next Gen Cohort)</option>
-                    <option value="VFX-01">VFX-01 (Cinema Ads & CGI)</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Payment Vault Channel *</label>
-                  <select id="formPaymentChannel" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500">
-                    <option value="Meezan Bank">Meezan Bank (Corporate 0102)</option>
-                    <option value="Easypaisa">Easypaisa Merchant</option>
-                    <option value="JazzCash">JazzCash Commercial</option>
-                    <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Total Fee (PKR) *</label>
-                  <input type="number" id="formTotalFee" value="50000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:border-amber-500">
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Paid Amount (PKR) *</label>
-                  <input type="number" id="formPaidFee" value="25000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:border-amber-500">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Calculated Balance Due</label>
-                <div class="w-full bg-slate-100 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-amber-600 dark:text-amber-400 flex items-center justify-between">
-                  <span>PKR</span>
-                  <span id="formRemainingBalancePreview" class="font-bold">25,000</span>
-                </div>
-              </div>
-
-              <div class="pt-3 flex flex-col sm:flex-row items-center gap-2.5">
-                <button type="submit" class="w-full sm:flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all active:scale-[0.98]">
-                  <i class="fa-solid fa-check text-[10px]"></i>
-                  Complete Enrollment
-                </button>
-                <button type="button" onclick="resetStudentForm()" class="w-full sm:w-auto py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all">
-                  Reset
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- ============================================== -->
-        <!-- TAB 4: FINANCES (Liquid Capital & Ledger Desk) -->
-        <!-- ============================================== -->
-        <section id="financesTab" class="tab-content space-y-6 hidden">
-          <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-amber-500/30 rounded-3xl p-5 sm:p-7 relative overflow-hidden shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
-              <div>
-                <span class="text-xs font-mono uppercase tracking-widest text-amber-600 dark:text-amber-400 font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-vault"></i>
-                  Total Consolidated Liquid Capital
-                </span>
-                <div class="mt-2 flex items-baseline gap-2">
-                  <span class="text-xl font-bold text-slate-400">PKR</span>
-                  <span id="financeTotalCapital" class="financial-val text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white font-mono">
-                    1,450,000
-                  </span>
-                </div>
-                <p class="text-xs text-slate-500 mt-1">Aggregated real-time liquid assets across physical cash vaults & enterprise bank lines.</p>
-              </div>
-
-              <div class="flex flex-wrap items-center gap-2.5">
-                <button onclick="openInterTransferModal()" class="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-2 transition-all">
-                  <i class="fa-solid fa-money-bill-transfer"></i>
-                  Inter-Account Transfer
-                </button>
-                <button onclick="openExpenseModal()" class="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-500 border border-rose-500/30 text-xs font-bold flex items-center gap-2 transition-all">
-                  <i class="fa-solid fa-receipt"></i>
-                  Record Kharcha (Expense)
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-              <div>
-                <span class="text-xs font-semibold text-slate-500">Meezan Bank Ltd</span>
-                <div class="mt-2">
-                  <span class="text-[10px] text-slate-400 font-mono">PKR</span>
-                  <div id="accBal_Meezan" class="financial-val text-xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">850,000</div>
-                </div>
-              </div>
-              <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                <span>Corp # 0102...</span>
-                <span class="text-emerald-500">Active</span>
-              </div>
-            </div>
-
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-              <div>
-                <span class="text-xs font-semibold text-slate-500">Easypaisa Merchant</span>
-                <div class="mt-2">
-                  <span class="text-[10px] text-slate-400 font-mono">PKR</span>
-                  <div id="accBal_Easypaisa" class="financial-val text-xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">240,000</div>
-                </div>
-              </div>
-              <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                <span>0300-1234567</span>
-                <span class="text-emerald-500">Active</span>
-              </div>
-            </div>
-
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-              <div>
-                <span class="text-xs font-semibold text-slate-500">JazzCash Commercial</span>
-                <div class="mt-2">
-                  <span class="text-[10px] text-slate-400 font-mono">PKR</span>
-                  <div id="accBal_JazzCash" class="financial-val text-xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">180,000</div>
-                </div>
-              </div>
-              <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                <span>0321-9876543</span>
-                <span class="text-emerald-500">Active</span>
-              </div>
-            </div>
-
-            <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-              <div>
-                <span class="text-xs font-semibold text-slate-500">Physical Vault (Galla)</span>
-                <div class="mt-2">
-                  <span class="text-[10px] text-slate-400 font-mono">PKR</span>
-                  <div id="accBal_Vault" class="financial-val text-xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">180,000</div>
-                </div>
-              </div>
-              <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                <span>Cash Reserve</span>
-                <span class="text-emerald-500">In Office</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-sm">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-file-invoice-dollar text-rose-500"></i>
-                Operational Expenses & Petty Deductions
-              </h3>
-              <span id="totalExpensesSum" class="text-[11px] font-mono font-bold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-lg border border-rose-500/20">
-                Total Expenses: PKR 45,000
-              </span>
-            </div>
-
-            <div class="overflow-x-auto custom-scroll">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="bg-slate-50 dark:bg-[#070B12]/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 font-mono uppercase tracking-wider">
-                    <th class="py-2 px-3">Date</th>
-                    <th class="py-2 px-3">Audit Hash</th>
-                    <th class="py-2 px-3">Expense Head / Purpose</th>
-                    <th class="py-2 px-3">Deducted From</th>
-                    <th class="py-2 px-3 text-right">Amount (PKR)</th>
-                    <th class="py-2 px-3 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="expensesTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-700 dark:text-slate-300"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================== -->
-        <!-- TAB: CLIENT DESK (DEDICATED COMMERCIAL PORTAL) -->
-        <!-- ============================================== -->
-        <section id="clientPortalTab" class="tab-content space-y-6 hidden">
-          <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-purple-500/30 rounded-3xl p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-briefcase"></i>
-              </div>
-              <div>
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Commercial Studio Client Desk</h2>
-                <p class="text-xs text-slate-500 font-mono">B2B Production Campaigns, Render Deliverables & Invoices</p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div class="bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-                <span class="text-xs font-bold text-slate-500">Active Campaign</span>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-1">CGI Brand Commercial V2</p>
-                <span class="inline-block mt-2 px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-mono">Render Stage 85%</span>
-              </div>
-
-              <div class="bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-                <span class="text-xs font-bold text-slate-500">Invoice Status</span>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-1">INV-2026-GG89</p>
-                <span class="inline-block mt-2 px-2 py-0.5 rounded text-[10px] bg-sky-500/20 text-sky-400 font-mono">Paid & Cleared</span>
-              </div>
-
-              <div class="bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-                <span class="text-xs font-bold text-slate-500">Executive Contact</span>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 mt-1">studio@globalguru.com</p>
-                <span class="inline-block mt-2 px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-400 font-mono">Dedicated Lead</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================== -->
-        <!-- TAB 5: SETTINGS (BALANCED 12-COL FLUID GRID)  -->
-        <!-- ============================================== -->
-        <section id="settingsTab" class="tab-content space-y-6 hidden">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            <!-- Left Main Settings (8 Cols) -->
-            <div class="lg:col-span-8 space-y-6">
-              
-              <!-- Master Security Card -->
-              <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-xs">
-                    <i class="fa-solid fa-lock"></i>
-                  </div>
-                  <div>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Master Security & PIN Manager</h3>
-                    <p class="text-xs text-slate-500">Configure master stealth code for Super Admin gateway.</p>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
-                  <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Current Master PIN</label>
-                    <input type="password" id="pinManagerCurrent" placeholder="••••" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 font-mono">
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">New 4-Digit PIN</label>
-                    <input type="password" id="pinManagerNew" placeholder="e.g. 7860" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 font-mono">
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Confirm PIN</label>
-                    <input type="password" id="pinManagerConfirm" placeholder="e.g. 7860" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 font-mono">
-                  </div>
-                </div>
-
-                <!-- Masked Recovery Token -->
-                <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                  <div class="text-xs text-slate-500 font-mono flex items-center gap-1.5">
-                    <span>Emergency Token:</span>
-                    <span id="maskedTokenDisplay" class="font-bold text-amber-500 cursor-pointer select-none" onclick="toggleTokenMask()" title="Click to reveal">••••••••••••••••</span>
-                    <i class="fa-solid fa-eye text-[10px] text-slate-400 cursor-pointer ml-1" onclick="toggleTokenMask()"></i>
-                  </div>
-                  <button onclick="handleUpdateMasterPin()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs transition-all hover:bg-amber-400">
-                    Update Master PIN
-                  </button>
-                </div>
-              </div>
-
-              <!-- Backup Engine -->
-              <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-500 flex items-center justify-center font-bold text-xs">
-                    <i class="fa-solid fa-database"></i>
-                  </div>
-                  <div>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Full Ecosystem Backup Center</h3>
-                    <p class="text-xs text-slate-500">Download system snapshot or restore from a JSON backup file.</p>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                  <div class="bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 flex flex-col justify-between space-y-3">
-                    <div>
-                      <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Export Snapshot</span>
-                      <p class="text-[11px] text-slate-500 mt-0.5">Download entire ecosystem database in JSON or CSV.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button onclick="exportDataJSON()" class="flex-1 py-1.5 px-3 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-file-code text-amber-500"></i> JSON
-                      </button>
-                      <button onclick="exportDataCSV()" class="flex-1 py-1.5 px-3 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-file-csv text-emerald-500"></i> CSV
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 flex flex-col justify-between space-y-3">
-                    <div>
-                      <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Restore / Import</span>
-                      <p class="text-[11px] text-slate-500 mt-0.5">Rebuild ecosystem state from a previous JSON backup.</p>
-                    </div>
-                    <div>
-                      <input type="file" id="importJsonFileInput" accept=".json" class="hidden" onchange="handleImportFile(event)">
-                      <button onclick="document.getElementById('importJsonFileInput').click()" class="w-full py-1.5 px-3 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-600 dark:text-sky-300 border border-sky-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-upload"></i> Restore Backup
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Right Column Corporate Identity (4 Cols) -->
-            <div class="lg:col-span-4 space-y-6">
-              <div class="bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-500 flex items-center justify-center font-bold text-xs">
-                    <i class="fa-brands fa-linkedin-in"></i>
-                  </div>
-                  <div>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Corporate Identity</h3>
-                    <p class="text-xs text-slate-500">Verified Executive Handle</p>
-                  </div>
-                </div>
-
-                <div class="bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3">
-                  <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-xl bg-[#070B12] border-2 border-amber-500 flex items-center justify-center font-bold text-amber-500 text-xs shadow-md">
-                      YA
-                    </div>
-                    <div>
-                      <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Yasir Ali</h4>
-                      <p class="text-[11px] text-amber-600 dark:text-amber-400 font-mono">Founder & CEO, Global Guru</p>
-                    </div>
-                  </div>
-
-                  <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="w-full py-2 px-3 rounded-xl bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 dark:text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
-                    <i class="fa-brands fa-linkedin"></i> linkedin.com/in/yasiraliglobalguru
-                  </a>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-      </main>
-
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- BOTTOM FOOTER & THEME SWITCHER (NATURAL FLOW, ZERO OVERLAP)    -->
-    <!-- ============================================================== -->
-    <footer class="w-full mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white/95 dark:bg-[#070B12]/95 backdrop-blur-md py-3.5 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-mono transition-colors">
-      <div>Global Guru Enterprise Ecosystem • Multan Tech Cluster</div>
-      
-      <!-- Consumer Theme Selector -->
-      <div class="flex items-center gap-1 bg-slate-200/80 dark:bg-slate-900 p-1 rounded-xl border border-slate-300 dark:border-slate-800">
-        <button onclick="setTheme('light')" id="themeBtn_light" class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400 text-xs">
-          <i class="fa-solid fa-sun text-amber-500 text-xs"></i> <span>Light</span>
-        </button>
-        <button onclick="setTheme('dark')" id="themeBtn_dark" class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400 text-xs">
-          <i class="fa-solid fa-moon text-blue-400 text-xs"></i> <span>Dark</span>
-        </button>
-        <button onclick="setTheme('system')" id="themeBtn_system" class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400 text-xs">
-          <i class="fa-solid fa-desktop text-xs"></i> <span>System</span>
-        </button>
+  <section id="shell" class="hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="side-brand">
+        <img class="logo" src="logo.png" alt="GG" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+        <div class="logo-fallback">GG</div>
+        <div><strong>GLOBAL GURU</strong><span>YOUR DIGITAL PARTNER</span></div>
       </div>
-    </footer>
-
-  </div>
-
-  <!-- STEALTH ADMIN POPUP MODAL (3 Clicks on GG Logo) -->
-  <div id="stealthPinModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-xs sm:max-w-sm bg-white dark:bg-[#0E131F] border border-amber-500/40 rounded-3xl p-5 shadow-2xl relative text-center">
-      <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center justify-center text-xl font-black mb-3">
-        <i class="fa-solid fa-shield-halved"></i>
+      <nav id="nav" class="nav"></nav>
+      <div class="side-user">
+        <div id="sideAvatar" class="avatar">GG</div>
+        <div class="grow"><strong id="sideName" class="ellipsis small">User</strong><span id="sideRole" class="ellipsis small muted" style="display:block">Role</span></div>
+        <button class="icon-btn" onclick="logout()" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
       </div>
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white">Stealth Security Gateway</h3>
-      <p class="text-xs text-slate-500 mt-0.5 mb-3 font-mono">Enter Authorized Master PIN</p>
-
-      <form onsubmit="handleStealthPinSubmit(event)" class="space-y-3">
-        <input type="password" id="stealthPinInput" maxlength="4" placeholder="••••" required class="w-full text-center tracking-[1em] text-xl bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl py-2.5 text-amber-500 font-mono focus:outline-none focus:border-amber-500">
-        <div class="flex items-center gap-2">
-          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
-            Unlock Master Suite
-          </button>
-          <button type="button" onclick="closeModal('stealthPinModal')" class="py-2.5 px-3.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- INTER-ACCOUNT TRANSFER MODAL -->
-  <div id="interTransferModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl">
-      <div class="flex items-center justify-between mb-3.5">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <i class="fa-solid fa-money-bill-transfer text-amber-500"></i> Inter-Account Funds Transfer
-        </h3>
-        <button onclick="closeModal('interTransferModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <form onsubmit="handleInterTransferSubmit(event)" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Source Account (From)</label>
-          <select id="transferFromAccount" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200">
-            <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-            <option value="Meezan Bank">Meezan Bank</option>
-            <option value="Easypaisa">Easypaisa</option>
-            <option value="JazzCash">JazzCash</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Destination Account (To)</label>
-          <select id="transferToAccount" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200">
-            <option value="Meezan Bank">Meezan Bank</option>
-            <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-            <option value="Easypaisa">Easypaisa</option>
-            <option value="JazzCash">JazzCash</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Transfer Amount (PKR)</label>
-          <input type="number" id="transferAmount" min="1" required placeholder="e.g. 50000" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100 font-mono">
-        </div>
-
-        <div class="pt-1.5 flex items-center gap-2">
-          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">Execute Transfer</button>
-          <button type="button" onclick="closeModal('interTransferModal')" class="py-2.5 px-3.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- RECORD EXPENSE MODAL -->
-  <div id="expenseModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl">
-      <div class="flex items-center justify-between mb-3.5">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <i class="fa-solid fa-receipt text-rose-500"></i> Record Operational Expense (Kharcha)
-        </h3>
-        <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <form onsubmit="handleExpenseSubmit(event)" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Expense Description / Purpose</label>
-          <input type="text" id="expenseDescription" required placeholder="e.g. Fiber Internet, Studio Lighting" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Deduct From Account</label>
-          <select id="expenseAccount" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200">
-            <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-            <option value="Meezan Bank">Meezan Bank</option>
-            <option value="Easypaisa">Easypaisa</option>
-            <option value="JazzCash">JazzCash</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Amount (PKR)</label>
-          <input type="number" id="expenseAmount" min="1" required placeholder="e.g. 15000" class="w-full bg-slate-50 dark:bg-[#070B12] border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-100 font-mono">
-        </div>
-
-        <div class="pt-1.5 flex items-center gap-2">
-          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs transition-all">Record Deduction</button>
-          <button type="button" onclick="closeModal('expenseModal')" class="py-2.5 px-3.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- COHORT SCHEDULER MODAL -->
-  <div id="cohortSchedulerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#0E131F] border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl">
-      <div class="flex items-center justify-between mb-3.5">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <i class="fa-solid fa-calendar-days text-amber-500"></i> Batch Cohort Timings & Schedules
-        </h3>
-        <button onclick="closeModal('cohortSchedulerModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="space-y-2.5">
-        <div class="p-2.5 bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
-          <div>
-            <span class="font-bold text-amber-500">Batch AI-01</span>
-            <p class="text-slate-500 text-[10px]">Mon & Wed • 08:00 PM - 10:00 PM PKT</p>
-          </div>
-          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[9px] font-mono">In Progress</span>
-        </div>
-
-        <div class="p-2.5 bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
-          <div>
-            <span class="font-bold text-sky-500">Batch AI-02</span>
-            <p class="text-slate-500 text-[10px]">Tue & Thu • 08:00 PM - 10:00 PM PKT</p>
-          </div>
-          <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 text-[9px] font-mono">Registration Open</span>
-        </div>
-
-        <div class="p-2.5 bg-slate-50 dark:bg-[#070B12] border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
-          <div>
-            <span class="font-bold text-purple-500">Batch VFX-01</span>
-            <p class="text-slate-500 text-[10px]">Fri & Sat • 09:00 PM - 11:00 PM PKT</p>
-          </div>
-          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[9px] font-mono">In Progress</span>
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <button onclick="closeModal('cohortSchedulerModal')" class="w-full py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* ========================================================= */
-    /* MASTER STATE & DATA INITIALIZATION                        */
-    /* ========================================================= */
-    const WHITELIST_EMAILS = [
-      'globalgurubusiness@gmail.com',
-      'globalgurultd@gmail.com'
-    ];
-
-    const DEFAULT_MASTER_PIN = '7860';
-    const DEFAULT_STAFF_PASS = '4321';
-    let isTokenMasked = true;
-
-    let appState = {
-      currentUser: null,
-      masterPin: DEFAULT_MASTER_PIN,
-      staffPass: DEFAULT_STAFF_PASS,
-      isPanicMasked: false,
-      selectedGoogleEmail: 'globalgurubusiness@gmail.com',
-      switches: {
-        panicMask: false,
-        admissionFreeze: false,
-        khataMaintenance: false,
-        whatsappDesk: true,
-        clientStudio: true,
-        backupClearance: true,
-        fundsSync: true,
-        staffRestriction: true,
-        cohortTimers: true,
-        autoSlip: true,
-        auditTrace: true,
-      },
-      accounts: {
-        'Meezan Bank': 850000,
-        'Easypaisa': 240000,
-        'JazzCash': 180000,
-        'Physical Vault': 180000
-      },
-      students: [
-        {
-          id: 'GG-AI-01-101',
-          name: 'Hamza Khan',
-          phone: '3001234567',
-          batch: 'AI-01',
-          totalFee: 50000,
-          paid: 50000,
-          channel: 'Meezan Bank',
-          status: 'Paid in Full',
-          date: '2026-03-01'
-        },
-        {
-          id: 'GG-AI-01-102',
-          name: 'Zainab Bibi',
-          phone: '3219876543',
-          batch: 'AI-01',
-          totalFee: 50000,
-          paid: 25000,
-          channel: 'Easypaisa',
-          status: 'Partial (Due)',
-          date: '2026-03-04'
-        },
-        {
-          id: 'GG-VFX-01-201',
-          name: 'Bilal Ahmed',
-          phone: '3335558888',
-          batch: 'VFX-01',
-          totalFee: 65000,
-          paid: 30000,
-          channel: 'JazzCash',
-          status: 'Partial (Due)',
-          date: '2026-03-10'
-        }
-      ],
-      expenses: [
-        { id: 1, hash: 'TX-9A82F1', date: '2026-03-02', desc: 'High-Speed Fiber Optics Internet', account: 'Meezan Bank', amount: 15000 },
-        { id: 2, hash: 'TX-4C71B8', date: '2026-03-05', desc: 'Studio Production Lighting Replacements', account: 'Physical Vault', amount: 30000 }
-      ]
-    };
-
-    function loadPersistedState() {
-      try {
-        const stored = localStorage.getItem('GG_ECOSYSTEM_STATE');
-        if (stored) {
-          appState = { ...appState, ...JSON.parse(stored) };
-        }
-      } catch (err) {
-        console.error('State load error:', err);
-      }
-    }
-
-    function persistState() {
-      try {
-        localStorage.setItem('GG_ECOSYSTEM_STATE', JSON.stringify(appState));
-        const syncLabel = document.getElementById('cloudSyncStatus');
-        if (syncLabel) syncLabel.textContent = 'Synced';
-      } catch (err) {
-        console.error('State save error:', err);
-      }
-    }
-
-    /* ========================================================= */
-    /* THEME SWITCHER ENGINE                                     */
-    /* ========================================================= */
-    function setTheme(mode) {
-      localStorage.setItem('gg_theme_preference', mode);
-      applyTheme(mode);
-    }
-
-    function applyTheme(mode) {
-      const root = document.documentElement;
-      const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
-      if (isDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-
-      ['light', 'dark', 'system'].forEach(t => {
-        const btn = document.getElementById('themeBtn_' + t);
-        if (btn) {
-          if (t === mode) {
-            btn.className = 'px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white font-bold text-xs';
-          } else {
-            btn.className = 'px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400 text-xs';
-          }
-        }
-      });
-    }
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      const current = localStorage.getItem('gg_theme_preference') || 'system';
-      if (current === 'system') applyTheme('system');
-    });
-
-    /* ========================================================= */
-    /* AUTHENTICATION & STEALTH VERIFICATION GATEWAY             */
-    /* ========================================================= */
-    let logoTapCount = 0;
-    let logoTapTimer = null;
-
-    function handleLogoTap() {
-      logoTapCount++;
-      const dot = document.getElementById('tapPulseDot');
-      if (dot) {
-        dot.style.opacity = '1';
-        setTimeout(() => dot.style.opacity = '0', 250);
-      }
-
-      clearTimeout(logoTapTimer);
-      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 900);
-
-      if (logoTapCount >= 3) {
-        logoTapCount = 0;
-        openStealthPinModal();
-      }
-    }
-
-    function openStealthPinModal() {
-      const modal = document.getElementById('stealthPinModal');
-      const input = document.getElementById('stealthPinInput');
-      modal.classList.remove('hidden');
-      input.value = '';
-      input.focus();
-    }
-
-    function handleStealthPinSubmit(e) {
-      e.preventDefault();
-      const pin = document.getElementById('stealthPinInput').value.trim();
-      const currentMaster = appState.masterPin || DEFAULT_MASTER_PIN;
-
-      if (pin === currentMaster || pin === '7860' || pin === 'GG-EMERGENCY-2026') {
-        closeModal('stealthPinModal');
-        appState.currentUser = { email: 'globalgurubusiness@gmail.com', role: 'SUPER_ADMIN' };
-        showToast('Super Admin Master Gateway Unlocked', 'success');
-        enterWorkspace();
-      } else {
-        showToast('Access Denied: Invalid Master Code', 'error');
-        document.getElementById('stealthPinInput').value = '';
-      }
-    }
-
-    function handleGoogleSignIn() {
-      document.getElementById('authPhaseGoogle').classList.add('hidden');
-      document.getElementById('authPhaseBlindForm').classList.remove('hidden');
-      document.getElementById('activeSignedEmail').textContent = appState.selectedGoogleEmail;
-      document.getElementById('blindPhoneInput').focus();
-    }
-
-    function handleBlindVerification() {
-      const phone = document.getElementById('blindPhoneInput').value.trim();
-      const passcode = document.getElementById('blindPasscodeInput').value.trim().toUpperCase();
-      const email = appState.selectedGoogleEmail;
-
-      if (!phone) {
-        showToast('Please enter your WhatsApp contact number', 'warning');
-        return;
-      }
-
-      if (passcode === appState.staffPass || passcode === '4321' || passcode === 'SIS') {
-        appState.currentUser = { email: email, role: 'STAFF' };
-        showToast('Staff Operations Workspace Verified', 'success');
-        enterWorkspace();
-        return;
-      }
-
-      if (passcode === appState.masterPin || passcode === '7860') {
-        appState.currentUser = { email: email, role: 'SUPER_ADMIN' };
-        showToast('Super Admin Executive Hub Unlocked', 'success');
-        enterWorkspace();
-        return;
-      }
-
-      if (passcode.startsWith('AI-') || passcode.startsWith('VFX-') || passcode === 'LEARNER') {
-        appState.currentUser = { email: email, role: 'LEARNER' };
-        showToast('Learner Profile Workspace Verified', 'success');
-        enterWorkspace();
-        return;
-      }
-
-      if (passcode.startsWith('CLIENT') || passcode === 'STUDIO') {
-        appState.currentUser = { email: email, role: 'CLIENT' };
-        showToast('Commercial Client Portal Verified', 'success');
-        enterWorkspace();
-        return;
-      }
-
-      showToast('Access Denied: Invalid Batch ID or Key', 'error');
-    }
-
-    function enterWorkspace() {
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('workspaceScreen').classList.remove('hidden');
-
-      const role = appState.currentUser.role;
-      const roleBadge = document.getElementById('roleBadge');
-      const userSub = document.getElementById('userStatusSub');
-
-      userSub.textContent = appState.currentUser.email;
-
-      // Strict Role-Based View Configuration
-      if (role === 'SUPER_ADMIN') {
-        roleBadge.textContent = 'Super Admin';
-        roleBadge.className = 'text-[9px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30';
-        enableSuperAdminTabs();
-        switchTab('executiveHubTab');
-      } else if (role === 'STAFF') {
-        roleBadge.textContent = 'Staff Operations';
-        roleBadge.className = 'text-[9px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30';
-        restrictStaffTabs();
-        switchTab('directoryTab');
-      } else if (role === 'CLIENT') {
-        roleBadge.textContent = 'Client Desk';
-        roleBadge.className = 'text-[9px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30';
-        restrictClientTabs();
-        switchTab('clientPortalTab');
-      } else {
-        roleBadge.textContent = 'Learner Desk';
-        roleBadge.className = 'text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30';
-        restrictLearnerTabs();
-        switchTab('directoryTab');
-      }
-
-      refreshAllViews();
-    }
-
-    function handleSignOut() {
-      appState.currentUser = null;
-      document.getElementById('authPhaseBlindForm').classList.add('hidden');
-      document.getElementById('authPhaseGoogle').classList.remove('hidden');
-      document.getElementById('blindPhoneInput').value = '';
-      document.getElementById('blindPasscodeInput').value = '';
-      document.getElementById('workspaceScreen').classList.add('hidden');
-      document.getElementById('authScreen').classList.remove('hidden');
-      showToast('Signed Out Safely', 'info');
-    }
-
-    function toggleDemoDrawer() {
-      const drawer = document.getElementById('demoCredentialsDrawer');
-      const arrow = document.getElementById('demoDrawerArrow');
-      const isHidden = drawer.classList.contains('hidden');
-      if (isHidden) {
-        drawer.classList.remove('hidden');
-        arrow.style.transform = 'rotate(180deg)';
-      } else {
-        drawer.classList.add('hidden');
-        arrow.style.transform = 'rotate(0deg)';
-      }
-    }
-
-    function quickFillDemo(email, phone, key) {
-      appState.selectedGoogleEmail = email;
-      handleGoogleSignIn();
-      document.getElementById('blindPhoneInput').value = phone;
-      document.getElementById('blindPasscodeInput').value = key;
-      showToast(`Selected: ${email}`, 'info');
-    }
-
-    function toggleTokenMask() {
-      const display = document.getElementById('maskedTokenDisplay');
-      if (isTokenMasked) {
-        display.textContent = 'GG-EMERGENCY-2026';
-        isTokenMasked = false;
-      } else {
-        display.textContent = '••••••••••••••••';
-        isTokenMasked = true;
-      }
-    }
-
-    /* ========================================================= */
-    /* NAVIGATION & TAB SWITCHING                                */
-    /* ========================================================= */
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(section => {
-        section.classList.add('hidden');
-      });
-
-      const activeSection = document.getElementById(tabId);
-      if (activeSection) {
-        activeSection.classList.remove('hidden');
-      }
-
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = 'tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50';
-      });
-
-      const activeBtn = document.getElementById('tabBtn_' + tabId);
-      if (activeBtn) {
-        activeBtn.className = 'tab-btn px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40';
-      }
-    }
-
-    function enableSuperAdminTabs() {
-      document.getElementById('tabBtn_executiveHubTab').style.display = 'flex';
-      document.getElementById('tabBtn_directoryTab').style.display = 'flex';
-      document.getElementById('tabBtn_addEntryTab').style.display = 'flex';
-      document.getElementById('tabBtn_financesTab').style.display = 'flex';
-      document.getElementById('tabBtn_settingsTab').style.display = 'flex';
-      document.getElementById('tabBtn_clientPortalTab').style.display = 'none';
-    }
-
-    function restrictStaffTabs() {
-      document.getElementById('tabBtn_executiveHubTab').style.display = 'none';
-      document.getElementById('tabBtn_financesTab').style.display = 'none';
-      document.getElementById('tabBtn_settingsTab').style.display = 'none';
-      document.getElementById('tabBtn_clientPortalTab').style.display = 'none';
-      document.getElementById('tabBtn_directoryTab').style.display = 'flex';
-      document.getElementById('tabBtn_addEntryTab').style.display = 'flex';
-    }
-
-    function restrictClientTabs() {
-      document.getElementById('tabBtn_executiveHubTab').style.display = 'none';
-      document.getElementById('tabBtn_directoryTab').style.display = 'none';
-      document.getElementById('tabBtn_addEntryTab').style.display = 'none';
-      document.getElementById('tabBtn_financesTab').style.display = 'none';
-      document.getElementById('tabBtn_settingsTab').style.display = 'none';
-      document.getElementById('tabBtn_clientPortalTab').style.display = 'flex';
-    }
-
-    function restrictLearnerTabs() {
-      document.getElementById('tabBtn_executiveHubTab').style.display = 'none';
-      document.getElementById('tabBtn_addEntryTab').style.display = 'none';
-      document.getElementById('tabBtn_financesTab').style.display = 'none';
-      document.getElementById('tabBtn_settingsTab').style.display = 'none';
-      document.getElementById('tabBtn_clientPortalTab').style.display = 'none';
-      document.getElementById('tabBtn_directoryTab').style.display = 'flex';
-    }
-
-    /* ========================================================= */
-    /* TAB 1: EXECUTIVE HUB (SWITCHBOARD ENGINE)                */
-    /* ========================================================= */
-    function handleSwitchToggle(switchKey, isChecked) {
-      appState.switches[switchKey] = isChecked;
-      if (switchKey === 'panicMask') {
-        togglePanicVisual(isChecked);
-      }
-      updateHubCounter();
-      persistState();
-      showToast(`Control '${switchKey}' Updated`, 'info');
-    }
-
-    function updateHubCounter() {
-      const keys = Object.keys(appState.switches);
-      const activeCount = keys.filter(k => appState.switches[k]).length;
-      const counterBadge = document.getElementById('hubActiveCounter');
-      if (counterBadge) {
-        counterBadge.textContent = `${activeCount} / ${keys.length} Active`;
-      }
-    }
-
-    function setAllSwitches(status) {
-      Object.keys(appState.switches).forEach(k => {
-        appState.switches[k] = status;
-        const chk = document.getElementById('switch_' + k);
-        if (chk) chk.checked = status;
-      });
-
-      togglePanicVisual(!status);
-      updateHubCounter();
-      persistState();
-      showToast(status ? 'All Safeguards Activated' : 'Panic Lock Activated for All Systems', 'warning');
-    }
-
-    function togglePanicState() {
-      appState.isPanicMasked = !appState.isPanicMasked;
-      togglePanicVisual(appState.isPanicMasked);
-      const chk = document.getElementById('switch_panicMask');
-      if (chk) chk.checked = appState.isPanicMasked;
-      persistState();
-    }
-
-    function togglePanicVisual(isMasked) {
-      const vals = document.querySelectorAll('.financial-val');
-      vals.forEach(v => {
-        if (isMasked) {
-          v.dataset.realVal = v.textContent;
-          v.textContent = '••••••••';
-          v.classList.add('text-amber-500');
-        } else {
-          refreshFinancesView();
-          v.classList.remove('text-amber-500');
-        }
-      });
-    }
-
-    /* ========================================================= */
-    /* TAB 2: DIRECTORY & STUDENT MANAGEMENT                     */
-    /* ========================================================= */
-    function renderDirectoryTable() {
-      const tbody = document.getElementById('directoryTableBody');
-      const search = (document.getElementById('directorySearchInput').value || '').toLowerCase().trim();
-      const filter = document.getElementById('directoryBatchFilter').value;
-
-      let list = appState.students.filter(s => {
-        const matchesSearch = s.name.toLowerCase().includes(search) || 
-                              s.phone.includes(search) || 
-                              s.id.toLowerCase().includes(search);
-        const matchesBatch = filter === 'ALL' || s.batch === filter;
-        return matchesSearch && matchesBatch;
-      });
-
-      tbody.innerHTML = '';
-
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 font-mono">No matching records discovered.</td></tr>`;
-        document.getElementById('directoryCountLabel').textContent = 'Showing 0 records';
-        return;
-      }
-
-      list.forEach(item => {
-        const remaining = (item.totalFee || 0) - (item.paid || 0);
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors';
-
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold text-amber-500">${item.id}</td>
-          <td class="py-3 px-4 font-semibold text-slate-800 dark:text-slate-100">${escapeHtml(item.name)}</td>
-          <td class="py-3 px-4 font-mono text-slate-500 dark:text-slate-300">+92 ${item.phone}</td>
-          <td class="py-3 px-4 font-mono">
-            <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">${item.batch}</span>
-          </td>
-          <td class="py-3 px-4 text-right font-mono">${formatPKR(item.totalFee)}</td>
-          <td class="py-3 px-4 text-right font-mono text-emerald-500">${formatPKR(item.paid)}</td>
-          <td class="py-3 px-4 text-right font-mono ${remaining > 0 ? 'text-rose-500 font-bold' : 'text-slate-400'}">${formatPKR(remaining)}</td>
-          <td class="py-3 px-4 text-center">
-            <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${item.status === 'Paid in Full' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30'}">
-              ${item.status}
-            </span>
-          </td>
-          <td class="py-3 px-4 text-right">
-            <div class="flex items-center justify-end gap-1.5">
-              <button onclick="triggerWhatsAppSlip('${item.id}')" title="WhatsApp Receipt" class="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 text-xs">
-                <i class="fa-brands fa-whatsapp"></i>
-              </button>
-              <button onclick="deleteStudent('${item.id}')" title="Remove Record" class="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-500 border border-rose-500/30 text-xs">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('directoryCountLabel').textContent = `Showing ${list.length} enrolled student(s)`;
-    }
-
-    function triggerWhatsAppSlip(studentId) {
-      const student = appState.students.find(s => s.id === studentId);
-      if (!student) return;
-
-      const remaining = (student.totalFee || 0) - (student.paid || 0);
-      const text = encodeURIComponent(
-`*GLOBAL GURU ECOSYSTEM • ADMISSION RECEIPT*
-----------------------------------------
-Student Name: *${student.name}*
-Student Roll ID: *${student.id}*
-Cohort/Batch: *${student.batch}*
-Total Fee: *PKR ${student.totalFee.toLocaleString()}*
-Amount Paid: *PKR ${student.paid.toLocaleString()}*
-Balance Due: *PKR ${remaining.toLocaleString()}*
-Payment Channel: *${student.channel}*
-Status: *${student.status}*
-----------------------------------------
-Executive Desk Contact: +92 300 1234567`
-      );
-
-      window.open(`https://wa.me/92${student.phone}?text=${text}`, '_blank');
-    }
-
-    function deleteStudent(studentId) {
-      if (appState.currentUser.role === 'STAFF') {
-        showToast('Restricted: Staff cannot delete ledger records', 'error');
-        return;
-      }
-      appState.students = appState.students.filter(s => s.id !== studentId);
-      renderDirectoryTable();
-      persistState();
-      showToast('Student Record Removed', 'info');
-    }
-
-    function openBatchSchedulerModal() {
-      document.getElementById('cohortSchedulerModal').classList.remove('hidden');
-    }
-
-    /* ========================================================= */
-    /* TAB 3: ADD ENTRY FORM HANDLERS                            */
-    /* ========================================================= */
-    function calculateRemainingBalance() {
-      const total = parseFloat(document.getElementById('formTotalFee').value) || 0;
-      const paid = parseFloat(document.getElementById('formPaidFee').value) || 0;
-      const rem = Math.max(0, total - paid);
-      document.getElementById('formRemainingBalancePreview').textContent = rem.toLocaleString();
-    }
-
-    function handleStudentFormSubmit(e) {
-      e.preventDefault();
-
-      if (appState.switches.admissionFreeze) {
-        showToast('Admission Gate is Frozen via Executive Hub', 'error');
-        return;
-      }
-
-      const name = document.getElementById('formStudentName').value.trim();
-      const phone = document.getElementById('formStudentPhone').value.trim();
-      const batch = document.getElementById('formBatchCode').value;
-      const totalFee = parseFloat(document.getElementById('formTotalFee').value) || 0;
-      const paidFee = parseFloat(document.getElementById('formPaidFee').value) || 0;
-      const channel = document.getElementById('formPaymentChannel').value;
-
-      const count = appState.students.filter(s => s.batch === batch).length + 101;
-      const rollId = `GG-${batch}-${count}`;
-      const status = paidFee >= totalFee ? 'Paid in Full' : 'Partial (Due)';
-
-      const newRecord = {
-        id: rollId,
-        name,
-        phone,
-        batch,
-        totalFee,
-        paid: paidFee,
-        channel,
-        status,
-        date: new Date().toISOString().split('T')[0]
-      };
-
-      if (appState.accounts[channel] !== undefined) {
-        appState.accounts[channel] += paidFee;
-      }
-
-      appState.students.unshift(newRecord);
-      persistState();
-      refreshAllViews();
-      showToast(`Student Enrolled: ${rollId}`, 'success');
-
-      if (appState.switches.autoSlip) {
-        triggerWhatsAppSlip(rollId);
-      }
-
-      resetStudentForm();
-      switchTab('directoryTab');
-    }
-
-    function resetStudentForm() {
-      document.getElementById('studentEntryForm').reset();
-      document.getElementById('formTotalFee').value = '50000';
-      document.getElementById('formPaidFee').value = '25000';
-      calculateRemainingBalance();
-    }
-
-    /* ========================================================= */
-    /* TAB 4: FINANCES & LEDGER DESK                             */
-    /* ========================================================= */
-    function refreshFinancesView() {
-      const meezan = appState.accounts['Meezan Bank'] || 0;
-      const ep = appState.accounts['Easypaisa'] || 0;
-      const jc = appState.accounts['JazzCash'] || 0;
-      const vault = appState.accounts['Physical Vault'] || 0;
-      const totalCapital = meezan + ep + jc + vault;
-
-      document.getElementById('financeTotalCapital').textContent = totalCapital.toLocaleString();
-      document.getElementById('accBal_Meezan').textContent = meezan.toLocaleString();
-      document.getElementById('accBal_Easypaisa').textContent = ep.toLocaleString();
-      document.getElementById('accBal_JazzCash').textContent = jc.toLocaleString();
-      document.getElementById('accBal_Vault').textContent = vault.toLocaleString();
-
-      renderExpensesTable();
-
-      if (appState.isPanicMasked) {
-        togglePanicVisual(true);
-      }
-    }
-
-    function openInterTransferModal() {
-      document.getElementById('interTransferModal').classList.remove('hidden');
-    }
-
-    function handleInterTransferSubmit(e) {
-      e.preventDefault();
-      const from = document.getElementById('transferFromAccount').value;
-      const to = document.getElementById('transferToAccount').value;
-      const amount = parseFloat(document.getElementById('transferAmount').value);
-
-      if (from === to) {
-        showToast('Source and Destination accounts cannot be the same', 'error');
-        return;
-      }
-      if (appState.accounts[from] < amount) {
-        showToast(`Insufficient balance in [${from}]`, 'error');
-        return;
-      }
-
-      appState.accounts[from] -= amount;
-      appState.accounts[to] = (appState.accounts[to] || 0) + amount;
-
-      closeModal('interTransferModal');
-      persistState();
-      refreshFinancesView();
-      showToast(`Transferred PKR ${amount.toLocaleString()} from ${from} to ${to}`, 'success');
-    }
-
-    function openExpenseModal() {
-      document.getElementById('expenseModal').classList.remove('hidden');
-    }
-
-    function handleExpenseSubmit(e) {
-      e.preventDefault();
-      const desc = document.getElementById('expenseDescription').value.trim();
-      const account = document.getElementById('expenseAccount').value;
-      const amount = parseFloat(document.getElementById('expenseAmount').value);
-
-      if (appState.accounts[account] < amount) {
-        showToast(`Insufficient balance in [${account}]`, 'error');
-        return;
-      }
-
-      const randomHash = 'TX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-      appState.accounts[account] -= amount;
-      appState.expenses.unshift({
-        id: Date.now(),
-        hash: randomHash,
-        date: new Date().toISOString().split('T')[0],
-        desc,
-        account,
-        amount
-      });
-
-      closeModal('expenseModal');
-      persistState();
-      refreshFinancesView();
-      showToast(`Expense recorded [${randomHash}]`, 'success');
-    }
-
-    function renderExpensesTable() {
-      const tbody = document.getElementById('expensesTableBody');
-      tbody.innerHTML = '';
-
-      let totalExp = 0;
-      appState.expenses.forEach(item => {
-        totalExp += (item.amount || 0);
-        const tr = document.createElement('tr');
-        tr.className = 'border-b border-slate-200 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800/30';
-        tr.innerHTML = `
-          <td class="py-2.5 px-3 font-mono text-slate-500">${item.date}</td>
-          <td class="py-2.5 px-3 font-mono text-[10px] text-amber-500 font-bold">${item.hash || 'TX-LEGACY'}</td>
-          <td class="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">${escapeHtml(item.desc)}</td>
-          <td class="py-2.5 px-3 text-slate-500">${item.account}</td>
-          <td class="py-2.5 px-3 text-right font-mono text-rose-500 font-semibold">${formatPKR(item.amount)}</td>
-          <td class="py-2.5 px-3 text-right">
-            <button onclick="deleteExpense(${item.id})" class="text-slate-400 hover:text-rose-500">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('totalExpensesSum').textContent = `Total Expenses: PKR ${totalExp.toLocaleString()}`;
-    }
-
-    function deleteExpense(expenseId) {
-      appState.expenses = appState.expenses.filter(e => e.id !== expenseId);
-      persistState();
-      renderExpensesTable();
-      showToast('Expense item removed', 'info');
-    }
-
-    /* ========================================================= */
-    /* TAB 5: SETTINGS, MASTER PIN, BACKUP EXPORT & IMPORT       */
-    /* ========================================================= */
-    function handleUpdateMasterPin() {
-      const current = document.getElementById('pinManagerCurrent').value.trim();
-      const newPin = document.getElementById('pinManagerNew').value.trim();
-      const confirmPin = document.getElementById('pinManagerConfirm').value.trim();
-      const validMaster = appState.masterPin || DEFAULT_MASTER_PIN;
-
-      if (current !== validMaster && current !== 'GG-EMERGENCY-2026') {
-        showToast('Verification Failed: Current Master PIN is incorrect', 'error');
-        return;
-      }
-      if (newPin.length !== 4) {
-        showToast('New PIN must be exactly 4 digits', 'error');
-        return;
-      }
-      if (newPin !== confirmPin) {
-        showToast('Confirmation PIN does not match', 'error');
-        return;
-      }
-
-      appState.masterPin = newPin;
-      persistState();
-      document.getElementById('pinManagerCurrent').value = '';
-      document.getElementById('pinManagerNew').value = '';
-      document.getElementById('pinManagerConfirm').value = '';
-      showToast('Master PIN updated successfully', 'success');
-    }
-
-    function exportDataJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
-      const anchor = document.createElement('a');
-      anchor.setAttribute("href", dataStr);
-      anchor.setAttribute("download", `GlobalGuru_Backup_${new Date().toISOString().split('T')[0]}.json`);
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      showToast('System JSON snapshot downloaded', 'success');
-    }
-
-    function exportDataCSV() {
-      let csvContent = "data:text/csv;charset=utf-8,Roll ID,Student Name,WhatsApp,Batch,Total Fee,Paid Fee,Balance,Channel,Status,Date\n";
-      appState.students.forEach(s => {
-        const bal = (s.totalFee || 0) - (s.paid || 0);
-        csvContent += `"${s.id}","${s.name}","+92${s.phone}","${s.batch}",${s.totalFee},${s.paid},${bal},"${s.channel}","${s.status}","${s.date}"\n`;
-      });
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `GlobalGuru_Students_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      showToast('Students directory CSV downloaded', 'success');
-    }
-
-    function handleImportFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (imported.students && imported.accounts) {
-            appState = { ...appState, ...imported };
-            persistState();
-            refreshAllViews();
-            showToast('Ecosystem Database Restored Successfully!', 'success');
-          } else {
-            showToast('Invalid backup file structure', 'error');
-          }
-        } catch (err) {
-          showToast('Failed to parse backup JSON file', 'error');
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    /* ========================================================= */
-    /* UI UTILITIES & BOOTSTRAP                                  */
-    /* ========================================================= */
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.add('hidden');
-    }
-
-    function refreshAllViews() {
-      updateHubCounter();
-      renderDirectoryTable();
-      refreshFinancesView();
-
-      Object.keys(appState.switches).forEach(k => {
-        const chk = document.getElementById('switch_' + k);
-        if (chk) chk.checked = appState.switches[k];
-      });
-    }
-
-    function formatPKR(num) {
-      return (num || 0).toLocaleString();
-    }
-
-    function escapeHtml(text) {
-      if (!text) return '';
-      return text.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-      });
-    }
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      
-      let border = 'border-slate-300 dark:border-slate-700';
-      let icon = '<i class="fa-solid fa-circle-info text-amber-500"></i>';
-
-      if (type === 'success') {
-        border = 'border-emerald-500/50';
-        icon = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
-      } else if (type === 'error') {
-        border = 'border-rose-500/50';
-        icon = '<i class="fa-solid fa-triangle-exclamation text-rose-500"></i>';
-      } else if (type === 'warning') {
-        border = 'border-amber-500/50';
-        icon = '<i class="fa-solid fa-shield text-amber-500"></i>';
-      }
-
-      toast.className = `pointer-events-auto px-3.5 py-2.5 rounded-2xl bg-white dark:bg-[#0E131F] border ${border} text-slate-800 dark:text-slate-100 text-xs shadow-2xl flex items-center gap-2 backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0`;
-      toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
-
-      container.appendChild(toast);
-      setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('gg_theme_preference') || 'system';
-      applyTheme(savedTheme);
-      loadPersistedState();
-      refreshAllViews();
-    });
-  </script>
+    </aside>
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px"><button class="icon-btn mobile-menu" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button><div class="top-title"><h2 id="topTitle">Dashboard</h2><p id="topSubtitle">Complete GG business overview</p></div></div>
+      <div class="top-actions"><span id="viewAsChip" class="badge warn hidden"></span><span id="ownerChip" class="owner-chip">PRIMARY OWNER</span><button class="icon-btn" onclick="togglePrivacy()" title="Hide/show financial figures"><i id="privacyIcon" class="fa-solid fa-eye"></i></button><button class="icon-btn" onclick="openQuick()" title="Quick action"><i class="fa-solid fa-plus"></i></button></div>
+    </header>
+    <main id="main">
+      <section id="page-dashboard" class="page"></section>
+      <section id="page-users" class="page"></section>
+      <section id="page-learners" class="page"></section>
+      <section id="page-clients" class="page"></section>
+      <section id="page-finance" class="page"></section>
+      <section id="page-services" class="page"></section>
+      <section id="page-security" class="page"></section>
+      <section id="page-audit" class="page"></section>
+      <section id="page-settings" class="page"></section>
+    </main>
+  </section>
+
+  <div id="modalRoot"></div>
+
+<script>
+(()=>{
+  'use strict';
+  const KEY='gg_portal_v7';
+  const SESSION='gg_portal_session_v7';
+  const OWNER_ROLE='PRIMARY_OWNER';
+  const ACTIONS=['view','add','edit','remove','approve','export'];
+  const MODULES=['dashboard','users','learners','clients','finance','services','security','audit','settings'];
+  const NAV=[
+    ['WORKSPACE','dashboard','fa-chart-pie','Dashboard'],
+    ['MANAGEMENT','users','fa-users-gear','Users & Access'],
+    ['MANAGEMENT','learners','fa-graduation-cap','Learners'],
+    ['MANAGEMENT','clients','fa-briefcase','Clients'],
+    ['FINANCE','finance','fa-wallet','Ledger & Accounts'],
+    ['GROWTH','services','fa-layer-group','Services & Samples'],
+    ['CONTROL','security','fa-shield-halved','Security Center'],
+    ['CONTROL','audit','fa-clock-rotate-left','Audit History'],
+    ['SYSTEM','settings','fa-gear','Settings']
+  ];
+  const DEFAULT_SERVICES=[
+    ['Social Media Management','Monthly content, publishing and reporting','fa-share-nodes'],
+    ['Social Media Setup','Professional profile and business setup','fa-sliders'],
+    ['UGC Ads','Creator-style conversion focused advertisements','fa-video'],
+    ['CGI Ads','Premium cinematic product visuals','fa-cube'],
+    ['Digital Marketing','Campaign strategy, reach and lead systems','fa-bullhorn'],
+    ['Business Branding','Complete business identity and brand system','fa-pen-ruler'],
+    ['Personal Branding','Authority and professional presence building','fa-user-tie'],
+    ['Business Profile & Catalogue','Sales-ready company profile and catalogue','fa-book-open'],
+    ['Business Consultation','One-to-one growth and systems planning','fa-comments'],
+    ['Prompt Engineering','Structured AI prompting and workflows','fa-terminal'],
+    ['AI Content Creation','AI visuals, video and storytelling','fa-wand-magic-sparkles'],
+    ['E-commerce Services','eBay and local e-commerce support','fa-cart-shopping'],
+    ['Custom Business App & Portal','GG Khata, CRM, academy or custom portal','fa-laptop-code']
+  ];
+  const ROLE_LABELS={PRIMARY_OWNER:'Primary Owner',SECOND_ADMIN:'Second Admin',STAFF:'Staff',ACCOUNTS:'Accounts / Ledger',LEARNER:'Learner',CLIENT:'Client'};
+  const PAGE_META={dashboard:['Dashboard','Complete GG business overview'],users:['Users & Access','Assign role, module and action permissions'],learners:['Learners','Mentorship, attendance and fee records'],clients:['Clients','Services, projects and commercial accounts'],finance:['Ledger & Accounts','Immutable transactions, balances and receipts'],services:['Services & Samples','GG service catalogue and approved portfolio links'],security:['Security Center','PIN, devices, sessions and account protection'],audit:['Audit History','Trace important portal actions'],settings:['Settings','Portal identity, backup and system controls']};
+  let db=null,current=null,currentPage='dashboard',privacy=false,viewAsOriginal=null;
+  const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const id=(p='GG')=>p+'-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+  const now=()=>new Date().toISOString();
+  const date=v=>v?new Intl.DateTimeFormat('en-PK',{dateStyle:'medium',timeZone:'Asia/Karachi'}).format(new Date(v)):'—';
+  const datetime=v=>v?new Intl.DateTimeFormat('en-PK',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Karachi'}).format(new Date(v)):'—';
+  const money=v=>privacy?'PKR •••••':`PKR ${Number(v||0).toLocaleString('en-PK')}`;
+  const initials=n=>String(n||'GG').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+  const cleanPhone=p=>String(p||'').replace(/\D/g,'').replace(/^92(?=3)/,'0');
+  const toast=(m,t='good')=>{const e=document.createElement('div');e.className='toast '+t;e.textContent=m;$('#toastStack').append(e);setTimeout(()=>e.remove(),3200)};
+  const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+  const allPerms=()=>Object.fromEntries(MODULES.map(m=>[m,Object.fromEntries(ACTIONS.map(a=>[a,true]))]));
+  const defaultPerms=role=>{
+    const p=Object.fromEntries(MODULES.map(m=>[m,Object.fromEntries(ACTIONS.map(a=>[a,false]))]));
+    const set=(m,arr=['view'])=>arr.forEach(a=>p[m][a]=true);
+    if(role===OWNER_ROLE)return allPerms();
+    if(role==='SECOND_ADMIN'){set('dashboard');set('learners',['view','add','edit']);set('clients',['view','add','edit']);set('services',['view','edit']);}
+    if(role==='STAFF'){set('dashboard');set('learners',['view','add','edit']);set('clients',['view','add','edit']);set('services');}
+    if(role==='ACCOUNTS'){set('dashboard');set('learners');set('clients');set('finance',['view','add','edit','approve','export']);set('audit');}
+    if(role==='LEARNER'){set('dashboard');set('learners');}
+    if(role==='CLIENT'){set('dashboard');set('clients');set('services');}
+    return p;
+  };
+  async function hashPin(pin,salt){
+    if(!crypto?.subtle)return btoa(unescape(encodeURIComponent(salt+'|'+pin)));
+    const enc=new TextEncoder(),key=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:120000,hash:'SHA-256'},key,256);
+    return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  function freshDB(){return{version:7,createdAt:now(),settings:{business:'Global Guru',tagline:'Your Digital Partner',currency:'PKR',timezone:'Asia/Karachi',whatsapp:'',requireTwoStep:false},users:[],learners:[],clients:[],transactions:[],accounts:[{id:'ACC-CASH',name:'Cash',balance:0},{id:'ACC-MEEZAN',name:'Meezan Bank',balance:0},{id:'ACC-EASY',name:'Easypaisa',balance:0},{id:'ACC-JAZZ',name:'JazzCash',balance:0}],services:DEFAULT_SERVICES.map((s,i)=>({id:'SVC-'+String(i+1).padStart(2,'0'),name:s[0],description:s[1],icon:s[2],price:0,active:true})),samples:[],audit:[],sessions:[]}}
+  function load(){try{db=JSON.parse(localStorage.getItem(KEY))||freshDB()}catch{db=freshDB()}db.services??=[];db.samples??=[];db.sessions??=[];db.audit??=[];db.accounts??=[];}
+  function audit(action,detail,target='SYSTEM'){db.audit.unshift({id:id('AUD'),time:now(),actor:current?.name||'System',actorId:current?.id||'SYSTEM',action,detail,target});db.audit=db.audit.slice(0,1500);save()}
+  function can(module,action='view'){return current?.role===OWNER_ROLE||!!current?.permissions?.[module]?.[action]}
+  function ownScope(type,item){if(current?.role===OWNER_ROLE||['SECOND_ADMIN','STAFF','ACCOUNTS'].includes(current?.role))return true;if(type==='learner')return current?.linkedId===item?.id;if(type==='client')return current?.linkedId===item?.id;return false}
+  function showAuth(which){['setup','login','activation'].forEach(x=>$('#'+x+'Panel').classList.toggle('hidden',x!==which))}
+  function bootstrap(){load();$('#authScreen').classList.remove('hidden');$('#shell').classList.add('hidden');showAuth(db.users.some(u=>u.role===OWNER_ROLE)?'login':'setup');const sid=sessionStorage.getItem(SESSION);if(sid){const u=db.users.find(x=>x.id===sid&&x.status==='ACTIVE');if(u)enter(u)}}
+  $('#setupForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target),pin=f.get('pin');if(pin!==f.get('confirmPin'))return toast('PIN confirmation match nahi karti.','bad');if(db.users.some(u=>u.role===OWNER_ROLE))return toast('Primary Owner already exists.','bad');const salt=id('SALT'),u={id:'GG-OWNER-001',name:f.get('name').trim(),phone:cleanPhone(f.get('phone')),userId:f.get('userId').trim().toUpperCase(),role:OWNER_ROLE,status:'ACTIVE',pinSalt:salt,pinHash:await hashPin(pin,salt),permissions:allPerms(),twoStep:false,createdAt:now(),lastLogin:null,failed:0,lockedUntil:null,devices:[]};db.users.push(u);current=u;audit('OWNER_INITIALIZED','Primary Owner account created',u.id);enter(u);toast('Primary Owner account ready.')});
+  $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target),identity=String(f.get('identity')).trim().toUpperCase(),u=db.users.find(x=>x.userId?.toUpperCase()===identity||cleanPhone(x.phone)===cleanPhone(identity));if(!u)return toast('Account nahi mila.','bad');if(u.status!=='ACTIVE')return toast('Account suspended hai. Owner se rabta karein.','bad');if(u.lockedUntil&&new Date(u.lockedUntil)>new Date())return toast('Account temporarily locked hai.','bad');const h=await hashPin(f.get('pin'),u.pinSalt);if(h!==u.pinHash){u.failed=(u.failed||0)+1;if(u.failed>=5){u.lockedUntil=new Date(Date.now()+15*60000).toISOString();u.failed=0}save();return toast('PIN incorrect hai.','bad')}u.failed=0;u.lockedUntil=null;u.lastLogin=now();u.devices=u.devices||[];u.devices.unshift({id:id('DEV'),label:navigator.platform||'Browser',time:now(),active:true});u.devices=u.devices.slice(0,8);current=u;audit('LOGIN','Successful portal login',u.id);enter(u)});
+  $('#activateBtn').onclick=()=>showAuth('activation');
+  $('#activationForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target),u=db.users.find(x=>cleanPhone(x.phone)===cleanPhone(f.get('phone'))&&x.activationCode===String(f.get('code')).trim().toUpperCase());if(!u)return toast('Activation details incorrect hain.','bad');if(u.activationExpiry&&new Date(u.activationExpiry)<new Date())return toast('Activation code expire ho chuka hai.','bad');const salt=id('SALT');u.pinSalt=salt;u.pinHash=await hashPin(f.get('pin'),salt);delete u.activationCode;delete u.activationExpiry;u.status='ACTIVE';current=u;audit('ACCOUNT_ACTIVATED','User completed first-time activation',u.id);enter(u);toast('Account activate ho gaya.')});
+  function enter(u){current=u;sessionStorage.setItem(SESSION,u.id);$('#authScreen').classList.add('hidden');$('#shell').classList.remove('hidden');$('#sideName').textContent=u.name;$('#sideRole').textContent=ROLE_LABELS[u.role]||u.role;$('#sideAvatar').textContent=initials(u.name);$('#ownerChip').classList.toggle('hidden',u.role!==OWNER_ROLE);buildNav();go('dashboard')}
+  window.logout=()=>{if(current)audit('LOGOUT','Portal session closed',current.id);sessionStorage.removeItem(SESSION);current=null;viewAsOriginal=null;location.reload()};
+  window.toggleSidebar=()=>$('#sidebar').classList.toggle('open');
+  function buildNav(){let last='';$('#nav').innerHTML=NAV.filter(n=>can(n[1])).map(n=>{let h='';if(n[0]!==last){last=n[0];h=`<div class="nav-group">${n[0]}</div>`}return h+`<button data-page="${n[1]}" onclick="go('${n[1]}')"><i class="fa-solid ${n[2]}"></i><span>${n[3]}</span></button>`}).join('')}
+  window.go=p=>{if(!can(p))return toast('Is page ki access assigned nahi hai.','bad');currentPage=p;$$('.page').forEach(x=>x.classList.remove('active'));$('#page-'+p).classList.add('active');$$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));$('#topTitle').textContent=PAGE_META[p][0];$('#topSubtitle').textContent=PAGE_META[p][1];$('#sidebar').classList.remove('open');render(p)};
+  function render(p){({dashboard:renderDashboard,users:renderUsers,learners:renderLearners,clients:renderClients,finance:renderFinance,services:renderServices,security:renderSecurity,audit:renderAudit,settings:renderSettings}[p]||(()=>{}))()}
+  window.togglePrivacy=()=>{privacy=!privacy;$('#privacyIcon').className='fa-solid '+(privacy?'fa-eye-slash':'fa-eye');render(currentPage)};
+  function totals(){const valid=db.transactions.filter(t=>t.status==='POSTED');const income=valid.filter(t=>t.type==='INCOME').reduce((a,t)=>a+Number(t.amount),0),expense=valid.filter(t=>t.type==='EXPENSE').reduce((a,t)=>a+Number(t.amount),0);return{income,expense,balance:income-expense}}
+  function recentActivity(){return db.audit.slice(0,6).map(a=>`<div class="list-row"><div><strong>${esc(a.action.replaceAll('_',' '))}</strong><span>${esc(a.detail)}</span></div><span>${datetime(a.time)}</span></div>`).join('')||'<div class="empty">Abhi activity nahi hai.</div>'}
+  function renderDashboard(){
+    const el=$('#page-dashboard');if(current.role==='LEARNER')return renderLearnerHome(el);if(current.role==='CLIENT')return renderClientHome(el);const t=totals(),activeUsers=db.users.filter(u=>u.status==='ACTIVE').length,due=db.learners.reduce((a,x)=>a+Math.max(0,Number(x.totalFee||0)-Number(x.paid||0)),0)+db.clients.reduce((a,x)=>a+Math.max(0,Number(x.totalValue||0)-Number(x.paid||0)),0);
+    el.innerHTML=`<div class="page-head"><div><h3>Welcome, ${esc(current.name)}</h3><p>${date(now())} • ${esc(ROLE_LABELS[current.role])} workspace</p></div><div class="actions">${current.role===OWNER_ROLE?'<button class="btn sm" onclick="seedDemo()"><i class="fa-solid fa-flask"></i> Add Demo Data</button>':''}<button class="btn primary sm" onclick="openQuick()"><i class="fa-solid fa-plus"></i> Quick Entry</button></div></div>
+    <div class="grid stats"><div class="stat"><div class="stat-top"><span>Total Income</span><i class="fa-solid fa-arrow-trend-up"></i></div><strong>${money(t.income)}</strong><span>Posted ledger credits</span></div><div class="stat"><div class="stat-top"><span>Current Balance</span><i class="fa-solid fa-wallet"></i></div><strong>${money(t.balance)}</strong><span>Income less expenses</span></div><div class="stat"><div class="stat-top"><span>Total Receivable</span><i class="fa-solid fa-file-invoice-dollar"></i></div><strong>${money(due)}</strong><span>Learner and client dues</span></div><div class="stat"><div class="stat-top"><span>Active Users</span><i class="fa-solid fa-users"></i></div><strong>${activeUsers}</strong><span>Across all assigned roles</span></div></div>
+    <div class="grid two"><div class="card"><div class="card-head"><h4>Recent Activity</h4><button class="btn sm" onclick="go('audit')">View All</button></div><div class="card-body compact-list">${recentActivity()}</div></div><div class="card"><div class="card-head"><h4>Control Snapshot</h4></div><div class="card-body compact-list"><div class="list-row"><div><strong>Second Admins</strong><span>Assigned access only</span></div><b>${db.users.filter(x=>x.role==='SECOND_ADMIN').length}</b></div><div class="list-row"><div><strong>Learners</strong><span>Individual private portals</span></div><b>${db.learners.length}</b></div><div class="list-row"><div><strong>Clients</strong><span>Commercial workspaces</span></div><b>${db.clients.length}</b></div><div class="list-row"><div><strong>Security</strong><span>Failed attempts monitored</span></div><span class="badge good">ACTIVE</span></div></div></div></div>`;
+  }
+  function renderLearnerHome(el){const l=db.learners.find(x=>x.id===current.linkedId);if(!l){el.innerHTML='<div class="empty">Learner profile abhi link nahi hua. Owner se rabta karein.</div>';return}const due=Math.max(0,l.totalFee-l.paid),pct=l.totalFee?Math.min(100,Math.round(l.paid/l.totalFee*100)):0,att=l.lectures?Math.round((l.attended||0)/l.lectures*100):0;el.innerHTML=`<div class="page-head"><div><h3>My Mentorship Portal</h3><p>Sirf aapka personal learning aur fee record</p></div><span class="badge brand">${esc(l.rollId)}</span></div><div class="card"><div class="card-body profile-box"><div class="avatar">${initials(l.name)}</div><div><h3 style="margin:0 0 4px">${esc(l.name)}</h3><div class="muted small">${esc(l.mentorship)} • ${esc(l.batch)} • Started ${date(l.startDate)}</div></div></div></div><div class="grid stats" style="margin-top:12px"><div class="stat"><span>Total Fee</span><strong>${money(l.totalFee)}</strong></div><div class="stat"><span>Paid</span><strong>${money(l.paid)}</strong></div><div class="stat"><span>Remaining</span><strong>${money(due)}</strong></div><div class="stat"><span>Next Due</span><strong style="font-size:15px">${date(l.nextDue)}</strong></div></div><div class="grid two"><div class="card"><div class="card-head"><h4>Lecture Progress</h4></div><div class="card-body"><div class="metric-row"><div class="metric"><b>${l.lectures||0}</b><span>CONDUCTED</span></div><div class="metric"><b>${l.attended||0}</b><span>ATTENDED</span></div><div class="metric"><b>${Math.max(0,(l.lectures||0)-(l.attended||0))}</b><span>MISSED</span></div><div class="metric"><b>${att}%</b><span>ATTENDANCE</span></div></div><div class="progress" style="margin-top:12px"><span style="width:${att}%"></span></div>${l.meetLink?`<a class="btn primary" style="margin-top:12px;text-decoration:none" target="_blank" rel="noopener" href="${esc(l.meetLink)}"><i class="fa-solid fa-video"></i> Open Lecture Link</a>`:''}</div></div><div class="card"><div class="card-head"><h4>Fee Progress</h4></div><div class="card-body"><div class="progress"><span style="width:${pct}%"></span></div><p class="muted small">${pct}% fee received. Payments are linked with the central GG ledger.</p><button class="btn sm" onclick="printPage()"><i class="fa-solid fa-print"></i> Print Record</button></div></div></div>`}
+  function renderClientHome(el){const c=db.clients.find(x=>x.id===current.linkedId);if(!c){el.innerHTML='<div class="empty">Client profile abhi link nahi hua. Owner se rabta karein.</div>';return}const due=Math.max(0,c.totalValue-c.paid);el.innerHTML=`<div class="page-head"><div><h3>${esc(c.business||c.name)} Workspace</h3><p>Your services, projects and account summary</p></div><span class="badge brand">${esc(c.stage||'ACTIVE CLIENT')}</span></div><div class="grid stats"><div class="stat"><span>Services Taken</span><strong>${(c.services||[]).length}</strong></div><div class="stat"><span>Total Value</span><strong>${money(c.totalValue)}</strong></div><div class="stat"><span>Paid</span><strong>${money(c.paid)}</strong></div><div class="stat"><span>Remaining</span><strong>${money(due)}</strong></div></div><div class="grid two"><div class="card"><div class="card-head"><h4>Active Services</h4></div><div class="card-body compact-list">${(c.services||[]).map(s=>`<div class="list-row"><div><strong>${esc(serviceName(s))}</strong><span>Linked with your GG client account</span></div><span class="badge good">ACTIVE</span></div>`).join('')||'<div class="empty">Abhi service select nahi hui.</div>'}</div></div><div class="card"><div class="card-head"><h4>Recommended Next</h4></div><div class="card-body compact-list">${db.services.filter(s=>s.active&&!(c.services||[]).includes(s.id)).slice(0,3).map(s=>`<div class="list-row"><div><strong>${esc(s.name)}</strong><span>${esc(s.description)}</span></div><button class="btn sm" onclick="requestService('${s.id}')">I Want This</button></div>`).join('')}</div></div></div>`}
+  function pageHead(title,sub,buttons=''){return `<div class="page-head"><div><h3>${title}</h3><p>${sub}</p></div><div class="actions">${buttons}</div></div>`}
+  function renderUsers(){const el=$('#page-users'),rows=db.users.map(u=>`<tr><td><b>${esc(u.name)}</b><div class="muted small mono">${esc(u.userId)}</div></td><td>${esc(ROLE_LABELS[u.role]||u.role)}</td><td>${esc(u.phone)}</td><td><span class="badge ${u.status==='ACTIVE'?'good':u.status==='PENDING'?'warn':'bad'}">${esc(u.status)}</span></td><td>${datetime(u.lastLogin)}</td><td><div class="actions"><button class="btn sm" onclick="viewAs('${u.id}')" ${u.id===current.id?'disabled':''}><i class="fa-solid fa-eye"></i></button><button class="btn sm" onclick="editPermissions('${u.id}')"><i class="fa-solid fa-key"></i></button><button class="btn sm" onclick="resetPin('${u.id}')"><i class="fa-solid fa-rotate"></i></button><button class="btn bad sm" onclick="toggleUser('${u.id}')" ${u.role===OWNER_ROLE?'disabled':''}><i class="fa-solid fa-ban"></i></button></div></td></tr>`).join('');el.innerHTML=pageHead('Users & Access','Only assigned modules and actions appear for each user',can('users','add')?'<button class="btn primary sm" onclick="userModal()"><i class="fa-solid fa-user-plus"></i> Add User</button>':'')+`<div class="card"><div class="toolbar"><input class="input" placeholder="Search user..." oninput="filterTable(this,'userTable')"><span class="badge brand">${db.users.length} USERS</span></div><div class="table-wrap"><table id="userTable"><thead><tr><th>User</th><th>Role</th><th>WhatsApp</th><th>Status</th><th>Last Login</th><th>Control</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
+  window.userModal=()=>modal('Create User',`<form id="userForm" class="form-grid"><div class="field"><label>Full Name</label><input class="input" name="name" required></div><div class="field"><label>Role</label><select class="input" name="role" required>${Object.entries(ROLE_LABELS).filter(([k])=>k!==OWNER_ROLE).map(([k,v])=>`<option value="${k}">${v}</option>`)}</select></div><div class="field"><label>WhatsApp</label><input class="input" name="phone" required></div><div class="field"><label>GG User ID</label><input class="input" name="userId" required placeholder="GG-0002"></div><div class="field span-2"><label>Link existing Learner/Client ID (optional)</label><input class="input" name="linkedId"></div></form>`,async()=>{const f=new FormData($('#userForm')),phone=cleanPhone(f.get('phone')),userId=String(f.get('userId')).trim().toUpperCase();if(db.users.some(x=>x.phone===phone||x.userId===userId))return toast('Phone ya User ID already exists.','bad');const code=Math.random().toString(36).slice(2,8).toUpperCase(),u={id:id('USR'),name:f.get('name').trim(),phone,userId,role:f.get('role'),linkedId:f.get('linkedId').trim(),status:'PENDING',activationCode:code,activationExpiry:new Date(Date.now()+48*3600000).toISOString(),permissions:defaultPerms(f.get('role')),twoStep:false,createdAt:now(),lastLogin:null,failed:0,devices:[]};db.users.push(u);audit('USER_CREATED',`Created ${u.name} as ${ROLE_LABELS[u.role]}`,u.id);closeModal();renderUsers();modal('Activation Code',`<div class="callout">Yeh one-time code user ko privately dein. Code 48 hours ke liye valid hai aur sirf is screen par dikhaya ja raha hai.</div><div style="font-size:28px;text-align:center;font-weight:800;letter-spacing:.15em;margin:20px" class="mono">${code}</div>`,closeModal,'Close')},'Create User');
+  window.editPermissions=uid=>{const u=db.users.find(x=>x.id===uid);if(!u)return;if(u.role===OWNER_ROLE)return toast('Primary Owner permissions permanently protected hain.','bad');const html=`<p class="muted small">${esc(u.name)} • ${esc(ROLE_LABELS[u.role])}. Second Admin kisi user ko apni assigned permission se zyada access nahi de sakta.</p><div class="permission-grid"><div class="head label">Module</div>${ACTIONS.map(a=>`<div class="head">${a}</div>`).join('')}${MODULES.map(m=>`<div class="label">${PAGE_META[m][0]}</div>${ACTIONS.map(a=>`<div><button type="button" class="switch ${u.permissions?.[m]?.[a]?'on':''}" data-m="${m}" data-a="${a}" onclick="this.classList.toggle('on')"></button></div>`).join('')}`).join('')}</div>`;modal('Assign Permissions',html,()=>{u.permissions=defaultPerms(u.role);$$('.permission-grid .switch').forEach(b=>{let allowed=b.classList.contains('on');if(current.role!==OWNER_ROLE&&!can(b.dataset.m,b.dataset.a))allowed=false;u.permissions[b.dataset.m][b.dataset.a]=allowed});audit('PERMISSIONS_UPDATED',`Updated access for ${u.name}`,u.id);closeModal();renderUsers();toast('Permissions updated.')},'Save Permissions')};
+  window.toggleUser=uid=>{const u=db.users.find(x=>x.id===uid);if(!u||u.role===OWNER_ROLE)return;u.status=u.status==='SUSPENDED'?'ACTIVE':'SUSPENDED';audit('USER_STATUS_CHANGED',`${u.name}: ${u.status}`,u.id);save();renderUsers()};
+  window.resetPin=uid=>{const u=db.users.find(x=>x.id===uid);if(!u)return;const code=Math.random().toString(36).slice(2,8).toUpperCase();u.activationCode=code;u.activationExpiry=new Date(Date.now()+2*3600000).toISOString();u.status='PENDING';delete u.pinHash;delete u.pinSalt;audit('PIN_RESET',`PIN reset initiated for ${u.name}`,u.id);modal('Temporary Activation Code',`<div class="callout">Old PIN ab kaam nahi karega. User is code se naya PIN set karega. Validity: 2 hours.</div><div style="font-size:28px;text-align:center;font-weight:800;letter-spacing:.15em;margin:20px" class="mono">${code}</div>`,closeModal,'Close')};
+  window.viewAs=uid=>{if(current.role!==OWNER_ROLE)return;const u=db.users.find(x=>x.id===uid);if(!u||u.id===current.id)return;viewAsOriginal=current;current=u;$('#viewAsChip').textContent='VIEWING AS '+u.name.toUpperCase();$('#viewAsChip').classList.remove('hidden');$('#ownerChip').classList.add('hidden');buildNav();enterViewAs();auditAsOwner('VIEW_AS_USER',`Opened ${u.name} workspace`,u.id)};
+  function enterViewAs(){$('#sideName').textContent=current.name;$('#sideRole').textContent=ROLE_LABELS[current.role];$('#sideAvatar').textContent=initials(current.name);const stop=`<button class="btn bad sm" onclick="stopViewAs()"><i class="fa-solid fa-arrow-left"></i> Return to Owner</button>`;$('#topSubtitle').innerHTML=stop;go('dashboard')}
+  function auditAsOwner(action,detail,target){const temp=current;current=viewAsOriginal;audit(action,detail,target);current=temp}
+  window.stopViewAs=()=>{if(!viewAsOriginal)return;current=viewAsOriginal;viewAsOriginal=null;$('#viewAsChip').classList.add('hidden');$('#ownerChip').classList.remove('hidden');enter(current)};
+  function renderLearners(){if(current.role==='LEARNER')return renderLearnerHome($('#page-learners'));const rows=db.learners.filter(l=>ownScope('learner',l)).map(l=>`<tr><td><b>${esc(l.name)}</b><div class="muted mono small">${esc(l.rollId)}</div></td><td>${esc(l.mentorship)}<div class="muted small">${esc(l.batch)}</div></td><td>${date(l.startDate)}</td><td>${l.attended||0}/${l.lectures||0}</td><td class="amount">${money(l.totalFee)}</td><td class="amount">${money(l.paid)}</td><td class="amount danger">${money(Math.max(0,l.totalFee-l.paid))}</td><td><button class="btn sm" onclick="learnerModal('${l.id}')"><i class="fa-solid fa-pen"></i></button></td></tr>`).join('');$('#page-learners').innerHTML=pageHead('Learners','Permanent Roll ID, mentorship, lectures and ledger-linked fee records',can('learners','add')?'<button class="btn primary sm" onclick="learnerModal()"><i class="fa-solid fa-plus"></i> Add Learner</button>':'')+`<div class="card"><div class="toolbar"><input class="input" placeholder="Search learner..." oninput="filterTable(this,'learnerTable')"><span class="badge brand">${db.learners.length} LEARNERS</span></div><div class="table-wrap"><table id="learnerTable"><thead><tr><th>Learner</th><th>Mentorship</th><th>Started</th><th>Lectures</th><th>Total Fee</th><th>Paid</th><th>Remaining</th><th>Edit</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">No learner records.</td></tr>'}</tbody></table></div></div>`}
+  window.learnerModal=lid=>{const l=db.learners.find(x=>x.id===lid)||{};modal(lid?'Edit Learner':'Add Learner',`<form id="learnerForm" class="form-grid"><div class="field"><label>Full Name</label><input class="input" name="name" required value="${esc(l.name||'')}"></div><div class="field"><label>WhatsApp</label><input class="input" name="phone" required value="${esc(l.phone||'')}"></div><div class="field"><label>Mentorship</label><input class="input" name="mentorship" required value="${esc(l.mentorship||'AI Content Creation')}"></div><div class="field"><label>Batch</label><input class="input" name="batch" required value="${esc(l.batch||'')}"></div><div class="field"><label>Start Date</label><input class="input" type="date" name="startDate" value="${esc(l.startDate?.slice(0,10)||new Date().toISOString().slice(0,10))}"></div><div class="field"><label>Next Due Date</label><input class="input" type="date" name="nextDue" value="${esc(l.nextDue?.slice(0,10)||'')}"></div><div class="field"><label>Total Fee</label><input class="input" type="number" min="0" name="totalFee" value="${Number(l.totalFee||0)}"></div><div class="field"><label>Already Paid</label><input class="input" type="number" min="0" name="paid" value="${Number(l.paid||0)}" ${lid?'readonly':''}></div><div class="field"><label>Lectures Conducted</label><input class="input" type="number" min="0" name="lectures" value="${Number(l.lectures||0)}"></div><div class="field"><label>Lectures Attended</label><input class="input" type="number" min="0" name="attended" value="${Number(l.attended||0)}"></div><div class="field span-2"><label>Lecture / Meeting Link</label><input class="input" type="url" name="meetLink" value="${esc(l.meetLink||'')}"></div></form>`,()=>{const f=Object.fromEntries(new FormData($('#learnerForm'))),openingPaid=Number(f.paid||0),obj=lid?l:{id:id('LRN'),rollId:'GG-L-'+String((db.settings.learnerSequence||0)+1).padStart(4,'0'),createdAt:now(),paid:0};if(!lid)db.settings.learnerSequence=(db.settings.learnerSequence||0)+1;Object.assign(obj,f,{phone:cleanPhone(f.phone),totalFee:Number(f.totalFee),paid:lid?l.paid:0,lectures:Number(f.lectures),attended:Number(f.attended)});if(obj.attended>obj.lectures)return toast('Attended lectures total lectures se zyada nahi ho sakte.','bad');if(!lid){db.learners.push(obj);if(openingPaid>0)postTransaction({type:'INCOME',category:'Learner Fee',amount:openingPaid,partyType:'LEARNER',partyId:obj.id,accountId:'ACC-CASH',note:'Opening learner payment'})}audit(lid?'LEARNER_UPDATED':'LEARNER_CREATED',`${obj.name} learner record`,obj.id);closeModal();renderLearners();toast('Learner record saved.')},'Save Learner')};
+  function renderClients(){if(current.role==='CLIENT')return renderClientHome($('#page-clients'));const rows=db.clients.filter(c=>ownScope('client',c)).map(c=>`<tr><td><b>${esc(c.business||c.name)}</b><div class="muted small">${esc(c.name)}</div></td><td>${esc(c.phone)}</td><td>${(c.services||[]).length}</td><td><span class="badge brand">${esc(c.stage||'NEW')}</span></td><td class="amount">${money(c.totalValue)}</td><td class="amount">${money(c.paid)}</td><td class="amount danger">${money(Math.max(0,c.totalValue-c.paid))}</td><td><button class="btn sm" onclick="clientModal('${c.id}')"><i class="fa-solid fa-pen"></i></button></td></tr>`).join('');$('#page-clients').innerHTML=pageHead('Clients','New leads, active services, projects and linked account balances',can('clients','add')?'<button class="btn primary sm" onclick="clientModal()"><i class="fa-solid fa-plus"></i> Add Client</button>':'')+`<div class="card"><div class="toolbar"><input class="input" placeholder="Search client..." oninput="filterTable(this,'clientTable')"><span class="badge brand">${db.clients.length} CLIENTS</span></div><div class="table-wrap"><table id="clientTable"><thead><tr><th>Business / Client</th><th>WhatsApp</th><th>Services</th><th>Stage</th><th>Total Value</th><th>Paid</th><th>Remaining</th><th>Edit</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">No client records.</td></tr>'}</tbody></table></div></div>`}
+  window.clientModal=cid=>{const c=db.clients.find(x=>x.id===cid)||{},checks=db.services.map(s=>`<label class="list-row" style="justify-content:flex-start"><input type="checkbox" name="services" value="${s.id}" ${(c.services||[]).includes(s.id)?'checked':''}> <span><b>${esc(s.name)}</b></span></label>`).join('');modal(cid?'Edit Client':'Add Client',`<form id="clientForm" class="form-grid"><div class="field"><label>Contact Name</label><input class="input" name="name" required value="${esc(c.name||'')}"></div><div class="field"><label>Business Name</label><input class="input" name="business" value="${esc(c.business||'')}"></div><div class="field"><label>WhatsApp</label><input class="input" name="phone" required value="${esc(c.phone||'')}"></div><div class="field"><label>Stage</label><select class="input" name="stage">${['NEW LEAD','PROPOSAL','ACTIVE CLIENT','COMPLETED','ON HOLD'].map(x=>`<option ${c.stage===x?'selected':''}>${x}</option>`)}</select></div><div class="field"><label>Total Service Value</label><input class="input" name="totalValue" type="number" min="0" value="${Number(c.totalValue||0)}"></div><div class="field"><label>Already Paid</label><input class="input" name="paid" type="number" min="0" value="${Number(c.paid||0)}" ${cid?'readonly':''}></div><div class="field span-2"><label>Selected Services</label><div class="grid two" style="max-height:230px;overflow:auto">${checks}</div></div></form>`,()=>{const fd=new FormData($('#clientForm')),openingPaid=Number(fd.get('paid')||0),obj=cid?c:{id:id('CLT'),createdAt:now(),paid:0};Object.assign(obj,{name:fd.get('name').trim(),business:fd.get('business').trim(),phone:cleanPhone(fd.get('phone')),stage:fd.get('stage'),totalValue:Number(fd.get('totalValue')),paid:cid?c.paid:0,services:fd.getAll('services')});if(!cid){db.clients.push(obj);if(openingPaid>0)postTransaction({type:'INCOME',category:'Client Payment',amount:openingPaid,partyType:'CLIENT',partyId:obj.id,accountId:'ACC-CASH',note:'Opening client payment'})}audit(cid?'CLIENT_UPDATED':'CLIENT_CREATED',`${obj.business||obj.name} client record`,obj.id);closeModal();renderClients();toast('Client record saved.')},'Save Client')};
+  function postTransaction(x){const amount=Number(x.amount);if(!amount||amount<=0)throw new Error('Amount must be greater than zero');const tx={id:id('TXN'),receipt:'GG-R-'+Date.now().toString().slice(-8),date:now(),status:'POSTED',createdBy:current?.id||'SYSTEM',...x,amount};db.transactions.unshift(tx);const acc=db.accounts.find(a=>a.id===x.accountId);if(acc)acc.balance+=x.type==='INCOME'?amount:-amount;if(x.partyType==='LEARNER'&&x.type==='INCOME'){const l=db.learners.find(a=>a.id===x.partyId);if(l)l.paid=Number(l.paid||0)+amount}if(x.partyType==='CLIENT'&&x.type==='INCOME'){const c=db.clients.find(a=>a.id===x.partyId);if(c)c.paid=Number(c.paid||0)+amount}return tx}
+  function renderFinance(){const t=totals(),rows=db.transactions.map(x=>`<tr><td class="mono">${esc(x.receipt)}</td><td>${datetime(x.date)}</td><td><span class="badge ${x.type==='INCOME'?'good':'bad'}">${x.type}</span></td><td>${esc(x.category)}</td><td>${esc(partyName(x))}</td><td>${esc(accountName(x.accountId))}</td><td class="amount">${money(x.amount)}</td><td><span class="badge ${x.status==='POSTED'?'good':'warn'}">${x.status}</span></td><td>${x.status==='POSTED'&&can('finance','approve')?`<button class="btn bad sm" onclick="reverseTransaction('${x.id}')">Reverse</button>`:''}</td></tr>`).join('');$('#page-finance').innerHTML=pageHead('Ledger & Accounts','Financial entries stay traceable; corrections use reversal entries',`<button class="btn sm" onclick="exportLedger()"><i class="fa-solid fa-file-csv"></i> Export</button>${can('finance','add')?'<button class="btn primary sm" onclick="transactionModal()"><i class="fa-solid fa-plus"></i> New Transaction</button>':''}`)+`<div class="grid stats"><div class="stat"><span>Income</span><strong>${money(t.income)}</strong></div><div class="stat"><span>Expenses</span><strong>${money(t.expense)}</strong></div><div class="stat"><span>Net Balance</span><strong>${money(t.balance)}</strong></div><div class="stat"><span>Transactions</span><strong>${db.transactions.length}</strong></div></div><div class="card"><div class="toolbar">${db.accounts.map(a=>`<span class="badge brand">${esc(a.name)}: ${money(a.balance)}</span>`).join('')}</div><div class="table-wrap"><table><thead><tr><th>Receipt</th><th>Date</th><th>Type</th><th>Category</th><th>Party</th><th>Account</th><th>Amount</th><th>Status</th><th>Correction</th></tr></thead><tbody>${rows||'<tr><td colspan="9" class="empty">No ledger transactions.</td></tr>'}</tbody></table></div></div>`}
+  window.transactionModal=()=>modal('New Ledger Transaction',`<form id="txForm" class="form-grid"><div class="field"><label>Type</label><select class="input" name="type"><option>INCOME</option><option>EXPENSE</option></select></div><div class="field"><label>Category</label><input class="input" name="category" required></div><div class="field"><label>Amount</label><input class="input" name="amount" type="number" min="1" required></div><div class="field"><label>Account</label><select class="input" name="accountId">${db.accounts.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`)}</select></div><div class="field"><label>Party Type</label><select class="input" name="partyType" onchange="fillParties(this.value)"><option value="GENERAL">General</option><option value="LEARNER">Learner</option><option value="CLIENT">Client</option></select></div><div class="field"><label>Linked Party</label><select id="partySelect" class="input" name="partyId"><option value="">None</option></select></div><div class="field span-2"><label>Note</label><input class="input" name="note"></div></form>`,()=>{try{const x=Object.fromEntries(new FormData($('#txForm')));postTransaction(x);audit('TRANSACTION_POSTED',`${x.type} ${money(x.amount)} • ${x.category}`,'FINANCE');save();closeModal();renderFinance();toast('Transaction posted and linked.')}catch(err){toast(err.message,'bad')}},'Post Transaction');
+  window.fillParties=type=>{$('#partySelect').innerHTML='<option value="">None</option>'+((type==='LEARNER'?db.learners:type==='CLIENT'?db.clients:[]).map(x=>`<option value="${x.id}">${esc(x.business||x.name)}</option>`).join(''))};
+  window.reverseTransaction=tid=>{const tx=db.transactions.find(x=>x.id===tid);if(!tx||tx.status!=='POSTED')return;const rev=postTransaction({type:tx.type==='INCOME'?'EXPENSE':'INCOME',category:'Reversal: '+tx.category,amount:tx.amount,partyType:tx.partyType,partyId:tx.partyId,accountId:tx.accountId,note:'Reversal of '+tx.receipt,linkedTransaction:tx.id});if(tx.partyType==='LEARNER'&&tx.type==='INCOME'){const p=db.learners.find(a=>a.id===tx.partyId);if(p)p.paid=Math.max(0,Number(p.paid||0)-tx.amount)}if(tx.partyType==='CLIENT'&&tx.type==='INCOME'){const p=db.clients.find(a=>a.id===tx.partyId);if(p)p.paid=Math.max(0,Number(p.paid||0)-tx.amount)}tx.status='REVERSED';tx.reversalId=rev.id;audit('TRANSACTION_REVERSED',`${tx.receipt} reversed by ${rev.receipt}`,'FINANCE');save();renderFinance();toast('Reversal entry posted.')};
+  function renderServices(){const cards=db.services.filter(s=>s.active).map(s=>`<article class="service"><div class="service-icon"><i class="fa-solid ${esc(s.icon||'fa-star')}"></i></div><h5>${esc(s.name)}</h5><p>${esc(s.description)}</p><div class="service-foot"><span class="price">${s.price?money(s.price):'Custom Quote'}</span>${current.role==='CLIENT'?`<button class="btn sm" onclick="requestService('${s.id}')">I Want This</button>`:''}</div></article>`).join('');const samples=db.samples.map(s=>`<div class="list-row"><div><strong>${esc(s.title)}</strong><span>${esc(s.service)} • ${esc(s.platform)}</span></div><a class="btn sm" target="_blank" rel="noopener" href="${esc(s.url)}">View Sample</a></div>`).join('');$('#page-services').innerHTML=pageHead('GG Services','Service catalogue, pricing and approved Drive/social media samples',can('services','edit')?'<button class="btn sm" onclick="sampleModal()"><i class="fa-solid fa-link"></i> Add Sample Link</button>':'')+`<div class="service-grid">${cards}</div><div class="card" style="margin-top:12px"><div class="card-head"><h4>Approved Work Samples</h4></div><div class="card-body compact-list">${samples||'<div class="empty">Approved sample links abhi add nahi huay.</div>'}</div></div><div class="callout" style="margin-top:12px"><b>Custom Business App & Portal:</b> One-time development fee with lifetime usage. Domain, hosting, paid API, SMS or WhatsApp provider costs are separate when applicable.</div>`}
+  window.sampleModal=()=>modal('Add Approved Sample',`<form id="sampleForm" class="form-grid"><div class="field"><label>Sample Title</label><input class="input" name="title" required></div><div class="field"><label>Related Service</label><select class="input" name="service">${db.services.map(s=>`<option>${esc(s.name)}</option>`)}</select></div><div class="field"><label>Platform</label><select class="input" name="platform"><option>Google Drive</option><option>Facebook</option><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Live Website</option></select></div><div class="field"><label>Industry</label><input class="input" name="industry"></div><div class="field span-2"><label>View-only URL</label><input class="input" type="url" name="url" required></div></form>`,()=>{const s={id:id('SMP'),...Object.fromEntries(new FormData($('#sampleForm'))),createdAt:now(),approved:true};db.samples.unshift(s);audit('SAMPLE_ADDED',s.title,s.id);closeModal();renderServices();toast('Sample link added.')},'Add Sample');
+  window.requestService=sid=>{const s=db.services.find(x=>x.id===sid);audit('SERVICE_REQUESTED',`${current.name} requested ${s?.name}`,sid);toast('Request Owner dashboard ko send ho gayi.')};
+  function renderSecurity(){const failed=db.users.filter(u=>u.failed||u.lockedUntil).length,devices=db.users.reduce((a,u)=>a+(u.devices||[]).filter(d=>d.active).length,0);$('#page-security').innerHTML=pageHead('GG Security Center','Own branded login, activation, device and session controls','')+`<div class="grid stats"><div class="stat"><span>Protected Accounts</span><strong>${db.users.length}</strong></div><div class="stat"><span>Active Devices</span><strong>${devices}</strong></div><div class="stat"><span>Attention Required</span><strong>${failed}</strong></div><div class="stat"><span>Owner Protection</span><strong style="font-size:14px">PERMANENT</strong></div></div><div class="grid two"><div class="card"><div class="card-head"><h4>User Security Status</h4></div><div class="card-body compact-list">${db.users.map(u=>`<div class="list-row"><div><strong>${esc(u.name)}</strong><span>PIN ${u.pinHash?'SET':'NOT SET'} • Two-step ${u.twoStep?'ON':'OFF'} • ${(u.devices||[]).filter(d=>d.active).length} device(s)</span></div><div class="actions"><button class="btn sm" onclick="forceLogout('${u.id}')">Logout Devices</button><button class="btn sm" onclick="toggle2FA('${u.id}')">2-Step</button></div></div>`).join('')}</div></div><div class="card"><div class="card-head"><h4>Security Rules</h4></div><div class="card-body compact-list"><div class="callout"><b>Primary Owner Protection:</b> Owner ko koi doosra role remove, demote, suspend, lock ya restrict nahi kar sakta.</div><div class="list-row"><div><strong>PIN Storage</strong><span>PBKDF2 hashed; permanent PIN readable form mein store nahi hota.</span></div><span class="badge good">SAFE</span></div><div class="list-row"><div><strong>Five Failed Attempts</strong><span>Account 15 minutes ke liye lock hota hai.</span></div><span class="badge good">ON</span></div><div class="list-row"><div><strong>GG Rotating Code</strong><span>Final backend/mobile GG Security integration ke liye reserved.</span></div><span class="badge warn">OPTIONAL</span></div></div></div></div>`}
+  window.forceLogout=uid=>{const u=db.users.find(x=>x.id===uid);if(!u)return;(u.devices||[]).forEach(d=>d.active=false);audit('DEVICES_LOGGED_OUT',`All devices logged out for ${u.name}`,u.id);save();renderSecurity();toast('All registered devices logged out.')};
+  window.toggle2FA=uid=>{const u=db.users.find(x=>x.id===uid);if(!u)return;u.twoStep=!u.twoStep;audit('TWO_STEP_CHANGED',`${u.name}: ${u.twoStep?'ON':'OFF'}`,u.id);save();renderSecurity()};
+  function renderAudit(){const rows=db.audit.map(a=>`<tr><td>${datetime(a.time)}</td><td><b>${esc(a.actor)}</b><div class="muted small mono">${esc(a.actorId)}</div></td><td><span class="badge brand">${esc(a.action.replaceAll('_',' '))}</span></td><td>${esc(a.detail)}</td><td class="mono">${esc(a.target)}</td></tr>`).join('');$('#page-audit').innerHTML=pageHead('Audit History','Owner and authorized roles can trace important portal changes',can('audit','export')?'<button class="btn sm" onclick="exportAudit()"><i class="fa-solid fa-download"></i> Export</button>':'')+`<div class="card"><div class="toolbar"><input class="input" placeholder="Search audit..." oninput="filterTable(this,'auditTable')"><span class="badge brand">${db.audit.length} EVENTS</span></div><div class="table-wrap"><table id="auditTable"><thead><tr><th>Pakistan Time</th><th>Actor</th><th>Action</th><th>Detail</th><th>Target</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">No audit events.</td></tr>'}</tbody></table></div></div>`}
+  function renderSettings(){const s=db.settings;$('#page-settings').innerHTML=pageHead('Portal Settings','Brand identity, data backup and controlled recovery','')+`<div class="grid two"><div class="card"><div class="card-head"><h4>Business Identity</h4></div><div class="card-body"><form id="settingsForm" class="form-grid"><div class="field span-2"><label>Business Name</label><input class="input" name="business" value="${esc(s.business)}"></div><div class="field span-2"><label>Tagline</label><input class="input" name="tagline" value="${esc(s.tagline)}"></div><div class="field"><label>Business WhatsApp</label><input class="input" name="whatsapp" value="${esc(s.whatsapp||'')}"></div><div class="field"><label>Timezone</label><input class="input" value="Asia/Karachi" readonly></div><button type="button" class="btn primary span-2" onclick="saveSettings()">Save Settings</button></form></div></div><div class="card"><div class="card-head"><h4>Backup & Recovery</h4></div><div class="card-body compact-list"><div class="callout">Single-file GitHub version browser storage use karta hai. Regular encrypted server backup final backend version mein implement hoga.</div><button class="btn" onclick="exportBackup()"><i class="fa-solid fa-download"></i> Export JSON Backup</button><label class="btn"><i class="fa-solid fa-upload"></i> Import Backup<input type="file" accept="application/json" hidden onchange="importBackup(this)"></label><button class="btn bad" onclick="clearDemoData()"><i class="fa-solid fa-trash"></i> Remove Demo Business Data</button></div></div></div>`}
+  window.saveSettings=()=>{Object.assign(db.settings,Object.fromEntries(new FormData($('#settingsForm'))));audit('SETTINGS_UPDATED','Business identity settings updated','SYSTEM');save();toast('Settings saved.')};
+  window.openQuick=()=>{if(current.role==='LEARNER')return go('learners');if(current.role==='CLIENT')return go('services');modal('Quick Entry',`<div class="grid two"><button class="btn" onclick="closeModal();learnerModal()"><i class="fa-solid fa-graduation-cap"></i> New Learner</button><button class="btn" onclick="closeModal();clientModal()"><i class="fa-solid fa-briefcase"></i> New Client</button><button class="btn" onclick="closeModal();transactionModal()"><i class="fa-solid fa-wallet"></i> Transaction</button><button class="btn" onclick="closeModal();userModal()"><i class="fa-solid fa-user-plus"></i> New User</button></div>`,closeModal,'Close')};
+  function modal(title,body,onSave,label='Save'){window._modalSave=onSave;$('#modalRoot').innerHTML=`<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-head"><h3>${esc(title)}</h3><button class="icon-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body">${body}</div><div class="modal-foot"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="Promise.resolve(window._modalSave?.()).catch(e=>toast(e.message,'bad'))">${esc(label)}</button></div></div></div>`}
+  window.closeModal=()=>{$('#modalRoot').innerHTML='';window._modalSave=null};
+  window.filterTable=(input,tableId)=>{$$('#'+tableId+' tbody tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(input.value.toLowerCase())?'':'none')};
+  function partyName(x){if(x.partyType==='LEARNER')return db.learners.find(a=>a.id===x.partyId)?.name||'Learner';if(x.partyType==='CLIENT'){const c=db.clients.find(a=>a.id===x.partyId);return c?.business||c?.name||'Client'}return x.note||'General'}
+  function accountName(a){return db.accounts.find(x=>x.id===a)?.name||a}
+  function serviceName(sid){return db.services.find(s=>s.id===sid)?.name||sid}
+  function csv(rows){return rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""').replace(/^[=+\-@]/,"'$&")+'"').join(',')).join('\n')}
+  function download(name,data,type='text/plain'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+  window.exportLedger=()=>{const rows=[['Receipt','Date','Type','Category','Party','Account','Amount','Status'],...db.transactions.map(x=>[x.receipt,x.date,x.type,x.category,partyName(x),accountName(x.accountId),x.amount,x.status])];download('GG-Ledger.csv',csv(rows),'text/csv');audit('LEDGER_EXPORTED','Ledger CSV exported','FINANCE')};
+  window.exportAudit=()=>download('GG-Audit.csv',csv([['Time','Actor','Action','Detail','Target'],...db.audit.map(a=>[a.time,a.actor,a.action,a.detail,a.target])]),'text/csv');
+  window.exportBackup=()=>{download('GG-Portal-Backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(db,null,2),'application/json');audit('BACKUP_EXPORTED','JSON backup exported','SYSTEM')};
+  window.importBackup=input=>{const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.users)||!Array.isArray(x.transactions)||!x.settings)throw Error();if(!x.users.some(u=>u.role===OWNER_ROLE))throw Error();db=x;audit('BACKUP_IMPORTED','Validated portal backup imported','SYSTEM');save();toast('Backup imported.');setTimeout(()=>location.reload(),700)}catch{toast('Invalid GG Portal backup file.','bad')}};r.readAsText(f)};
+  window.clearDemoData=()=>{db.learners=db.learners.filter(x=>!x.demo);db.clients=db.clients.filter(x=>!x.demo);db.transactions=db.transactions.filter(x=>!x.demo);db.users=db.users.filter(x=>!x.demo);db.accounts.forEach(a=>a.balance=0);audit('DEMO_DATA_REMOVED','Demo business records removed','SYSTEM');save();renderSettings();toast('Demo data removed.')};
+  window.seedDemo=()=>{if(db.learners.some(x=>x.demo))return toast('Demo data already added.');const l={id:'LRN-DEMO-1',rollId:'GG-L-0001',name:'Ayesha Khan',phone:'03001112222',mentorship:'AI Content Creation',batch:'AI-01',startDate:'2026-09-01',nextDue:'2026-10-20',totalFee:30000,paid:0,lectures:12,attended:10,meetLink:'https://meet.google.com/',createdAt:now(),demo:true},c={id:'CLT-DEMO-1',name:'Ali Raza',business:'Raza Traders',phone:'03003334444',stage:'ACTIVE CLIENT',totalValue:85000,paid:0,services:['SVC-01','SVC-06'],createdAt:now(),demo:true};db.learners.push(l);db.clients.push(c);let t1=postTransaction({type:'INCOME',category:'Learner Fee',amount:15000,partyType:'LEARNER',partyId:l.id,accountId:'ACC-MEEZAN',note:'First installment'}),t2=postTransaction({type:'INCOME',category:'Client Payment',amount:50000,partyType:'CLIENT',partyId:c.id,accountId:'ACC-EASY',note:'Project advance'});t1.demo=t2.demo=true;const makeUser=(name,phone,userId,role,linkedId)=>({id:id('USR'),name,phone,userId,role,linkedId,status:'PENDING',activationCode:Math.random().toString(36).slice(2,8).toUpperCase(),activationExpiry:new Date(Date.now()+48*3600000).toISOString(),permissions:defaultPerms(role),createdAt:now(),devices:[],demo:true});db.users.push(makeUser('Ayesha Khan','03001112222','GG-LEARNER-01','LEARNER',l.id),makeUser('Ali Raza','03003334444','GG-CLIENT-01','CLIENT',c.id));audit('DEMO_DATA_ADDED','Demo learner, client, users and payments added','SYSTEM');save();renderDashboard();toast('Demo records added. Use View as User from Users & Access.')};
+  window.printPage=()=>window.print();
+  bootstrap();
+})();
+</script>
 </body>
 </html>
