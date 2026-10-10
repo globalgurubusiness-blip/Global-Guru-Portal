@@ -335,7 +335,6 @@
       });
     }
 
-    // DAILY AUTO CUTOFF LIVE GALLA FLOW
     function listenAllTransactions() {
       const q = query(collection(db, "transactions"), where("userId", "==", currentUser.uid));
       onSnapshot(q, (snapshot) => {
@@ -575,12 +574,10 @@
       });
     }
 
-    // TRANSACTIONS HISTORY WITH RUNNING BALANCE ON EACH ENTRY
     function renderTransactions() {
       const txListEl = document.getElementById('tx-history-list');
       const dTxListEl = document.getElementById('d-tx-history-list');
 
-      // 1. Purani se Nayi order mein loop chala kar running balance calculate karein
       const chronologicalTx = [...currentTransactions].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       let running = 0;
       const txWithBalMap = {};
@@ -638,9 +635,10 @@
       if (event.key === 'Enter') {
         event.preventDefault();
         const inputId = isDesktop ? 'd-tx-amount' : 'tx-amount';
-        const calculated = evaluateExpression(event.target.value);
+        const el = document.getElementById(inputId);
+        const calculated = evaluateExpression(el.value);
         if (calculated > 0) {
-          event.target.value = calculated;
+          el.value = calculated;
         }
         addTransaction(type, isDesktop);
       }
@@ -698,7 +696,6 @@
       }
     };
 
-    // GALLA CASH ENTRY
     window.processGallaAccountEntry = async (actionType) => {
       const partySelect = document.getElementById('galla-party-select');
       const amountInput = document.getElementById('galla-entry-amount');
@@ -759,22 +756,36 @@
       }
     };
 
-    // CASH BOOK TABLE RENDER - WITH VISIBLE NOTE/DESCRIPTION COLUMN
+    // CASH BOOK TABLE RENDER - WITH VISIBLE NOTE & RUNNING REAL-TIME BALANCE
     function renderGallaTransactionsTable() {
       const listEl = document.getElementById('galla-history-tbody');
       if (!listEl) return;
       listEl.innerHTML = '';
 
       if (gallaTxHistory.length === 0) {
-        listEl.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-xs text-slate-400">No cash entries recorded yet.</td></tr>';
+        listEl.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-xs text-slate-400">No cash entries recorded yet.</td></tr>';
         return;
       }
 
-      gallaTxHistory.slice(0, 35).forEach(t => {
+      // Calculate running balance in chronological order (Oldest to Newest)
+      const chronological = [...gallaTxHistory].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      let running = gallaOpeningBalance;
+      const runningMap = {};
+
+      chronological.forEach(t => {
+        const isCashIn = (t.gallaAction === 'in') || (t.type === 'liye');
+        const amt = Number(t.amount || 0);
+        running += isCashIn ? amt : -amt;
+        runningMap[t.id] = running;
+      });
+
+      // Render rows (Newest on top)
+      gallaTxHistory.slice(0, 50).forEach(t => {
         const row = document.createElement('tr');
         row.className = "border-b border-slate-100 hover:bg-slate-50 text-xs";
         const isCashIn = (t.gallaAction === 'in') || (t.type === 'liye');
         const dateStr = new Date(t.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        const entryBal = runningMap[t.id] !== undefined ? runningMap[t.id] : 0;
 
         row.innerHTML = `
           <td class="p-2.5 text-slate-500 font-medium whitespace-nowrap">${dateStr}</td>
@@ -787,6 +798,9 @@
           </td>
           <td class="p-2.5 text-right font-black whitespace-nowrap ${isCashIn ? 'text-emerald-600' : 'text-rose-600'}">
             ${isCashIn ? '+' : '-'} Rs. ${Number(t.amount).toLocaleString()}
+          </td>
+          <td class="p-2.5 text-right font-black whitespace-nowrap text-slate-900 bg-slate-50/50">
+            Rs. ${entryBal.toLocaleString()}
           </td>
         `;
         listEl.appendChild(row);
@@ -815,7 +829,6 @@
       doc.text(text, startX + iconSize + spacing, bottomY);
     }
 
-    // 1. Galla Cash Book Statement PDF
     window.downloadGallaPDF = () => {
       playSound('download');
       const { jsPDF } = window.jspdf;
@@ -901,7 +914,6 @@
       pdf.save(`GG_Galla_Statement_${new Date().toISOString().slice(0, 10)}.pdf`);
     };
 
-    // 2. Customer Ledger Statement PDF
     window.downloadPDF = () => {
       playSound('download');
       const { jsPDF } = window.jspdf;
@@ -1454,7 +1466,7 @@
 
       </div>
 
-      <!-- PAGE 2: ACCOUNTS / GALLA VIEW (DAILY AUTO CUTOFF LIVE FLOW WITH NOTE COLUMN) -->
+      <!-- PAGE 2: ACCOUNTS / GALLA VIEW -->
       <div id="view-accounts" class="hidden flex-1 p-4 md:p-6 pb-20 md:pb-6 space-y-4 overflow-y-auto bg-slate-50">
         <div class="bg-white p-4 md:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-3 max-w-5xl mx-auto">
           <div class="flex items-center justify-between">
@@ -1491,7 +1503,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-5xl mx-auto">
-          <!-- Galla Entry Box: Optional Party Dropdown -->
+          <!-- Galla Entry Box -->
           <div class="md:col-span-5 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3.5">
             <div class="flex items-center justify-between">
               <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Galla Entry (Counter / Accounts)</h4>
@@ -1524,7 +1536,7 @@
             </div>
           </div>
 
-          <!-- History Table on Right Side with Description/Note Column & Grand Total Footer -->
+          <!-- History Table with Description/Note & Real-Time Balance Column -->
           <div class="md:col-span-7 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
               <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Cash Book Activity (History)</h4>
@@ -1541,6 +1553,7 @@
                     <th class="p-2.5">Note / Description</th>
                     <th class="p-2.5">Type</th>
                     <th class="p-2.5 text-right">Amount</th>
+                    <th class="p-2.5 text-right">Balance</th>
                   </tr>
                 </thead>
                 <tbody id="galla-history-tbody"></tbody>
@@ -1548,6 +1561,7 @@
                   <tr>
                     <td class="p-2.5" colspan="3">GRAND TOTAL (MEEZAN)</td>
                     <td class="p-2.5 text-emerald-400 font-extrabold text-[11px]" id="footer-total-in">+ Rs. 0</td>
+                    <td class="p-2.5 text-rose-400 font-extrabold text-[11px] text-right" id="footer-total-out">- Rs. 0</td>
                     <td class="p-2.5 text-right text-emerald-300 font-black" id="footer-grand-closing">Rs. 0</td>
                   </tr>
                 </tfoot>
