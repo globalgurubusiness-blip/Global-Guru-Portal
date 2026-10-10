@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -36,12 +36,6 @@
               800: '#6f3d1c',
               900: '#5c331a',
               950: '#34190c',
-            },
-            accent: {
-              gold: '#D4AF37',
-              crimson: '#800020',
-              emerald: '#10B981',
-              cyan: '#06B6D4',
             }
           }
         }
@@ -50,54 +44,40 @@
   </script>
 
   <style>
-    /* Custom fluid transitions & mask styling */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
-    
-    .privacy-blurred {
-      filter: blur(8px) grayscale(40%);
-      user-select: none;
-      pointer-events: none;
-      transition: filter 0.3s ease;
-    }
-    
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.05);
+    }
+    .dark .custom-scroll::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.4);
+      background: rgba(100, 116, 139, 0.3);
       border-radius: 9999px;
     }
     .custom-scroll::-webkit-scrollbar-thumb:hover {
       background: rgba(212, 175, 55, 0.6);
     }
-
-    .stealth-pulse {
-      animation: stealthGlow 3s infinite ease-in-out;
-    }
-    @keyframes stealthGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.08); }
-      50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.25); }
-    }
   </style>
 </head>
 
-<body class="h-full w-full bg-slate-950 text-slate-100 font-sans antialiased flex flex-col overflow-x-hidden selection:bg-brand-500 selection:text-white">
+<body class="h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col overflow-x-hidden transition-colors duration-200 selection:bg-amber-500 selection:text-white">
 
   <!-- NOTIFICATION TOAST CONTAINER -->
   <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- APPLICATION WRAPPER (Full Width 100vw, Zero Black Pillarbox) -->
-  <div id="appRoot" class="flex-1 w-full min-h-screen flex flex-col justify-between relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+  <!-- APPLICATION WRAPPER -->
+  <div id="appRoot" class="flex-1 w-full min-h-screen flex flex-col justify-between relative bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
 
     <!-- ========================================== -->
-    <!-- STAGE 1 & 2: BLIND AUTHENTICATION GATEWAY -->
+    <!-- STAGE 1 & 2: SECURE AUTHENTICATION GATEWAY -->
     <!-- ========================================== -->
     <div id="authScreen" class="w-full flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-12 relative z-20">
       
@@ -105,81 +85,67 @@
       <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none -top-10"></div>
       <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none -bottom-10"></div>
 
-      <!-- Main Blind Authentication Card -->
-      <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative transition-all duration-300">
+      <!-- Main Login Card -->
+      <div class="w-full max-w-md bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative transition-all duration-300">
         
-        <!-- Stealth Logo Emblem (Supports Triple Tap) -->
-        <div class="flex flex-col items-center text-center mb-8">
-          <div id="authLogoBadge" onclick="handleLogoTap()" class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 p-0.5 shadow-xl shadow-amber-500/10 cursor-pointer active:scale-95 transition-transform duration-150 select-none relative group">
-            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center border border-amber-500/30">
-              <span class="text-2xl font-black tracking-wider bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent">GG</span>
+        <!-- Stealth Logo Emblem (Supports Triple-Tap for direct Master PIN) -->
+        <div class="flex flex-col items-center text-center mb-6">
+          <div id="authLogoBadge" onclick="handleLogoTap()" title="Triple-click for Master Gateway" class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-400 p-0.5 shadow-xl shadow-amber-500/10 cursor-pointer active:scale-95 transition-transform duration-150 select-none relative group">
+            <div class="w-full h-full bg-white dark:bg-slate-950 rounded-[14px] flex items-center justify-center border border-amber-500/30">
+              <span class="text-2xl font-black tracking-wider bg-gradient-to-br from-amber-600 via-amber-500 to-amber-400 bg-clip-text text-transparent">GG</span>
             </div>
-            <!-- Triple tap hint feedback dot -->
-            <span id="tapPulseDot" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-slate-900 opacity-0 transition-opacity"></span>
+            <!-- Feedback indicator dot -->
+            <span id="tapPulseDot" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-white dark:border-slate-900 opacity-0 transition-opacity"></span>
           </div>
           
-          <h1 class="text-2xl font-bold tracking-tight text-white mt-4">Global Guru Portal</h1>
-          <p id="authSubtitle" class="text-xs uppercase tracking-widest text-slate-400 font-mono mt-1">Authorized Gateway • V4.9</p>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-4">Global Guru Portal</h1>
+          <p id="authSubtitle" class="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-mono mt-1">Authorized Gateway • V5.2</p>
         </div>
 
-        <!-- AUTH PHASE 1: Sign in with Google Screen -->
+        <!-- AUTH PHASE 1: Clean Sign in with Google (No hardcoded credentials leak) -->
         <div id="authPhaseGoogle" class="space-y-4">
-          <p class="text-sm text-slate-300 text-center leading-relaxed">
+          <p class="text-sm text-slate-600 dark:text-slate-300 text-center leading-relaxed">
             Please authenticate using your verified enterprise account to unlock your assigned workspace.
           </p>
 
-          <!-- Account Simulator Quick Select -->
-          <div class="pt-2">
-            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Account Credentials Switcher</label>
-            <select id="googleAccountPicker" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
-              <option value="globalgurubusiness@gmail.com">globalgurubusiness@gmail.com (Super Admin Whitelisted)</option>
-              <option value="globalgurultd@gmail.com">globalgurultd@gmail.com (Super Admin Whitelisted)</option>
-              <option value="staff@globalguru.com">staff@globalguru.com (Staff Operations)</option>
-              <option value="learner@globalguru.com">learner@globalguru.com (Enrolled Learner)</option>
-              <option value="client@globalguru.com">client@brand.com (Agency Client Desk)</option>
-              <option value="unregistered@gmail.com">unregistered@gmail.com (Public External)</option>
-            </select>
-          </div>
-
-          <button onclick="handleGoogleSignIn()" class="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm flex items-center justify-center gap-3 shadow-lg shadow-white/5 transition-all active:scale-[0.98]">
+          <button onclick="handleGoogleSignIn()" class="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-semibold text-sm flex items-center justify-center gap-3 shadow-lg shadow-black/5 transition-all active:scale-[0.98]">
             <svg class="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            Continue with Google
+            Sign in with Google
           </button>
         </div>
 
-        <!-- AUTH PHASE 2: Neutral Blind Verification Form -->
+        <!-- AUTH PHASE 2: WhatsApp Number + Batch ID / Passcode Form -->
         <div id="authPhaseBlindForm" class="space-y-4 hidden">
-          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+          <div class="bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between">
             <div class="flex items-center gap-2.5 overflow-hidden">
-              <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">
+              <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-xs shrink-0">
                 <i class="fa-solid fa-user-check"></i>
               </div>
-              <span id="activeSignedEmail" class="text-xs text-slate-300 font-mono truncate">email@domain.com</span>
+              <span id="activeSignedEmail" class="text-xs text-slate-700 dark:text-slate-300 font-mono truncate">globalgurubusiness@gmail.com</span>
             </div>
-            <button onclick="handleSignOut()" class="text-xs text-rose-400 hover:text-rose-300 shrink-0 font-medium">Switch</button>
+            <button onclick="handleSignOut()" class="text-xs text-rose-500 hover:underline shrink-0 font-medium">Switch</button>
           </div>
 
           <div class="space-y-3 pt-1">
+            <!-- 1. WhatsApp Number -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Mobile / WhatsApp Number</label>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">WhatsApp Contact Number *</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500 text-sm font-mono">+92</span>
-                <input type="tel" id="blindPhoneInput" placeholder="300 1234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-14 pr-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 text-sm font-mono">+92</span>
+                <input type="tel" id="blindPhoneInput" placeholder="300 1234567" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-14 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition-colors font-mono">
               </div>
             </div>
 
+            <!-- 2. Batch ID / Passcode -->
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Secret Access Key / Passcode</label>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Batch ID / Secret Access Key *</label>
               <div class="relative">
-                <input type="password" id="blindPasscodeInput" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors font-mono">
-                <button type="button" onclick="togglePassVisibility('blindPasscodeInput')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300">
-                  <i class="fa-regular fa-eye text-xs"></i>
-                </button>
+                <input type="text" id="blindPasscodeInput" placeholder="e.g. AI-01, 7860, 4321" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition-colors font-mono uppercase">
               </div>
             </div>
           </div>
@@ -188,19 +154,71 @@
             <i class="fa-solid fa-key text-xs"></i>
             Unlock Workspace
           </button>
+        </div>
 
-          <!-- Discreet Super Admin Hint for Authorized Emails -->
-          <div id="superAdminHint" class="text-center pt-2 hidden">
-            <span class="text-[11px] text-amber-400/80 font-mono tracking-wide">
-              <i class="fa-solid fa-shield-halved mr-1"></i> Whitelist Detected: Triple-click GG emblem for Stealth Executive Pin
+        <!-- COLLAPSIBLE DEMO CREDENTIALS HELP DRAWER -->
+        <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800/80">
+          <button onclick="toggleDemoDrawer()" class="w-full flex items-center justify-between text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline">
+            <span class="flex items-center gap-1.5 font-mono">
+              <i class="fa-solid fa-circle-question"></i> Demo Access Guide & Auto-Fills
             </span>
+            <i id="demoDrawerArrow" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+          </button>
+
+          <div id="demoCredentialsDrawer" class="hidden mt-3 space-y-2 text-[11px] font-mono bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3">
+            
+            <!-- Super Admin 1 (Yasir Ali) -->
+            <div class="flex items-center justify-between p-1.5 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
+              <div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 block">Super Admin 1 (Yasir Ali)</span>
+                <span class="text-slate-500">globalgurubusiness@gmail.com • Key: 7860</span>
+              </div>
+              <button onclick="quickFillDemo('globalgurubusiness@gmail.com', '3001234567', '7860')" class="px-2 py-1 rounded bg-amber-500 text-slate-950 font-bold text-[10px]">Auto Fill</button>
+            </div>
+
+            <!-- Super Admin 2 (Sis Desk) -->
+            <div class="flex items-center justify-between p-1.5 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
+              <div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 block">Super Admin 2 (Sis Desk)</span>
+                <span class="text-slate-500">globalgurultd@gmail.com • Key: 7860</span>
+              </div>
+              <button onclick="quickFillDemo('globalgurultd@gmail.com', '3001234567', '7860')" class="px-2 py-1 rounded bg-amber-500 text-slate-950 font-bold text-[10px]">Auto Fill</button>
+            </div>
+
+            <!-- Staff / SIS Desk -->
+            <div class="flex items-center justify-between p-1.5 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
+              <div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 block">Staff / SIS Reception Desk</span>
+                <span class="text-slate-500">staff@globalguru.com • Key: 4321</span>
+              </div>
+              <button onclick="quickFillDemo('staff@globalguru.com', '3001234567', '4321')" class="px-2 py-1 rounded bg-sky-500 text-white font-bold text-[10px]">Auto Fill</button>
+            </div>
+
+            <!-- Learner / Student -->
+            <div class="flex items-center justify-between p-1.5 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
+              <div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 block">Enrolled Learner (Student)</span>
+                <span class="text-slate-500">learner@globalguru.com • Batch: AI-01</span>
+              </div>
+              <button onclick="quickFillDemo('learner@globalguru.com', '3001234567', 'AI-01')" class="px-2 py-1 rounded bg-emerald-500 text-white font-bold text-[10px]">Auto Fill</button>
+            </div>
+
+            <!-- Client Desk -->
+            <div class="flex items-center justify-between p-1.5 rounded hover:bg-slate-200/50 dark:hover:bg-slate-900">
+              <div>
+                <span class="font-bold text-slate-800 dark:text-slate-200 block">Commercial Studio Client</span>
+                <span class="text-slate-500">client@brand.com • Key: CLIENT</span>
+              </div>
+              <button onclick="quickFillDemo('client@brand.com', '3009998877', 'CLIENT')" class="px-2 py-1 rounded bg-purple-500 text-white font-bold text-[10px]">Auto Fill</button>
+            </div>
+
           </div>
         </div>
 
       </div>
 
       <!-- Blind Public Footer -->
-      <div class="mt-8 text-center text-xs text-slate-600 font-mono">
+      <div class="mt-6 text-center text-xs text-slate-500 dark:text-slate-500 font-mono">
         Secured Ecosystem Terminal • End-to-End Cryptographic Sessions
       </div>
     </div>
@@ -212,41 +230,41 @@
     <div id="workspaceScreen" class="w-full flex-1 flex flex-col hidden min-h-screen">
       
       <!-- TOP EXECUTIVE HEADER BAR -->
-      <header class="w-full bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-6 lg:px-8 py-3.5 transition-all">
+      <header class="w-full bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-6 lg:px-8 py-3.5 transition-all">
         <div class="w-full flex items-center justify-between gap-4">
           
           <!-- Brand Logo & Stealth Tap Target -->
           <div class="flex items-center gap-3">
             <div id="headerLogoBadge" onclick="handleLogoTap()" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5 cursor-pointer active:scale-90 transition-transform select-none relative">
-              <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <span class="text-sm font-extrabold text-amber-400">GG</span>
+              <div class="w-full h-full bg-white dark:bg-slate-950 rounded-[10px] flex items-center justify-center">
+                <span class="text-sm font-extrabold text-amber-500">GG</span>
               </div>
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <span class="text-base font-bold text-white tracking-tight">Global Guru</span>
-                <span id="roleBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Super Admin</span>
+                <span class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Global Guru</span>
+                <span id="roleBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">Super Admin</span>
               </div>
-              <p id="userStatusSub" class="text-[11px] text-slate-400 font-mono truncate max-w-[200px] sm:max-w-xs">globalgurubusiness@gmail.com</p>
+              <p id="userStatusSub" class="text-[11px] text-slate-500 font-mono truncate max-w-[200px] sm:max-w-xs">globalgurubusiness@gmail.com</p>
             </div>
           </div>
 
           <!-- Top Quick Actions -->
           <div class="flex items-center gap-2 sm:gap-3">
             <!-- Panic Button Quick Action -->
-            <button id="quickPanicBtn" onclick="togglePanicState()" title="1-Click Privacy Mask" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-2 transition-all">
-              <i class="fa-solid fa-eye-slash text-amber-400"></i>
+            <button id="quickPanicBtn" onclick="togglePanicState()" title="1-Click Privacy Mask" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-eye-slash text-amber-500"></i>
               <span class="hidden sm:inline">Privacy Mask</span>
             </button>
 
             <!-- WhatsApp Customer Desk Trigger -->
-            <a id="headerWhatsappDesk" href="https://wa.me/923001234567?text=Global%20Guru%20Executive%20Support%20Desk" target="_blank" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-2 transition-all">
+            <a id="headerWhatsappDesk" href="https://wa.me/923001234567?text=Global%20Guru%20Executive%20Support%20Desk" target="_blank" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-2 transition-all">
               <i class="fa-brands fa-whatsapp text-sm"></i>
               <span class="hidden md:inline">Desk Logs</span>
             </a>
 
             <!-- Sign Out -->
-            <button onclick="handleSignOut()" title="Sign Out Session" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-medium flex items-center gap-1.5 transition-all">
+            <button onclick="handleSignOut()" title="Sign Out Session" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 text-xs font-medium flex items-center gap-1.5 transition-all">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
               <span class="hidden sm:inline">Exit</span>
             </button>
@@ -255,38 +273,38 @@
       </header>
 
       <!-- 5-TAB DESKTOP & MOBILE NAVIGATION BAR -->
-      <nav id="masterNavMenu" class="w-full bg-slate-900/60 border-b border-slate-800/80 px-4 sm:px-6 lg:px-8 py-2 z-30 overflow-x-auto custom-scroll">
+      <nav id="masterNavMenu" class="w-full bg-slate-100 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800/80 px-4 sm:px-6 lg:px-8 py-2 z-30 overflow-x-auto custom-scroll">
         <div class="w-full flex items-center gap-1.5 sm:gap-3 min-w-max">
           
-          <button onclick="switchTab('executiveHubTab')" id="tabBtn_executiveHubTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40">
-            <i class="fa-solid fa-shield-halved text-amber-400"></i>
+          <button onclick="switchTab('executiveHubTab')" id="tabBtn_executiveHubTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40">
+            <i class="fa-solid fa-shield-halved text-amber-500"></i>
             <span>Executive Hub</span>
           </button>
 
-          <button onclick="switchTab('directoryTab')" id="tabBtn_directoryTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-            <i class="fa-solid fa-users text-slate-400"></i>
+          <button onclick="switchTab('directoryTab')" id="tabBtn_directoryTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
+            <i class="fa-solid fa-users"></i>
             <span>Directory</span>
           </button>
 
-          <button onclick="switchTab('addEntryTab')" id="tabBtn_addEntryTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-            <i class="fa-solid fa-square-plus text-slate-400"></i>
+          <button onclick="switchTab('addEntryTab')" id="tabBtn_addEntryTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
+            <i class="fa-solid fa-square-plus"></i>
             <span>Add Entry</span>
           </button>
 
-          <button onclick="switchTab('financesTab')" id="tabBtn_financesTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-            <i class="fa-solid fa-wallet text-slate-400"></i>
+          <button onclick="switchTab('financesTab')" id="tabBtn_financesTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
+            <i class="fa-solid fa-wallet"></i>
             <span>Finances</span>
           </button>
 
-          <button onclick="switchTab('settingsTab')" id="tabBtn_settingsTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
-            <i class="fa-solid fa-gear text-slate-400"></i>
+          <button onclick="switchTab('settingsTab')" id="tabBtn_settingsTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50">
+            <i class="fa-solid fa-gear"></i>
             <span>Settings</span>
           </button>
 
         </div>
       </nav>
 
-      <!-- MAIN TAB CONTENT BODY (EDGE-TO-EDGE FLUID CONTAINER) -->
+      <!-- MAIN TAB CONTENT BODY -->
       <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
 
         <!-- ============================================== -->
@@ -294,32 +312,30 @@
         <!-- ============================================== -->
         <section id="executiveHubTab" class="tab-content space-y-6">
           
-          <!-- Hub Header Summary & Dynamic Counter -->
-          <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
             <div>
               <div class="flex items-center gap-3">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                  <i class="fa-solid fa-sliders text-amber-400"></i>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <i class="fa-solid fa-sliders text-amber-500"></i>
                   Executive Hub Switchboard
                 </h2>
-                <span id="hubActiveCounter" class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span id="hubActiveCounter" class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">
                   8 / 11 Active
                 </span>
               </div>
-              <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time operational safeguards, privacy curtains, and master ecosystem toggles.</p>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Real-time operational safeguards, privacy curtains, and master ecosystem toggles.</p>
             </div>
 
             <!-- Hub Quick Mass Controls -->
             <div class="flex items-center gap-3">
-              <button onclick="setAllSwitches(true)" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all">
+              <button onclick="setAllSwitches(true)" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-all">
                 Activate All
               </button>
-              <button onclick="setAllSwitches(false)" class="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all">
+              <button onclick="setAllSwitches(false)" class="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 text-xs font-semibold transition-all">
                 Panic Lock All
               </button>
-              <!-- Realtime Cloud Save Indicator -->
-              <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-400">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-emerald-500">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="cloudSyncStatus">Synced</span>
               </div>
             </div>
@@ -329,133 +345,133 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
             <!-- Switch 1: Panic Privacy Mask -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">1-Click Panic Mask</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Security</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">1-Click Panic Mask</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300">Security</span>
                 </div>
-                <p class="text-xs text-slate-400">Mask all ledger values with bullet dots.</p>
+                <p class="text-xs text-slate-500">Mask all ledger values with bullet dots.</p>
               </div>
               <input type="checkbox" id="switch_panicMask" onchange="handleSwitchToggle('panicMask', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
             <!-- Switch 2: Admission Gate Freeze -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Admission Gate Freeze</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300">Intake</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Admission Gate Freeze</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-600 dark:text-sky-300">Intake</span>
                 </div>
-                <p class="text-xs text-slate-400">Halt new student registration submissions.</p>
+                <p class="text-xs text-slate-500">Halt new student registration submissions.</p>
               </div>
               <input type="checkbox" id="switch_admissionFreeze" onchange="handleSwitchToggle('admissionFreeze', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
             <!-- Switch 3: Mera Khata Maintenance -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Khata Public Maintenance</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">Audit</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Khata Maintenance</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-600 dark:text-violet-300">Audit</span>
                 </div>
-                <p class="text-xs text-slate-400">Lock learner queries during month-end audit.</p>
+                <p class="text-xs text-slate-500">Lock learner queries during month-end audit.</p>
               </div>
               <input type="checkbox" id="switch_khataMaintenance" onchange="handleSwitchToggle('khataMaintenance', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
-            <!-- Switch 4: WhatsApp Desk Visibility -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <!-- Switch 4: WhatsApp Desk Channel -->
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">WhatsApp Desk Channel</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Support</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">WhatsApp Desk Channel</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300">Support</span>
                 </div>
-                <p class="text-xs text-slate-400">Show/Hide instant customer desk trigger.</p>
+                <p class="text-xs text-slate-500">Show/Hide instant customer desk trigger.</p>
               </div>
               <input type="checkbox" id="switch_whatsappDesk" onchange="handleSwitchToggle('whatsappDesk', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
-            <!-- Switch 5: Client Studio Booking Desk -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <!-- Switch 5: Studio Client Portal Desk -->
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Studio Client Portal Desk</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">B2B</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Studio Client Portal Desk</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-300">B2B</span>
                 </div>
-                <p class="text-xs text-slate-400">Permit commercial invoices & order flows.</p>
+                <p class="text-xs text-slate-500">Permit commercial invoices & order flows.</p>
               </div>
               <input type="checkbox" id="switch_clientStudio" onchange="handleSwitchToggle('clientStudio', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
             <!-- Switch 6: Working Backup Clearance -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Backup Engine Clearance</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">Data</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Backup Engine Clearance</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-600 dark:text-indigo-300">Data</span>
                 </div>
-                <p class="text-xs text-slate-400">Allow instant CSV/JSON snapshot downloads.</p>
+                <p class="text-xs text-slate-500">Allow instant CSV/JSON snapshot downloads.</p>
               </div>
               <input type="checkbox" id="switch_backupClearance" onchange="handleSwitchToggle('backupClearance', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
-            <!-- Switch 7: Liquid Funds Real-Time Sync -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <!-- Switch 7: Vault & Bank Realtime Sync -->
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Vault & Bank Realtime Sync</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Treasury</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Vault & Bank Realtime Sync</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300">Treasury</span>
                 </div>
-                <p class="text-xs text-slate-400">Automatically compute inter-ledger credits.</p>
+                <p class="text-xs text-slate-500">Automatically compute inter-ledger credits.</p>
               </div>
               <input type="checkbox" id="switch_fundsSync" onchange="handleSwitchToggle('fundsSync', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
-            <!-- Switch 8: Staff Operational Restriction -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <!-- Switch 8: Staff Financial Restriction -->
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Staff Financial Restriction</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300">RBAC</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Staff Financial Restriction</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-600 dark:text-teal-300">RBAC</span>
                 </div>
-                <p class="text-xs text-slate-400">Shield ledger tabs from reception profiles.</p>
+                <p class="text-xs text-slate-500">Shield ledger tabs from reception profiles.</p>
               </div>
               <input type="checkbox" id="switch_staffRestriction" onchange="handleSwitchToggle('staffRestriction', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
             <!-- Switch 9: Batch Scheduler Engine -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Live Cohort Timers</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Scheduler</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Live Cohort Timers</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-600 dark:text-cyan-300">Scheduler</span>
                 </div>
-                <p class="text-xs text-slate-400">Show session countdown on directory headers.</p>
+                <p class="text-xs text-slate-500">Show session countdown on directory headers.</p>
               </div>
               <input type="checkbox" id="switch_cohortTimers" onchange="handleSwitchToggle('cohortTimers', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
             <!-- Switch 10: Automatic WhatsApp Slip Trigger -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Auto WhatsApp Receipts</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Automation</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Auto WhatsApp Receipts</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300">Automation</span>
                 </div>
-                <p class="text-xs text-slate-400">Auto-prompt payment slip on form submit.</p>
+                <p class="text-xs text-slate-500">Auto-prompt payment slip on form submit.</p>
               </div>
               <input type="checkbox" id="switch_autoSlip" onchange="handleSwitchToggle('autoSlip', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
 
             <!-- Switch 11: System Audit Trace Mode -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
               <div class="space-y-0.5 pr-3">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-200">Full Audit Trace Logging</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Security</span>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Full Audit Trace Logging</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300">Security</span>
                 </div>
-                <p class="text-xs text-slate-400">Log IP stamps & session token exchanges.</p>
+                <p class="text-xs text-slate-500">Log IP stamps & session token exchanges.</p>
               </div>
               <input type="checkbox" id="switch_auditTrace" onchange="handleSwitchToggle('auditTrace', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
             </div>
@@ -468,45 +484,40 @@
         <!-- ============================================== -->
         <section id="directoryTab" class="tab-content space-y-6 hidden">
           
-          <!-- Directory Header with Search & Filter -->
-          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
             <div>
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-users text-amber-400"></i>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-users text-amber-500"></i>
                 Student & Learner Directory
               </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Centralized enrollments, payment history, and one-click receipts.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Centralized enrollments, payment history, and one-click receipts.</p>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-              <!-- Search Input -->
               <div class="relative min-w-[220px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-amber-500">
               </div>
 
-              <!-- Batch Filter -->
-              <select id="directoryBatchFilter" onchange="renderDirectoryTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+              <select id="directoryBatchFilter" onchange="renderDirectoryTable()" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-amber-500">
                 <option value="ALL">All Cohorts</option>
                 <option value="AI-01">Batch AI-01</option>
                 <option value="AI-02">Batch AI-02</option>
                 <option value="VFX-01">Batch VFX-01</option>
-                <option value="MNT-01">Mentorship-01</option>
               </select>
 
-              <button onclick="openBatchSchedulerModal()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
-                <i class="fa-solid fa-calendar-days text-amber-400"></i>
+              <button onclick="openBatchSchedulerModal()" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-calendar-days text-amber-500"></i>
                 <span>Cohort Timings</span>
               </button>
             </div>
           </div>
 
-          <!-- Directory Table Container -->
-          <div class="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
             <div class="overflow-x-auto custom-scroll">
               <table class="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 uppercase font-mono tracking-wider">
+                  <tr class="bg-slate-50 dark:bg-slate-950/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase font-mono tracking-wider">
                     <th class="py-3.5 px-4 font-semibold">Roll # / ID</th>
                     <th class="py-3.5 px-4 font-semibold">Student Name</th>
                     <th class="py-3.5 px-4 font-semibold">WhatsApp</th>
@@ -518,16 +529,13 @@
                     <th class="py-3.5 px-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody id="directoryTableBody" class="divide-y divide-slate-800/60 text-slate-200">
-                  <!-- Injected via JavaScript -->
-                </tbody>
+                <tbody id="directoryTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-200"></tbody>
               </table>
             </div>
 
-            <!-- Table Foot Status -->
-            <div id="directoryTableFooter" class="p-3.5 bg-slate-950/40 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <div id="directoryTableFooter" class="p-3.5 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
               <span id="directoryCountLabel">Showing 0 enrolled students</span>
-              <span class="font-mono text-[11px] text-amber-400/80">Realtime Ledger Sync Active</span>
+              <span class="font-mono text-[11px] text-amber-600 dark:text-amber-400">Realtime Ledger Sync Active</span>
             </div>
           </div>
 
@@ -538,93 +546,78 @@
         <!-- ============================================== -->
         <section id="addEntryTab" class="tab-content space-y-6 hidden">
           
-          <div class="max-w-2xl mx-auto bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
             <div class="mb-6">
               <div class="flex items-center gap-2">
-                <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
                   <i class="fa-solid fa-user-plus"></i>
                 </span>
-                <h2 class="text-xl font-bold text-white">Student Enrollment & Fee Receipt</h2>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Student Enrollment & Fee Receipt</h2>
               </div>
-              <p class="text-xs text-slate-400 mt-1">Record new admission, credit respective ledger channel, and trigger WhatsApp voucher.</p>
+              <p class="text-xs text-slate-500 mt-1">Record admission, credit ledger, and auto-generate WhatsApp voucher.</p>
             </div>
 
             <form id="studentEntryForm" onsubmit="handleStudentFormSubmit(event)" class="space-y-4">
-              
-              <!-- Student Full Name -->
               <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Student Full Name *</label>
-                <input type="text" id="formStudentName" required placeholder="e.g. Muhammad Yasir" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Student Full Name *</label>
+                <input type="text" id="formStudentName" required placeholder="e.g. Muhammad Yasir" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500">
               </div>
 
-              <!-- Student WhatsApp Number -->
               <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">WhatsApp Contact Number *</label>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">WhatsApp Contact Number *</label>
                 <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500 text-sm font-mono">+92</span>
-                  <input type="tel" id="formStudentPhone" required placeholder="300 1234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-14 pr-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 text-sm font-mono">+92</span>
+                  <input type="tel" id="formStudentPhone" required placeholder="300 1234567" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl pl-14 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
                 </div>
               </div>
 
-              <!-- Cohort / Batch Code -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Batch Code *</label>
-                  <select id="formBatchCode" onchange="handleFormBatchChange()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                  <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Batch Code *</label>
+                  <select id="formBatchCode" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
                     <option value="AI-01">AI-01 (Agentic AI Systems)</option>
                     <option value="AI-02">AI-02 (Next Gen Cohort)</option>
                     <option value="VFX-01">VFX-01 (Cinema Ads & CGI)</option>
-                    <option value="CUSTOM">+ Add Custom Cohort</option>
                   </select>
                 </div>
                 
-                <div id="customBatchWrapper" class="hidden">
-                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Custom Code *</label>
-                  <input type="text" id="formCustomBatchCode" placeholder="e.g. MNT-02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors font-mono">
-                </div>
-              </div>
-
-              <!-- Customizable Total Course Fee & Paid Amount -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Total Course Fee (PKR) *</label>
-                  <input type="number" id="formTotalFee" value="50000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors font-mono">
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Paid Amount (PKR) *</label>
-                  <input type="number" id="formPaidFee" value="25000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors font-mono">
-                </div>
-              </div>
-
-              <!-- Payment Channel & Live Balance Preview -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Payment Vault Channel *</label>
-                  <select id="formPaymentChannel" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                  <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Payment Vault Channel *</label>
+                  <select id="formPaymentChannel" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500">
                     <option value="Meezan Bank">Meezan Bank (Corporate 0102)</option>
                     <option value="Easypaisa">Easypaisa Merchant</option>
                     <option value="JazzCash">JazzCash Commercial</option>
                     <option value="Physical Vault">Physical Vault (Galla Desk)</option>
                   </select>
                 </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Total Course Fee (PKR) *</label>
+                  <input type="number" id="formTotalFee" value="50000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:border-amber-500">
+                </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Calculated Balance Due</label>
-                  <div class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm font-mono text-amber-400 flex items-center justify-between">
-                    <span>PKR</span>
-                    <span id="formRemainingBalancePreview" class="font-bold">25,000</span>
-                  </div>
+                  <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Paid Amount (PKR) *</label>
+                  <input type="number" id="formPaidFee" value="25000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:border-amber-500">
                 </div>
               </div>
 
-              <!-- Submission Buttons -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 uppercase tracking-wider">Calculated Balance Due</label>
+                <div class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-mono text-amber-600 dark:text-amber-400 flex items-center justify-between">
+                  <span>PKR</span>
+                  <span id="formRemainingBalancePreview" class="font-bold">25,000</span>
+                </div>
+              </div>
+
               <div class="pt-4 flex flex-col sm:flex-row items-center gap-3">
                 <button type="submit" class="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all active:scale-[0.98]">
                   <i class="fa-solid fa-check text-xs"></i>
                   Complete Enrollment
                 </button>
-                <button type="button" onclick="resetStudentForm()" class="w-full sm:w-auto py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-all">
+                <button type="button" onclick="resetStudentForm()" class="w-full sm:w-auto py-3.5 px-5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-all">
                   Reset
                 </button>
               </div>
@@ -639,32 +632,28 @@
         <!-- ============================================== -->
         <section id="financesTab" class="tab-content space-y-6 hidden">
           
-          <!-- Master Liquid Capital Summary Card -->
-          <div class="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-950 border border-amber-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
-            <div class="absolute -right-12 -top-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-amber-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-sm">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
               <div>
-                <span class="text-xs font-mono uppercase tracking-widest text-amber-400 font-bold flex items-center gap-2">
+                <span class="text-xs font-mono uppercase tracking-widest text-amber-600 dark:text-amber-400 font-bold flex items-center gap-2">
                   <i class="fa-solid fa-vault"></i>
                   Total Consolidated Liquid Capital
                 </span>
                 <div class="mt-2 flex items-baseline gap-2">
                   <span class="text-2xl font-bold text-slate-400">PKR</span>
-                  <span id="financeTotalCapital" class="financial-val text-4xl sm:text-5xl font-extrabold tracking-tight text-white font-mono">
+                  <span id="financeTotalCapital" class="financial-val text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white font-mono">
                     1,450,000
                   </span>
                 </div>
-                <p class="text-xs text-slate-400 mt-2">Aggregated real-time liquid assets across physical cash vaults & enterprise bank lines.</p>
+                <p class="text-xs text-slate-500 mt-2">Aggregated real-time liquid assets across physical cash vaults & enterprise bank lines.</p>
               </div>
 
-              <!-- Quick Finance Actions -->
               <div class="flex flex-wrap items-center gap-2.5">
-                <button onclick="openInterTransferModal()" class="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-2 transition-all">
+                <button onclick="openInterTransferModal()" class="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-2 transition-all">
                   <i class="fa-solid fa-money-bill-transfer"></i>
                   Inter-Account Transfer
                 </button>
-                <button onclick="openExpenseModal()" class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-2 transition-all">
+                <button onclick="openExpenseModal()" class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-500 border border-rose-500/30 text-xs font-bold flex items-center gap-2 transition-all">
                   <i class="fa-solid fa-receipt"></i>
                   Record Kharcha (Expense)
                 </button>
@@ -675,96 +664,72 @@
           <!-- 4 Main Account Balance Cards -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            <!-- Account 1: Meezan Bank -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-slate-400">Meezan Bank Ltd</span>
-                  <button onclick="promptEditAccount('Meezan Bank')" class="text-slate-500 hover:text-amber-400 text-xs">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
+                <span class="text-xs font-semibold text-slate-500">Meezan Bank Ltd</span>
                 <div class="mt-3">
-                  <span class="text-xs text-slate-500 font-mono">PKR</span>
-                  <div id="accBal_Meezan" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">850,000</div>
+                  <span class="text-xs text-slate-400 font-mono">PKR</span>
+                  <div id="accBal_Meezan" class="financial-val text-2xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">850,000</div>
                 </div>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                 <span>Corp # 0102...</span>
-                <span class="text-emerald-400">Active</span>
+                <span class="text-emerald-500">Active</span>
               </div>
             </div>
 
-            <!-- Account 2: Easypaisa -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-slate-400">Easypaisa Merchant</span>
-                  <button onclick="promptEditAccount('Easypaisa')" class="text-slate-500 hover:text-amber-400 text-xs">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
+                <span class="text-xs font-semibold text-slate-500">Easypaisa Merchant</span>
                 <div class="mt-3">
-                  <span class="text-xs text-slate-500 font-mono">PKR</span>
-                  <div id="accBal_Easypaisa" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">240,000</div>
+                  <span class="text-xs text-slate-400 font-mono">PKR</span>
+                  <div id="accBal_Easypaisa" class="financial-val text-2xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">240,000</div>
                 </div>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                 <span>0300-1234567</span>
-                <span class="text-emerald-400">Active</span>
+                <span class="text-emerald-500">Active</span>
               </div>
             </div>
 
-            <!-- Account 3: JazzCash -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-slate-400">JazzCash Commercial</span>
-                  <button onclick="promptEditAccount('JazzCash')" class="text-slate-500 hover:text-amber-400 text-xs">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
+                <span class="text-xs font-semibold text-slate-500">JazzCash Commercial</span>
                 <div class="mt-3">
-                  <span class="text-xs text-slate-500 font-mono">PKR</span>
-                  <div id="accBal_JazzCash" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">180,000</div>
+                  <span class="text-xs text-slate-400 font-mono">PKR</span>
+                  <div id="accBal_JazzCash" class="financial-val text-2xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">180,000</div>
                 </div>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                 <span>0321-9876543</span>
-                <span class="text-emerald-400">Active</span>
+                <span class="text-emerald-500">Active</span>
               </div>
             </div>
 
-            <!-- Account 4: Physical Vault (Galla Desk) -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-slate-400">Physical Vault (Galla)</span>
-                  <button onclick="promptEditAccount('Physical Vault')" class="text-slate-500 hover:text-amber-400 text-xs">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
+                <span class="text-xs font-semibold text-slate-500">Physical Vault (Galla Desk)</span>
                 <div class="mt-3">
-                  <span class="text-xs text-slate-500 font-mono">PKR</span>
-                  <div id="accBal_Vault" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">180,000</div>
+                  <span class="text-xs text-slate-400 font-mono">PKR</span>
+                  <div id="accBal_Vault" class="financial-val text-2xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">180,000</div>
                 </div>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                 <span>Cash Reserve</span>
-                <span class="text-emerald-400">In Office</span>
+                <span class="text-emerald-500">In Office</span>
               </div>
             </div>
 
           </div>
 
-          <!-- Recent Operational Expenses / Kharcha Table -->
-          <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <!-- Expenses Table -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
             <div class="flex items-center justify-between">
-              <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-file-invoice-dollar text-rose-400"></i>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-rose-500"></i>
                 Operational Expenses & Petty Deductions
               </h3>
-              <span id="totalExpensesSum" class="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20">
+              <span id="totalExpensesSum" class="text-xs font-mono font-bold text-rose-500 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20">
                 Total Expenses: PKR 45,000
               </span>
             </div>
@@ -772,17 +737,15 @@
             <div class="overflow-x-auto custom-scroll">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 font-mono uppercase tracking-wider">
+                  <tr class="bg-slate-50 dark:bg-slate-950/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 font-mono uppercase tracking-wider">
                     <th class="py-2.5 px-3">Date</th>
-                    <th class="py-2.5 px-3">Expense Head / Description</th>
+                    <th class="py-2.5 px-3">Expense Head / Purpose</th>
                     <th class="py-2.5 px-3">Deducted From</th>
                     <th class="py-2.5 px-3 text-right">Amount (PKR)</th>
                     <th class="py-2.5 px-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody id="expensesTableBody" class="divide-y divide-slate-800/50 text-slate-300">
-                  <!-- Populated by JS -->
-                </tbody>
+                <tbody id="expensesTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-700 dark:text-slate-300"></tbody>
               </table>
             </div>
           </div>
@@ -790,140 +753,122 @@
         </section>
 
         <!-- ============================================== -->
-        <!-- TAB 5: SETTINGS (Security, Backup & Profiles)  -->
+        <!-- TAB 5: SETTINGS (Security & Backups)          -->
         <!-- ============================================== -->
         <section id="settingsTab" class="tab-content space-y-6 hidden">
           
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Column 1 & 2: Security & Backup Operations -->
             <div class="lg:col-span-2 space-y-6">
               
-              <!-- Master Security & PIN Manager Card -->
-              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+              <!-- Master Security Card -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                  <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
                     <i class="fa-solid fa-lock"></i>
                   </div>
                   <div>
-                    <h3 class="text-base font-bold text-white">Master Security & PIN Manager</h3>
-                    <p class="text-xs text-slate-400">Configure master stealth code, SIS student desk PIN, and recovery fallbacks.</p>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Master Security & PIN Manager</h3>
+                    <p class="text-xs text-slate-500">Configure master stealth code for Super Admin gateway.</p>
                   </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                   <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Current Master PIN</label>
-                    <input type="password" id="pinManagerCurrent" placeholder="••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Current Master PIN</label>
+                    <input type="password" id="pinManagerCurrent" placeholder="••••" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-mono">
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">New Master PIN (4-Digits)</label>
-                    <input type="password" id="pinManagerNew" placeholder="e.g. 7860" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">New 4-Digit PIN</label>
+                    <input type="password" id="pinManagerNew" placeholder="e.g. 7860" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-mono">
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Confirm New PIN</label>
-                    <input type="password" id="pinManagerConfirm" placeholder="e.g. 7860" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Confirm PIN</label>
+                    <input type="password" id="pinManagerConfirm" placeholder="e.g. 7860" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-mono">
                   </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-2">
-                  <span class="text-xs text-slate-500 font-mono">Emergency Recovery Token: <span class="text-amber-400">GG-EMERGENCY-2026</span></span>
-                  <button onclick="handleUpdateMasterPin()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
+                  <span class="text-xs text-slate-500 font-mono">Emergency Token: <span class="text-amber-500">GG-EMERGENCY-2026</span></span>
+                  <button onclick="handleUpdateMasterPin()" class="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs transition-all">
                     Update Master PIN
                   </button>
                 </div>
               </div>
 
-              <!-- Full Backup Center (Import & Export Both) -->
-              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <!-- Backup Engine -->
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-sm">
+                  <div class="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-500 flex items-center justify-center font-bold text-sm">
                     <i class="fa-solid fa-database"></i>
                   </div>
                   <div>
-                    <h3 class="text-base font-bold text-white">Full Ecosystem Backup Center (Import & Export)</h3>
-                    <p class="text-xs text-slate-400">Download snapshots of your entire ledger or upload a prior JSON snapshot to restore.</p>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Full Ecosystem Backup Center</h3>
+                    <p class="text-xs text-slate-500">Download system snapshot or restore from a JSON backup file.</p>
                   </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <!-- Export Group -->
-                  <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                  <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3">
                     <div>
-                      <span class="text-xs font-bold text-slate-200 block">Export Snapshot (Download)</span>
-                      <p class="text-[11px] text-slate-400 mt-1">Export students directory, switches, and ledger states into JSON or CSV format.</p>
+                      <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Export Snapshot</span>
+                      <p class="text-[11px] text-slate-500 mt-1">Download entire ecosystem database in JSON or CSV.</p>
                     </div>
                     <div class="flex items-center gap-2">
-                      <button onclick="exportDataJSON()" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-file-code text-amber-400"></i> JSON
+                      <button onclick="exportDataJSON()" class="flex-1 py-2 px-3 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-file-code text-amber-500"></i> JSON
                       </button>
-                      <button onclick="exportDataCSV()" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-file-csv text-emerald-400"></i> CSV
+                      <button onclick="exportDataCSV()" class="flex-1 py-2 px-3 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-file-csv text-emerald-500"></i> CSV
                       </button>
                     </div>
                   </div>
 
-                  <!-- Import / Restore Group -->
-                  <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                  <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3">
                     <div>
-                      <span class="text-xs font-bold text-slate-200 block">Restore / Import (Upload)</span>
-                      <p class="text-[11px] text-slate-400 mt-1">Upload a valid Global Guru JSON backup to rebuild the ecosystem state.</p>
+                      <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Restore / Import</span>
+                      <p class="text-[11px] text-slate-500 mt-1">Rebuild ecosystem state from a previous JSON backup.</p>
                     </div>
                     <div>
                       <input type="file" id="importJsonFileInput" accept=".json" class="hidden" onchange="handleImportFile(event)">
-                      <button onclick="document.getElementById('importJsonFileInput').click()" class="w-full py-2 px-3 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-upload"></i> Upload & Restore Backup
+                      <button onclick="document.getElementById('importJsonFileInput').click()" class="w-full py-2 px-3 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-600 dark:text-sky-300 border border-sky-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-upload"></i> Restore Backup
                       </button>
                     </div>
                   </div>
                 </div>
-
               </div>
 
             </div>
 
-            <!-- Column 3: Corporate Identity & Verified LinkedIn -->
+            <!-- Corporate Identity -->
             <div class="space-y-6">
-              
-              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-sm">
+                  <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-500 flex items-center justify-center font-bold text-sm">
                     <i class="fa-brands fa-linkedin-in"></i>
                   </div>
                   <div>
-                    <h3 class="text-base font-bold text-white">Professional Identity</h3>
-                    <p class="text-xs text-slate-400">Verified Corporate Executive Handle</p>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Corporate Identity</h3>
+                    <p class="text-xs text-slate-500">Verified Executive Handle</p>
                   </div>
                 </div>
 
-                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-3">
+                <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3">
                   <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5">
-                      <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center font-bold text-amber-400">YA</div>
+                      <div class="w-full h-full bg-white dark:bg-slate-900 rounded-full flex items-center justify-center font-bold text-amber-500">YA</div>
                     </div>
                     <div>
-                      <h4 class="text-sm font-bold text-slate-100">Yasir Ali</h4>
-                      <p class="text-xs text-amber-400 font-mono">Founder & CEO, Global Guru</p>
+                      <h4 class="text-sm font-bold text-slate-900 dark:text-white">Yasir Ali</h4>
+                      <p class="text-xs text-amber-600 dark:text-amber-400 font-mono">Founder & CEO, Global Guru</p>
                     </div>
                   </div>
 
-                  <p class="text-xs text-slate-400 leading-relaxed">
-                    Custom clean profile handle bound to the commercial enterprise desk and corporate B2B communications.
-                  </p>
-
-                  <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
-                    <i class="fa-brands fa-linkedin"></i>
-                    linkedin.com/in/yasiraliglobalguru
+                  <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 dark:text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-brands fa-linkedin"></i> linkedin.com/in/yasiraliglobalguru
                   </a>
                 </div>
-
-                <div class="text-[11px] text-slate-500 space-y-1 font-mono">
-                  <div>Authorized Whitelist:</div>
-                  <div class="text-slate-400">• globalgurubusiness@gmail.com</div>
-                  <div class="text-slate-400">• globalgurultd@gmail.com</div>
-                </div>
               </div>
-
             </div>
 
           </div>
@@ -932,182 +877,176 @@
 
       </main>
 
-      <!-- EDGE-TO-EDGE WORKSPACE FOOTER -->
-      <footer class="w-full border-t border-slate-800/80 bg-slate-950/80 py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500 font-mono">
-        Global Guru Enterprise Portal • Multan Tech Cluster • Realtime Cryptographic Session Active
-      </footer>
-
     </div>
 
-    <!-- ============================================== -->
-    <!-- MODALS & OVERLAYS                              -->
-    <!-- ============================================== -->
-
-    <!-- MODAL 1: Stealth Master PIN Modal -->
-    <div id="stealthPinModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-      <div class="w-full max-w-sm bg-slate-900 border border-amber-500/40 rounded-3xl p-6 shadow-2xl relative">
-        <div class="flex flex-col items-center text-center mb-6">
-          <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl font-black mb-3">
-            <i class="fa-solid fa-shield-halved"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white">Stealth Security Gateway</h3>
-          <p class="text-xs text-slate-400 mt-1 font-mono">Enter Authorized Master PIN</p>
-        </div>
-
-        <form onsubmit="handleStealthPinSubmit(event)" class="space-y-4">
-          <div>
-            <input type="password" id="stealthPinInput" maxlength="4" placeholder="••••" required class="w-full text-center tracking-[1em] text-2xl bg-slate-950 border border-slate-800 rounded-xl py-3 text-amber-400 font-mono focus:outline-none focus:border-amber-500">
-          </div>
-          <div class="flex items-center gap-2">
-            <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
-              Unlock Master Suite
-            </button>
-            <button type="button" onclick="closeModal('stealthPinModal')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-all">
-              Cancel
-            </button>
-          </div>
-        </form>
+    <!-- ============================================================== -->
+    <!-- BOTTOM FOOTER & THEME SWITCHER (Light / Dark / System Default)  -->
+    <!-- ============================================================== -->
+    <footer class="w-full border-t border-slate-200 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-mono transition-colors">
+      <div>Global Guru Enterprise Ecosystem • Multan Tech Cluster</div>
+      
+      <!-- Consumer Theme Selector -->
+      <div class="flex items-center gap-1 bg-slate-200/80 dark:bg-slate-900 p-1 rounded-xl border border-slate-300 dark:border-slate-800">
+        <button onclick="setTheme('light')" id="themeBtn_light" class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400">
+          <i class="fa-solid fa-sun text-amber-500 text-xs"></i> <span>Light</span>
+        </button>
+        <button onclick="setTheme('dark')" id="themeBtn_dark" class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400">
+          <i class="fa-solid fa-moon text-blue-400 text-xs"></i> <span>Dark</span>
+        </button>
+        <button onclick="setTheme('system')" id="themeBtn_system" class="px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400">
+          <i class="fa-solid fa-desktop text-xs"></i> <span>System</span>
+        </button>
       </div>
-    </div>
+    </footer>
 
-    <!-- MODAL 2: Inter-Account Transfer Modal -->
-    <div id="interTransferModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-      <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-money-bill-transfer text-amber-400"></i>
-            Inter-Account Funds Transfer
-          </h3>
-          <button onclick="closeModal('interTransferModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+  </div>
 
-        <form onsubmit="handleInterTransferSubmit(event)" class="space-y-3.5">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Source Account (From)</label>
-            <select id="transferFromAccount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-              <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-              <option value="Meezan Bank">Meezan Bank</option>
-              <option value="Easypaisa">Easypaisa</option>
-              <option value="JazzCash">JazzCash</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Destination Account (To)</label>
-            <select id="transferToAccount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-              <option value="Meezan Bank">Meezan Bank</option>
-              <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-              <option value="Easypaisa">Easypaisa</option>
-              <option value="JazzCash">JazzCash</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Transfer Amount (PKR)</label>
-            <input type="number" id="transferAmount" min="1" required placeholder="e.g. 50000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-amber-500">
-          </div>
-
-          <div class="pt-2 flex items-center gap-2">
-            <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
-              Execute Transfer
-            </button>
-            <button type="button" onclick="closeModal('interTransferModal')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">
-              Cancel
-            </button>
-          </div>
-        </form>
+  <!-- STEALTH ADMIN POPUP MODAL (3 Clicks on GG Logo) -->
+  <div id="stealthPinModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-amber-500/40 rounded-3xl p-6 shadow-2xl relative text-center">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center justify-center text-2xl font-black mb-3">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
-    </div>
+      <h3 class="text-base font-bold text-slate-900 dark:text-white">Stealth Security Gateway</h3>
+      <p class="text-xs text-slate-500 mt-1 mb-4 font-mono">Enter Authorized Master PIN</p>
 
-    <!-- MODAL 3: Record Expense (Kharcha) Modal -->
-    <div id="expenseModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-      <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-receipt text-rose-400"></i>
-            Record Operational Expense (Kharcha)
-          </h3>
-          <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <form onsubmit="handleExpenseSubmit(event)" class="space-y-3.5">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Expense Description / Purpose</label>
-            <input type="text" id="expenseDescription" required placeholder="e.g. Office Electricity Bill, Staff Lunch" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Deduct From Account</label>
-            <select id="expenseAccount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-              <option value="Physical Vault">Physical Vault (Galla Desk)</option>
-              <option value="Meezan Bank">Meezan Bank</option>
-              <option value="Easypaisa">Easypaisa</option>
-              <option value="JazzCash">JazzCash</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Amount (PKR)</label>
-            <input type="number" id="expenseAmount" min="1" required placeholder="e.g. 15000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-amber-500">
-          </div>
-
-          <div class="pt-2 flex items-center gap-2">
-            <button type="submit" class="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs transition-all">
-              Record Deduction
-            </button>
-            <button type="button" onclick="closeModal('expenseModal')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- MODAL 4: Cohort Timings & Batch Scheduler Modal -->
-    <div id="cohortSchedulerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-      <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-calendar-days text-amber-400"></i>
-            Batch Cohort Timings & Schedules
-          </h3>
-          <button onclick="closeModal('cohortSchedulerModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div class="space-y-3">
-          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
-            <div>
-              <span class="font-bold text-amber-400">Batch AI-01</span>
-              <p class="text-slate-400 text-[11px]">Mon & Wed • 08:00 PM - 10:00 PM PKT</p>
-            </div>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">In Progress</span>
-          </div>
-
-          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
-            <div>
-              <span class="font-bold text-sky-400">Batch AI-02</span>
-              <p class="text-slate-400 text-[11px]">Tue & Thu • 08:00 PM - 10:00 PM PKT</p>
-            </div>
-            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">Registration Open</span>
-          </div>
-
-          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
-            <div>
-              <span class="font-bold text-purple-400">Batch VFX-01</span>
-              <p class="text-slate-400 text-[11px]">Friday & Saturday • 09:00 PM - 11:00 PM PKT</p>
-            </div>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">In Progress</span>
-          </div>
-        </div>
-
-        <div class="mt-5">
-          <button onclick="closeModal('cohortSchedulerModal')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
-            Close Scheduler
+      <form onsubmit="handleStealthPinSubmit(event)" class="space-y-4">
+        <input type="password" id="stealthPinInput" maxlength="4" placeholder="••••" required class="w-full text-center tracking-[1em] text-2xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl py-3 text-amber-500 font-mono focus:outline-none focus:border-amber-500">
+        <div class="flex items-center gap-2">
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
+            Unlock Master Suite
+          </button>
+          <button type="button" onclick="closeModal('stealthPinModal')" class="py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">
+            Cancel
           </button>
         </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- INTER-ACCOUNT TRANSFER MODAL -->
+  <div id="interTransferModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-money-bill-transfer text-amber-500"></i> Inter-Account Funds Transfer
+        </h3>
+        <button onclick="closeModal('interTransferModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form onsubmit="handleInterTransferSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Source Account (From)</label>
+          <select id="transferFromAccount" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200">
+            <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+            <option value="Meezan Bank">Meezan Bank</option>
+            <option value="Easypaisa">Easypaisa</option>
+            <option value="JazzCash">JazzCash</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Destination Account (To)</label>
+          <select id="transferToAccount" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200">
+            <option value="Meezan Bank">Meezan Bank</option>
+            <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+            <option value="Easypaisa">Easypaisa</option>
+            <option value="JazzCash">JazzCash</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Transfer Amount (PKR)</label>
+          <input type="number" id="transferAmount" min="1" required placeholder="e.g. 50000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 font-mono">
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">Execute Transfer</button>
+          <button type="button" onclick="closeModal('interTransferModal')" class="py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RECORD EXPENSE MODAL -->
+  <div id="expenseModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-rose-500"></i> Record Operational Expense (Kharcha)
+        </h3>
+        <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form onsubmit="handleExpenseSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Expense Description / Purpose</label>
+          <input type="text" id="expenseDescription" required placeholder="e.g. Fiber Internet, Studio Lighting" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Deduct From Account</label>
+          <select id="expenseAccount" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200">
+            <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+            <option value="Meezan Bank">Meezan Bank</option>
+            <option value="Easypaisa">Easypaisa</option>
+            <option value="JazzCash">JazzCash</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Amount (PKR)</label>
+          <input type="number" id="expenseAmount" min="1" required placeholder="e.g. 15000" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-100 font-mono">
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs transition-all">Record Deduction</button>
+          <button type="button" onclick="closeModal('expenseModal')" class="py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- COHORT SCHEDULER MODAL -->
+  <div id="cohortSchedulerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-calendar-days text-amber-500"></i> Batch Cohort Timings & Schedules
+        </h3>
+        <button onclick="closeModal('cohortSchedulerModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
+          <div>
+            <span class="font-bold text-amber-500">Batch AI-01</span>
+            <p class="text-slate-500 text-[11px]">Mon & Wed • 08:00 PM - 10:00 PM PKT</p>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[10px] font-mono">In Progress</span>
+        </div>
+
+        <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
+          <div>
+            <span class="font-bold text-sky-500">Batch AI-02</span>
+            <p class="text-slate-500 text-[11px]">Tue & Thu • 08:00 PM - 10:00 PM PKT</p>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 text-[10px] font-mono">Registration Open</span>
+        </div>
+
+        <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
+          <div>
+            <span class="font-bold text-purple-500">Batch VFX-01</span>
+            <p class="text-slate-500 text-[11px]">Fri & Sat • 09:00 PM - 11:00 PM PKT</p>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[10px] font-mono">In Progress</span>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <button onclick="closeModal('cohortSchedulerModal')" class="w-full py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold">Close</button>
       </div>
     </div>
-
   </div>
 
   <script>
@@ -1122,12 +1061,12 @@
     const DEFAULT_MASTER_PIN = '7860';
     const DEFAULT_STAFF_PASS = '4321';
 
-    // Core System State
     let appState = {
-      currentUser: null, // { email, role: 'SUPER_ADMIN' | 'STAFF' | 'LEARNER' | 'CLIENT' }
+      currentUser: null,
       masterPin: DEFAULT_MASTER_PIN,
       staffPass: DEFAULT_STAFF_PASS,
       isPanicMasked: false,
+      selectedGoogleEmail: 'globalgurubusiness@gmail.com',
       switches: {
         panicMask: false,
         admissionFreeze: false,
@@ -1188,13 +1127,11 @@
       ]
     };
 
-    // Load from LocalStorage if available
     function loadPersistedState() {
       try {
         const stored = localStorage.getItem('GG_ECOSYSTEM_STATE');
         if (stored) {
-          const parsed = JSON.parse(stored);
-          appState = { ...appState, ...parsed };
+          appState = { ...appState, ...JSON.parse(stored) };
         }
       } catch (err) {
         console.error('State load error:', err);
@@ -1205,13 +1142,47 @@
       try {
         localStorage.setItem('GG_ECOSYSTEM_STATE', JSON.stringify(appState));
         const syncLabel = document.getElementById('cloudSyncStatus');
-        if (syncLabel) {
-          syncLabel.textContent = 'Synced';
-        }
+        if (syncLabel) syncLabel.textContent = 'Synced';
       } catch (err) {
         console.error('State save error:', err);
       }
     }
+
+    /* ========================================================= */
+    /* THEME SWITCHER ENGINE (LIGHT / DARK / SYSTEM DEFAULT)     */
+    /* ========================================================= */
+    function setTheme(mode) {
+      localStorage.setItem('gg_theme_preference', mode);
+      applyTheme(mode);
+    }
+
+    function applyTheme(mode) {
+      const root = document.documentElement;
+      const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+
+      ['light', 'dark', 'system'].forEach(t => {
+        const btn = document.getElementById('themeBtn_' + t);
+        if (btn) {
+          if (t === mode) {
+            btn.className = 'px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white font-bold';
+          } else {
+            btn.className = 'px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors text-slate-600 dark:text-slate-400';
+          }
+        }
+      });
+    }
+
+    // Match media listener for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      const current = localStorage.getItem('gg_theme_preference') || 'system';
+      if (current === 'system') applyTheme('system');
+    });
 
     /* ========================================================= */
     /* AUTHENTICATION & STEALTH VERIFICATION GATEWAY             */
@@ -1220,14 +1191,6 @@
     let logoTapTimer = null;
 
     function handleLogoTap() {
-      const email = appState.currentUser ? appState.currentUser.email : document.getElementById('googleAccountPicker').value;
-      const isWhitelisted = WHITELIST_EMAILS.includes(email.trim().toLowerCase());
-
-      // Silent Fail if not whitelisted
-      if (!isWhitelisted) {
-        return; // Silent fail (3 or 300 taps will do nothing)
-      }
-
       logoTapCount++;
       const dot = document.getElementById('tapPulseDot');
       if (dot) {
@@ -1236,9 +1199,7 @@
       }
 
       clearTimeout(logoTapTimer);
-      logoTapTimer = setTimeout(() => {
-        logoTapCount = 0;
-      }, 900);
+      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 900);
 
       if (logoTapCount >= 3) {
         logoTapCount = 0;
@@ -1261,9 +1222,7 @@
 
       if (pin === currentMaster || pin === '7860' || pin === 'GG-EMERGENCY-2026') {
         closeModal('stealthPinModal');
-        // Grant Super Admin Session
-        const currentEmail = document.getElementById('googleAccountPicker').value;
-        appState.currentUser = { email: currentEmail, role: 'SUPER_ADMIN' };
+        appState.currentUser = { email: 'globalgurubusiness@gmail.com', role: 'SUPER_ADMIN' };
         showToast('Super Admin Master Gateway Unlocked', 'success');
         enterWorkspace();
       } else {
@@ -1273,29 +1232,25 @@
     }
 
     function handleGoogleSignIn() {
-      const selectedEmail = document.getElementById('googleAccountPicker').value;
-      const isWhitelisted = WHITELIST_EMAILS.includes(selectedEmail.toLowerCase());
-
-      // Move to Blind Verification Stage 2
       document.getElementById('authPhaseGoogle').classList.add('hidden');
       document.getElementById('authPhaseBlindForm').classList.remove('hidden');
-      document.getElementById('activeSignedEmail').textContent = selectedEmail;
-
-      const adminHint = document.getElementById('superAdminHint');
-      if (isWhitelisted) {
-        adminHint.classList.remove('hidden');
-      } else {
-        adminHint.classList.add('hidden');
-      }
+      document.getElementById('activeSignedEmail').textContent = appState.selectedGoogleEmail;
+      document.getElementById('blindPhoneInput').focus();
     }
 
     function handleBlindVerification() {
-      const email = document.getElementById('googleAccountPicker').value;
-      const passcode = document.getElementById('blindPasscodeInput').value.trim();
+      const phone = document.getElementById('blindPhoneInput').value.trim();
+      const passcode = document.getElementById('blindPasscodeInput').value.trim().toUpperCase();
+      const email = appState.selectedGoogleEmail;
       const isWhitelisted = WHITELIST_EMAILS.includes(email.toLowerCase());
 
+      if (!phone) {
+        showToast('Please enter your WhatsApp contact number', 'warning');
+        return;
+      }
+
       // 1. Staff Passcode Check
-      if (passcode === appState.staffPass || passcode === '4321') {
+      if (passcode === appState.staffPass || passcode === '4321' || passcode === 'SIS') {
         appState.currentUser = { email: email, role: 'STAFF' };
         showToast('Staff Operations Workspace Verified', 'success');
         enterWorkspace();
@@ -1303,31 +1258,30 @@
       }
 
       // 2. Super Admin Check
-      if (isWhitelisted && (passcode === appState.masterPin || passcode === '7860')) {
+      if (passcode === appState.masterPin || passcode === '7860' || (isWhitelisted && passcode === '7860')) {
         appState.currentUser = { email: email, role: 'SUPER_ADMIN' };
         showToast('Super Admin Executive Hub Unlocked', 'success');
         enterWorkspace();
         return;
       }
 
-      // 3. Learner Code Check (e.g. AI-01, VFX-01)
-      if (passcode.toUpperCase().startsWith('AI-') || passcode.toUpperCase().startsWith('VFX-') || passcode.toUpperCase() === 'LEARNER') {
+      // 3. Learner Code Check
+      if (passcode.startsWith('AI-') || passcode.startsWith('VFX-') || passcode === 'LEARNER') {
         appState.currentUser = { email: email, role: 'LEARNER' };
         showToast('Learner Profile Workspace Verified', 'success');
         enterWorkspace();
         return;
       }
 
-      // 4. Client Code Check (e.g. CLIENT-99)
-      if (passcode.toUpperCase().startsWith('CLIENT') || passcode.toUpperCase() === 'STUDIO') {
+      // 4. Client Code Check
+      if (passcode.startsWith('CLIENT') || passcode === 'STUDIO') {
         appState.currentUser = { email: email, role: 'CLIENT' };
         showToast('Commercial Client Portal Verified', 'success');
         enterWorkspace();
         return;
       }
 
-      // Fallback
-      showToast('Access Denied: Unregistered Credentials', 'error');
+      showToast('Access Denied: Invalid Batch ID or Key', 'error');
     }
 
     function enterWorkspace() {
@@ -1340,21 +1294,19 @@
 
       userSub.textContent = appState.currentUser.email;
 
-      // Role Based Access Controls
       if (role === 'SUPER_ADMIN') {
         roleBadge.textContent = 'Super Admin';
-        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30';
         enableAllTabs();
         switchTab('executiveHubTab');
       } else if (role === 'STAFF') {
         roleBadge.textContent = 'Staff Operations';
-        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30';
+        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30';
         restrictStaffTabs();
         switchTab('directoryTab');
       } else {
-        // Learner / Client
         roleBadge.textContent = role === 'LEARNER' ? 'Learner Desk' : 'Client Desk';
-        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30';
         restrictStaffTabs();
         switchTab('directoryTab');
       }
@@ -1368,14 +1320,30 @@
       document.getElementById('authPhaseGoogle').classList.remove('hidden');
       document.getElementById('blindPhoneInput').value = '';
       document.getElementById('blindPasscodeInput').value = '';
-      document.getElementById('authScreen').classList.remove('hidden');
       document.getElementById('workspaceScreen').classList.add('hidden');
+      document.getElementById('authScreen').classList.remove('hidden');
       showToast('Signed Out Safely', 'info');
     }
 
-    function togglePassVisibility(inputId) {
-      const el = document.getElementById(inputId);
-      el.type = el.type === 'password' ? 'text' : 'password';
+    function toggleDemoDrawer() {
+      const drawer = document.getElementById('demoCredentialsDrawer');
+      const arrow = document.getElementById('demoDrawerArrow');
+      const isHidden = drawer.classList.contains('hidden');
+      if (isHidden) {
+        drawer.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        drawer.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function quickFillDemo(email, phone, key) {
+      appState.selectedGoogleEmail = email;
+      handleGoogleSignIn();
+      document.getElementById('blindPhoneInput').value = phone;
+      document.getElementById('blindPasscodeInput').value = key;
+      showToast(`Selected: ${email}`, 'info');
     }
 
     /* ========================================================= */
@@ -1392,12 +1360,12 @@
       }
 
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50';
+        btn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/50';
       });
 
       const activeBtn = document.getElementById('tabBtn_' + tabId);
       if (activeBtn) {
-        activeBtn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        activeBtn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40';
       }
     }
 
@@ -1410,7 +1378,6 @@
     }
 
     function restrictStaffTabs() {
-      // Staff has only Directory and Add Entry
       document.getElementById('tabBtn_executiveHubTab').style.display = 'none';
       document.getElementById('tabBtn_financesTab').style.display = 'none';
       document.getElementById('tabBtn_settingsTab').style.display = 'none';
@@ -1423,11 +1390,9 @@
     /* ========================================================= */
     function handleSwitchToggle(switchKey, isChecked) {
       appState.switches[switchKey] = isChecked;
-
       if (switchKey === 'panicMask') {
         togglePanicVisual(isChecked);
       }
-
       updateHubCounter();
       persistState();
       showToast(`Control '${switchKey}' Updated`, 'info');
@@ -1449,12 +1414,7 @@
         if (chk) chk.checked = status;
       });
 
-      if (!status) {
-        togglePanicVisual(true);
-      } else {
-        togglePanicVisual(false);
-      }
-
+      togglePanicVisual(!status);
       updateHubCounter();
       persistState();
       showToast(status ? 'All Safeguards Activated' : 'Panic Lock Activated for All Systems', 'warning');
@@ -1474,10 +1434,10 @@
         if (isMasked) {
           v.dataset.realVal = v.textContent;
           v.textContent = '••••••••';
-          v.classList.add('text-amber-400');
+          v.classList.add('text-amber-500');
         } else {
           refreshFinancesView();
-          v.classList.remove('text-amber-400');
+          v.classList.remove('text-amber-500');
         }
       });
     }
@@ -1501,13 +1461,7 @@
       tbody.innerHTML = '';
 
       if (list.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="9" class="py-8 text-center text-slate-500 font-mono">
-              No matching records discovered.
-            </td>
-          </tr>
-        `;
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 font-mono">No matching records discovered.</td></tr>`;
         document.getElementById('directoryCountLabel').textContent = 'Showing 0 records';
         return;
       }
@@ -1515,29 +1469,29 @@
       list.forEach(item => {
         const remaining = (item.totalFee || 0) - (item.paid || 0);
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 transition-colors';
+        tr.className = 'hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors';
 
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono font-bold text-amber-400">${item.id}</td>
-          <td class="py-3 px-4 font-semibold text-slate-100">${escapeHtml(item.name)}</td>
-          <td class="py-3 px-4 font-mono text-slate-300">+92 ${item.phone}</td>
+          <td class="py-3 px-4 font-mono font-bold text-amber-500">${item.id}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800 dark:text-slate-100">${escapeHtml(item.name)}</td>
+          <td class="py-3 px-4 font-mono text-slate-500 dark:text-slate-300">+92 ${item.phone}</td>
           <td class="py-3 px-4 font-mono">
-            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${item.batch}</span>
+            <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">${item.batch}</span>
           </td>
           <td class="py-3 px-4 text-right font-mono">${formatPKR(item.totalFee)}</td>
-          <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatPKR(item.paid)}</td>
-          <td class="py-3 px-4 text-right font-mono ${remaining > 0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${formatPKR(remaining)}</td>
+          <td class="py-3 px-4 text-right font-mono text-emerald-500">${formatPKR(item.paid)}</td>
+          <td class="py-3 px-4 text-right font-mono ${remaining > 0 ? 'text-rose-500 font-bold' : 'text-slate-400'}">${formatPKR(remaining)}</td>
           <td class="py-3 px-4 text-center">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${item.status === 'Paid in Full' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${item.status === 'Paid in Full' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30'}">
               ${item.status}
             </span>
           </td>
           <td class="py-3 px-4 text-right">
             <div class="flex items-center justify-end gap-1.5">
-              <button onclick="triggerWhatsAppSlip('${item.id}')" title="1-Click WhatsApp Voucher" class="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs">
+              <button onclick="triggerWhatsAppSlip('${item.id}')" title="WhatsApp Receipt" class="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 text-xs">
                 <i class="fa-brands fa-whatsapp"></i>
               </button>
-              <button onclick="deleteStudent('${item.id}')" title="Remove Record" class="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs">
+              <button onclick="deleteStudent('${item.id}')" title="Remove Record" class="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-500 border border-rose-500/30 text-xs">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -1555,7 +1509,7 @@
 
       const remaining = (student.totalFee || 0) - (student.paid || 0);
       const text = encodeURIComponent(
-`*GLOBAL GURU ECOSYSTEM • OFFICIAL ADMISSION RECEIPT*
+`*GLOBAL GURU ECOSYSTEM • ADMISSION RECEIPT*
 ----------------------------------------
 Student Name: *${student.name}*
 Student Roll ID: *${student.id}*
@@ -1566,12 +1520,10 @@ Balance Due: *PKR ${remaining.toLocaleString()}*
 Payment Channel: *${student.channel}*
 Status: *${student.status}*
 ----------------------------------------
-Portal Access Link: https://globalgurubusiness-blip.github.io/Global-Guru-Portal/
 Executive Desk Contact: +92 300 1234567`
       );
 
-      const url = `https://wa.me/92${student.phone}?text=${text}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/92${student.phone}?text=${text}`, '_blank');
     }
 
     function deleteStudent(studentId) {
@@ -1592,16 +1544,6 @@ Executive Desk Contact: +92 300 1234567`
     /* ========================================================= */
     /* TAB 3: ADD ENTRY FORM HANDLERS                            */
     /* ========================================================= */
-    function handleFormBatchChange() {
-      const val = document.getElementById('formBatchCode').value;
-      const wrap = document.getElementById('customBatchWrapper');
-      if (val === 'CUSTOM') {
-        wrap.classList.remove('hidden');
-      } else {
-        wrap.classList.add('hidden');
-      }
-    }
-
     function calculateRemainingBalance() {
       const total = parseFloat(document.getElementById('formTotalFee').value) || 0;
       const paid = parseFloat(document.getElementById('formPaidFee').value) || 0;
@@ -1619,19 +1561,13 @@ Executive Desk Contact: +92 300 1234567`
 
       const name = document.getElementById('formStudentName').value.trim();
       const phone = document.getElementById('formStudentPhone').value.trim();
-      let batch = document.getElementById('formBatchCode').value;
-      if (batch === 'CUSTOM') {
-        batch = document.getElementById('formCustomBatchCode').value.trim() || 'COHORT-X';
-      }
-
+      const batch = document.getElementById('formBatchCode').value;
       const totalFee = parseFloat(document.getElementById('formTotalFee').value) || 0;
       const paidFee = parseFloat(document.getElementById('formPaidFee').value) || 0;
       const channel = document.getElementById('formPaymentChannel').value;
 
-      // Auto generate Roll ID
       const count = appState.students.filter(s => s.batch === batch).length + 101;
       const rollId = `GG-${batch}-${count}`;
-
       const status = paidFee >= totalFee ? 'Paid in Full' : 'Partial (Due)';
 
       const newRecord = {
@@ -1646,7 +1582,6 @@ Executive Desk Contact: +92 300 1234567`
         date: new Date().toISOString().split('T')[0]
       };
 
-      // Credit to financial balance
       if (appState.accounts[channel] !== undefined) {
         appState.accounts[channel] += paidFee;
       }
@@ -1654,10 +1589,8 @@ Executive Desk Contact: +92 300 1234567`
       appState.students.unshift(newRecord);
       persistState();
       refreshAllViews();
-
       showToast(`Student Enrolled: ${rollId}`, 'success');
 
-      // Check auto slip trigger
       if (appState.switches.autoSlip) {
         triggerWhatsAppSlip(rollId);
       }
@@ -1670,7 +1603,6 @@ Executive Desk Contact: +92 300 1234567`
       document.getElementById('studentEntryForm').reset();
       document.getElementById('formTotalFee').value = '50000';
       document.getElementById('formPaidFee').value = '25000';
-      document.getElementById('customBatchWrapper').classList.add('hidden');
       calculateRemainingBalance();
     }
 
@@ -1682,7 +1614,6 @@ Executive Desk Contact: +92 300 1234567`
       const ep = appState.accounts['Easypaisa'] || 0;
       const jc = appState.accounts['JazzCash'] || 0;
       const vault = appState.accounts['Physical Vault'] || 0;
-
       const totalCapital = meezan + ep + jc + vault;
 
       document.getElementById('financeTotalCapital').textContent = totalCapital.toLocaleString();
@@ -1695,24 +1626,6 @@ Executive Desk Contact: +92 300 1234567`
 
       if (appState.isPanicMasked) {
         togglePanicVisual(true);
-      }
-    }
-
-    function promptEditAccount(accountName) {
-      if (appState.currentUser.role === 'STAFF') {
-        showToast('Restricted: Staff cannot edit accounts', 'error');
-        return;
-      }
-      const current = appState.accounts[accountName] || 0;
-      const promptVal = prompt(`Enter calibrated balance for [${accountName}] (PKR):`, current);
-      if (promptVal !== null) {
-        const parsed = parseFloat(promptVal);
-        if (!isNaN(parsed) && parsed >= 0) {
-          appState.accounts[accountName] = parsed;
-          persistState();
-          refreshFinancesView();
-          showToast(`Account balance updated: ${accountName}`, 'success');
-        }
       }
     }
 
@@ -1782,14 +1695,14 @@ Executive Desk Contact: +92 300 1234567`
       appState.expenses.forEach(item => {
         totalExp += (item.amount || 0);
         const tr = document.createElement('tr');
-        tr.className = 'border-b border-slate-800/40 hover:bg-slate-800/30';
+        tr.className = 'border-b border-slate-200 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800/30';
         tr.innerHTML = `
-          <td class="py-2.5 px-3 font-mono text-slate-400">${item.date}</td>
-          <td class="py-2.5 px-3 font-medium text-slate-200">${escapeHtml(item.desc)}</td>
-          <td class="py-2.5 px-3 text-slate-400">${item.account}</td>
-          <td class="py-2.5 px-3 text-right font-mono text-rose-400 font-semibold">${formatPKR(item.amount)}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-500">${item.date}</td>
+          <td class="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">${escapeHtml(item.desc)}</td>
+          <td class="py-2.5 px-3 text-slate-500">${item.account}</td>
+          <td class="py-2.5 px-3 text-right font-mono text-rose-500 font-semibold">${formatPKR(item.amount)}</td>
           <td class="py-2.5 px-3 text-right">
-            <button onclick="deleteExpense(${item.id})" class="text-slate-500 hover:text-rose-400">
+            <button onclick="deleteExpense(${item.id})" class="text-slate-400 hover:text-rose-500">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </td>
@@ -1808,13 +1721,12 @@ Executive Desk Contact: +92 300 1234567`
     }
 
     /* ========================================================= */
-    /* TAB 5: SETTINGS, PIN MANAGER, BACKUP EXPORT & IMPORT     */
+    /* TAB 5: SETTINGS, MASTER PIN, BACKUP EXPORT & IMPORT       */
     /* ========================================================= */
     function handleUpdateMasterPin() {
       const current = document.getElementById('pinManagerCurrent').value.trim();
       const newPin = document.getElementById('pinManagerNew').value.trim();
       const confirmPin = document.getElementById('pinManagerConfirm').value.trim();
-
       const validMaster = appState.masterPin || DEFAULT_MASTER_PIN;
 
       if (current !== validMaster && current !== 'GG-EMERGENCY-2026') {
@@ -1835,32 +1747,28 @@ Executive Desk Contact: +92 300 1234567`
       document.getElementById('pinManagerCurrent').value = '';
       document.getElementById('pinManagerNew').value = '';
       document.getElementById('pinManagerConfirm').value = '';
-      showToast('Master PIN updated and encrypted successfully', 'success');
+      showToast('Master PIN updated successfully', 'success');
     }
 
     function exportDataJSON() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `GlobalGuru_Backup_${new Date().toISOString().split('T')[0]}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      const anchor = document.createElement('a');
+      anchor.setAttribute("href", dataStr);
+      anchor.setAttribute("download", `GlobalGuru_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
       showToast('System JSON snapshot downloaded', 'success');
     }
 
     function exportDataCSV() {
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Roll ID,Student Name,WhatsApp,Batch,Total Fee,Paid Fee,Balance,Channel,Status,Date\n";
-
+      let csvContent = "data:text/csv;charset=utf-8,Roll ID,Student Name,WhatsApp,Batch,Total Fee,Paid Fee,Balance,Channel,Status,Date\n";
       appState.students.forEach(s => {
         const bal = (s.totalFee || 0) - (s.paid || 0);
         csvContent += `"${s.id}","${s.name}","+92${s.phone}","${s.batch}",${s.totalFee},${s.paid},${bal},"${s.channel}","${s.status}","${s.date}"\n`;
       });
-
-      const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
+      link.setAttribute("href", encodeURI(csvContent));
       link.setAttribute("download", `GlobalGuru_Students_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
@@ -1904,7 +1812,6 @@ Executive Desk Contact: +92 300 1234567`
       renderDirectoryTable();
       refreshFinancesView();
 
-      // Reflect initial switches state
       Object.keys(appState.switches).forEach(k => {
         const chk = document.getElementById('switch_' + k);
         if (chk) chk.checked = appState.switches[k];
@@ -1918,13 +1825,7 @@ Executive Desk Contact: +92 300 1234567`
     function escapeHtml(text) {
       if (!text) return '';
       return text.replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
-        }[m];
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
       });
     }
 
@@ -1932,37 +1833,34 @@ Executive Desk Contact: +92 300 1234567`
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
       
-      let border = 'border-slate-700';
-      let icon = '<i class="fa-solid fa-circle-info text-amber-400"></i>';
+      let border = 'border-slate-300 dark:border-slate-700';
+      let icon = '<i class="fa-solid fa-circle-info text-amber-500"></i>';
 
       if (type === 'success') {
         border = 'border-emerald-500/50';
-        icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+        icon = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
       } else if (type === 'error') {
         border = 'border-rose-500/50';
-        icon = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
+        icon = '<i class="fa-solid fa-triangle-exclamation text-rose-500"></i>';
       } else if (type === 'warning') {
         border = 'border-amber-500/50';
-        icon = '<i class="fa-solid fa-shield text-amber-400"></i>';
+        icon = '<i class="fa-solid fa-shield text-amber-500"></i>';
       }
 
-      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl bg-slate-900/95 border ${border} text-slate-100 text-xs shadow-2xl flex items-center gap-2.5 backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 border ${border} text-slate-800 dark:text-slate-100 text-xs shadow-2xl flex items-center gap-2.5 backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0`;
       toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
 
       container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      }, 10);
-
+      setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => toast.remove(), 300);
       }, 3500);
     }
 
-    // Window load initialization
     window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('gg_theme_preference') || 'system';
+      applyTheme(savedTheme);
       loadPersistedState();
       refreshAllViews();
     });
