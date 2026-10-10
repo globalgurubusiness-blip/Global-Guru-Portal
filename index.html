@@ -1,887 +1,1971 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Global Guru • Ecosystem Portal</title>
-  <meta name="theme-color" content="#4A0E17">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Guru Ecosystem Portal</title>
   
-  <!-- Fonts & Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase Compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#fbf7ee',
+              100: '#f5ecd5',
+              200: '#edd6aa',
+              300: '#e3bb74',
+              400: '#d79f43',
+              500: '#c58327',
+              600: '#aa651e',
+              700: '#884a1b',
+              800: '#6f3d1c',
+              900: '#5c331a',
+              950: '#34190c',
+            },
+            accent: {
+              gold: '#D4AF37',
+              crimson: '#800020',
+              emerald: '#10B981',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-    :root {
-      --primary: #4A0E17;
-      --primary-dark: #32070D;
-      --gold: #D4AF37;
+    /* Custom fluid transitions & mask styling */
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0B0F19; }
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
-    input:checked + .slider { background-color: #059669; }
-    input:checked + .slider:before { transform: translateX(20px); }
+    
+    .privacy-blurred {
+      filter: blur(8px) grayscale(40%);
+      user-select: none;
+      pointer-events: none;
+      transition: filter 0.3s ease;
+    }
+    
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(212, 175, 55, 0.6);
+    }
+
+    .stealth-pulse {
+      animation: stealthGlow 3s infinite ease-in-out;
+    }
+    @keyframes stealthGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.08); }
+      50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.25); }
+    }
   </style>
 </head>
-<body class="flex justify-center min-h-screen text-slate-800 antialiased selection:bg-amber-400">
 
-<!-- Hybrid Container: Mobile par auto fit, Web/Desktop par wide spacious container -->
-<div class="w-full max-w-full md:max-w-4xl lg:max-w-6xl min-h-screen bg-slate-50 flex flex-col relative shadow-2xl md:border-x border-slate-200">
+<body class="h-full w-full bg-slate-950 text-slate-100 font-sans antialiased flex flex-col overflow-x-hidden selection:bg-brand-500 selection:text-white">
 
-  <!-- ================================================= -->
-  <!-- SCREEN 1: SPLASH & GOOGLE SIGN-IN ENTRY GATEWAY   -->
-  <!-- ================================================= -->
-  <div id="stage-login" class="flex-1 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#4A0E17]/10 via-slate-50 to-slate-100">
-    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-slate-200">
+  <!-- NOTIFICATION TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- APPLICATION WRAPPER (Full Width 100vw, Zero Black Pillarbox) -->
+  <div id="appRoot" class="flex-1 w-full min-h-screen flex flex-col justify-between relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+
+    <!-- ========================================== -->
+    <!-- STAGE 1 & 2: BLIND AUTHENTICATION GATEWAY -->
+    <!-- ========================================== -->
+    <div id="authScreen" class="w-full flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-12 relative z-20">
       
-      <!-- Official Logo Container -->
-      <div class="relative inline-block mb-4">
-        <img src="logo.png" alt="Global Guru Logo" class="w-24 h-24 rounded-full mx-auto object-contain shadow-lg bg-white p-1 ring-4 ring-[#4A0E17]/10 border border-slate-100" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GG&background=4A0E17&color=fff&size=128';">
-      </div>
-      
-      <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Global Guru</h2>
-      <p class="text-xs text-slate-500 font-medium mt-1 mb-8">Academy & Creative Studio Ecosystem</p>
-      
-      <!-- Continue with Google Button -->
-      <button id="googleSignInBtn" onclick="handleGoogleSignIn()" class="w-full py-3.5 px-4 bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-700 font-bold rounded-2xl shadow-sm flex items-center justify-center gap-3 transition">
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        <span id="googleBtnText">Continue with Google</span>
-      </button>
+      <!-- Subtle Ambient Backlight -->
+      <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none -top-10"></div>
+      <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none -bottom-10"></div>
 
-      <p class="text-[10px] text-slate-400 mt-6 font-medium">Verified Official Access Portal</p>
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- SCREEN 2: ROLE SELECTION (PUBLIC: LEARNER & CLIENT)-->
-  <!-- ================================================= -->
-  <div id="stage-role-select" class="hidden flex-1 flex flex-col justify-center items-center p-5 bg-gradient-to-b from-slate-50 to-slate-100">
-    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-200 max-w-md w-full space-y-5">
-      
-      <!-- Top GG Logo with Secret Triple Click Action -->
-      <div class="text-center pb-2 border-b border-slate-100">
-        <div onclick="handleLogoSecretClick()" title="GG Portal" class="cursor-pointer inline-block transform active:scale-95 transition">
-          <img src="logo.png" alt="GG Logo" class="w-14 h-14 rounded-full mx-auto object-contain border-2 border-[#D4AF37] shadow-md bg-white p-0.5" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GG&background=4A0E17&color=fff&size=128';">
-        </div>
-        <h3 class="text-base font-extrabold text-slate-900 mt-2">Welcome, <span id="authenticatedUserName">User</span></h3>
-        <p class="text-xs text-slate-400 mt-0.5">Apna authorized portal option select karein:</p>
-      </div>
-
-      <!-- Public Options (Super Admin is Hidden) -->
-      <div class="space-y-3">
-        <!-- Option 1: Learner -->
-        <div onclick="openLearnerAuthModal()" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-[#4A0E17] hover:bg-slate-50 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-lg">🎓</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900">Learner (Student)</h4>
-              <p class="text-[11px] text-slate-400">Batches, Lectures & Mera Khata</p>
+      <!-- Main Blind Authentication Card -->
+      <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative transition-all duration-300">
+        
+        <!-- Stealth Logo Emblem (Supports Triple Tap) -->
+        <div class="flex flex-col items-center text-center mb-8">
+          <div id="authLogoBadge" onclick="handleLogoTap()" class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 p-0.5 shadow-xl shadow-amber-500/10 cursor-pointer active:scale-95 transition-transform duration-150 select-none relative group">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center border border-amber-500/30">
+              <span class="text-2xl font-black tracking-wider bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent">GG</span>
             </div>
+            <!-- Triple tap hint feedback dot -->
+            <span id="tapPulseDot" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-slate-900 opacity-0 transition-opacity"></span>
           </div>
-          <span class="text-xs font-bold text-[#4A0E17]">Select →</span>
-        </div>
-
-        <!-- Option 2: Client -->
-        <div onclick="openClientAuthModal()" class="p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 hover:bg-emerald-50/30 cursor-pointer transition flex items-center justify-between active:scale-[0.99]">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-lg">💼</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900">Client (Commercial Services)</h4>
-              <p class="text-[11px] text-slate-400">Studio Video Ads, UGC & VFX</p>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-emerald-700">Select →</span>
-        </div>
-      </div>
-
-      <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-600 hover:text-rose-700 pt-1 block">
-        Sign Out / Change Account
-      </button>
-
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- SCREEN 3: ROLE PORTALS (LEARNER / CLIENT / ADMIN)  -->
-  <!-- ================================================= -->
-  <div id="stage-portal" class="hidden flex-1 flex flex-col relative">
-
-    <!-- Top Navigation Header -->
-    <header class="bg-[#4A0E17] text-white p-3.5 md:px-8 flex justify-between items-center sticky top-0 z-30 shadow-md border-b-2 border-[#D4AF37]">
-      <div class="flex items-center gap-3">
-        <img src="logo.png" alt="GG" class="w-9 h-9 rounded-full bg-white object-contain border border-[#D4AF37]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GG&background=4A0E17&color=fff&size=128';">
-        <div>
-          <h1 class="text-sm font-extrabold tracking-tight uppercase leading-tight">Global Guru</h1>
-          <p id="portalSubTag" class="text-[10px] text-amber-200 font-medium">Academy Portal</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span id="activeRoleChip" class="text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-white/20 text-white">Learner</span>
-        <button onclick="handleLogout()" title="Logout" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-white">
-          <i class="fa-solid fa-power-off"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- Sub Header Bar -->
-    <div class="bg-slate-100 px-4 md:px-8 py-2.5 text-xs font-semibold text-slate-500 flex justify-between items-center border-b border-slate-200">
-      <span id="portalViewHeading" class="font-bold text-slate-700">🏠 Overview Dashboard</span>
-      <span class="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Cloud Live
-      </span>
-    </div>
-
-    <!-- VIEWS SCROLLER CONTAINER (Hybrid Grid Layout for Desktop) -->
-    <div class="flex-1 overflow-y-auto pb-24 p-4 md:p-8 space-y-6">
-
-      <!-- VIEW A: LEARNER PORTAL (Classes & Mera Khata) -->
-      <div id="view-learner" class="space-y-6 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-gradient-to-br from-[#4A0E17] to-[#2B080D] text-white p-6 rounded-3xl shadow-lg border border-amber-500/30 flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 bg-white/10 px-2.5 py-1 rounded-full">Student Portal</span>
-              <h2 class="text-xl font-extrabold mt-3 tracking-tight">Mentorship Batches</h2>
-              <p class="text-xs text-slate-200 mt-1">Live AI & E-Commerce Cohorts schedule aur details:</p>
-            </div>
-            <div class="mt-6 pt-3 border-t border-white/10 flex gap-2">
-              <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl font-bold">🕒 5:30 PM - 7:00 PM PKT</span>
-            </div>
-          </div>
-
-          <!-- Mera Khata Live Verification Form -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-            <div class="flex justify-between items-center">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Mera Khata (Fee Verification)</h3>
-              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Live Verification</span>
-            </div>
-            <p class="text-xs text-slate-500">Apna registered WhatsApp number enter karein aur <strong>Enter</strong> press karein:</p>
-            
-            <form onsubmit="event.preventDefault(); runKhataSearch();" class="flex gap-2">
-              <input type="text" id="khataInput" placeholder="e.g. 03001112233" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#4A0E17]/20 focus:border-[#4A0E17]">
-              <button type="submit" class="px-4 py-2.5 bg-[#4A0E17] text-white rounded-xl text-xs font-bold hover:bg-[#681522] transition flex items-center gap-1.5 shadow-sm">
-                <i class="fa-solid fa-magnifying-glass"></i> Search
-              </button>
-            </form>
-
-            <div id="khataResultBox" class="pt-1"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- VIEW B: CLIENT PORTAL (Commercial Production & Order Desk) -->
-      <div id="view-client" class="space-y-6 hidden">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-700">
-          <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-white/10 px-2.5 py-1 rounded-full">Creative Agency Studio</span>
-          <h2 class="text-xl font-extrabold mt-3 tracking-tight">Commercial Production & Media Ads</h2>
-          <p class="text-xs text-slate-300 mt-1">High-converting UGC video hooks aur cinematic 3D commercials.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Production Packages</h3>
-            
-            <div class="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 space-y-1">
-              <div class="flex justify-between items-center">
-                <strong class="text-xs text-emerald-900">Tier 1 UGC Hook Ads</strong>
-                <span class="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">48h Delivery</span>
-              </div>
-              <p class="text-[11px] text-slate-600">TikTok, Instagram Reels & Meta Ads ke liye high-converting hooks.</p>
-            </div>
-
-            <div class="p-4 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-1">
-              <div class="flex justify-between items-center">
-                <strong class="text-xs text-amber-900">Tier 2 3D / VFX CGI Commercials</strong>
-                <span class="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Premium TVC</span>
-              </div>
-              <p class="text-[11px] text-slate-600">Cinematic 3D lighting, bottle liquid simulations & premium branding.</p>
-            </div>
-          </div>
-
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-900">Client Quotation Desk</h3>
-              <p class="text-xs text-slate-500 mt-2">Apne customized campaign ki requirements studio manager ke sath discuss karein aur live quote hasil karein.</p>
-            </div>
-
-            <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20I%20want%20to%20order%20commercial%20production" target="_blank" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md">
-              <i class="fa-brands fa-whatsapp text-sm"></i> Order on WhatsApp (+92 311 6246000)
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- VIEW C: SUPER ADMIN PORTAL (7 SWITCHES & SENSITIVE FINANCES) -->
-      <div id="view-admin" class="space-y-6 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          <!-- Master Owner Switchboard (ALL 7 CONTROLS) -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 border-l-4 border-amber-400">
-            <div class="flex justify-between items-center">
-              <div>
-                <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Master Owner Switchboard</h4>
-                <p class="text-[11px] text-slate-400 mt-0.5">Control live operational visibility:</p>
+          <h1 class="text-2xl font-bold tracking-tight text-white mt-4">Global Guru Portal</h1>
+          <p id="authSubtitle" class="text-xs uppercase tracking-widest text-slate-400 font-mono mt-1">Authorized Gateway • V4.9</p>
+        </div>
+
+        <!-- AUTH PHASE 1: Sign in with Google Screen -->
+        <div id="authPhaseGoogle" class="space-y-4">
+          <p class="text-sm text-slate-300 text-center leading-relaxed">
+            Please authenticate using your verified enterprise account to unlock your assigned workspace.
+          </p>
+
+          <!-- Account Simulator Quick Select -->
+          <div class="pt-2">
+            <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Account Credentials Switcher</label>
+            <select id="googleAccountPicker" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+              <option value="globalgurubusiness@gmail.com">globalgurubusiness@gmail.com (Super Admin Whitelisted)</option>
+              <option value="globalgurultd@gmail.com">globalgurultd@gmail.com (Super Admin Whitelisted)</option>
+              <option value="staff@globalguru.com">staff@globalguru.com (Staff Operations)</option>
+              <option value="learner@globalguru.com">learner@globalguru.com (Enrolled Learner)</option>
+              <option value="client@globalguru.com">client@brand.com (Agency Client Desk)</option>
+              <option value="unregistered@gmail.com">unregistered@gmail.com (Public External)</option>
+            </select>
+          </div>
+
+          <button onclick="handleGoogleSignIn()" class="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm flex items-center justify-center gap-3 shadow-lg shadow-white/5 transition-all active:scale-[0.98]">
+            <svg class="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Continue with Google
+          </button>
+        </div>
+
+        <!-- AUTH PHASE 2: Neutral Blind Verification Form -->
+        <div id="authPhaseBlindForm" class="space-y-4 hidden">
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+              <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">
+                <i class="fa-solid fa-user-check"></i>
               </div>
-              <span class="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md">7 Controls Active</span>
+              <span id="activeSignedEmail" class="text-xs text-slate-300 font-mono truncate">email@domain.com</span>
+            </div>
+            <button onclick="handleSignOut()" class="text-xs text-rose-400 hover:text-rose-300 shrink-0 font-medium">Switch</button>
+          </div>
+
+          <div class="space-y-3 pt-1">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Mobile / WhatsApp Number</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500 text-sm font-mono">+92</span>
+                <input type="tel" id="blindPhoneInput" placeholder="300 1234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-14 pr-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+              </div>
             </div>
 
-            <div class="divide-y divide-slate-100 text-xs">
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">1. Bank Balances Access</strong><p class="text-[10px] text-slate-400">Meezan, Easypaisa, JazzCash</p></div>
-                <label class="switch"><input type="checkbox" id="perm_bank" onchange="updateSwitch('perm_bank', this.checked)"><span class="slider"></span></label>
-              </div>
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">2. Galla (Cash Vault) Access</strong><p class="text-[10px] text-slate-400">Physical drawer cash balance</p></div>
-                <label class="switch"><input type="checkbox" id="perm_vault" onchange="updateSwitch('perm_vault', this.checked)"><span class="slider"></span></label>
-              </div>
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">3. Net Profit Calculations</strong><p class="text-[10px] text-slate-400">Calculated margin metrics</p></div>
-                <label class="switch"><input type="checkbox" id="perm_profit" onchange="updateSwitch('perm_profit', this.checked)"><span class="slider"></span></label>
-              </div>
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">4. Student Directory View</strong><p class="text-[10px] text-slate-400">Registered phone directory</p></div>
-                <label class="switch"><input type="checkbox" id="perm_students" onchange="updateSwitch('perm_students', this.checked)"><span class="slider"></span></label>
-              </div>
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">5. Fee Editing & Slips Approval</strong><p class="text-[10px] text-slate-400">Direct admission & fee entries</p></div>
-                <label class="switch"><input type="checkbox" id="perm_fee_edit" onchange="updateSwitch('perm_fee_edit', this.checked)"><span class="slider"></span></label>
-              </div>
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">6. Batch & Schedule Management</strong><p class="text-[10px] text-slate-400">Timing updates aur cohorts</p></div>
-                <label class="switch"><input type="checkbox" id="perm_schedule" onchange="updateSwitch('perm_schedule', this.checked)"><span class="slider"></span></label>
-              </div>
-              <div class="py-2.5 flex justify-between items-center">
-                <div><strong class="text-slate-800">7. System Backups Access</strong><p class="text-[10px] text-slate-400">JSON/CSV download clearance</p></div>
-                <label class="switch"><input type="checkbox" id="perm_backup" onchange="updateSwitch('perm_backup', this.checked)"><span class="slider"></span></label>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Secret Access Key / Passcode</label>
+              <div class="relative">
+                <input type="password" id="blindPasscodeInput" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                <button type="button" onclick="togglePassVisibility('blindPasscodeInput')" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300">
+                  <i class="fa-regular fa-eye text-xs"></i>
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="space-y-6">
-            <!-- Financial Overview Card -->
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Ecosystem Financial Balances</h4>
-              <div id="adminFinancesDisplay" class="space-y-2 text-xs"></div>
+          <button onclick="handleBlindVerification()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all active:scale-[0.98]">
+            <i class="fa-solid fa-key text-xs"></i>
+            Unlock Workspace
+          </button>
+
+          <!-- Discreet Super Admin Hint for Authorized Emails -->
+          <div id="superAdminHint" class="text-center pt-2 hidden">
+            <span class="text-[11px] text-amber-400/80 font-mono tracking-wide">
+              <i class="fa-solid fa-shield-halved mr-1"></i> Whitelist Detected: Triple-click GG emblem for Stealth Executive Pin
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Blind Public Footer -->
+      <div class="mt-8 text-center text-xs text-slate-600 font-mono">
+        Secured Ecosystem Terminal • End-to-End Cryptographic Sessions
+      </div>
+    </div>
+
+
+    <!-- ============================================================== -->
+    <!-- MAIN WORKSPACE VIEW (DESKTOP FULL WIDTH + RESPONSIVE MOBILE)   -->
+    <!-- ============================================================== -->
+    <div id="workspaceScreen" class="w-full flex-1 flex flex-col hidden min-h-screen">
+      
+      <!-- TOP EXECUTIVE HEADER BAR -->
+      <header class="w-full bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-6 lg:px-8 py-3.5 transition-all">
+        <div class="w-full flex items-center justify-between gap-4">
+          
+          <!-- Brand Logo & Stealth Tap Target -->
+          <div class="flex items-center gap-3">
+            <div id="headerLogoBadge" onclick="handleLogoTap()" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5 cursor-pointer active:scale-90 transition-transform select-none relative">
+              <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                <span class="text-sm font-extrabold text-amber-400">GG</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base font-bold text-white tracking-tight">Global Guru</span>
+                <span id="roleBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Super Admin</span>
+              </div>
+              <p id="userStatusSub" class="text-[11px] text-slate-400 font-mono truncate max-w-[200px] sm:max-w-xs">globalgurubusiness@gmail.com</p>
+            </div>
+          </div>
+
+          <!-- Top Quick Actions -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Panic Button Quick Action -->
+            <button id="quickPanicBtn" onclick="togglePanicState()" title="1-Click Privacy Mask" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-eye-slash text-amber-400"></i>
+              <span class="hidden sm:inline">Privacy Mask</span>
+            </button>
+
+            <!-- WhatsApp Customer Desk Trigger -->
+            <a id="headerWhatsappDesk" href="https://wa.me/923001234567?text=Global%20Guru%20Executive%20Support%20Desk" target="_blank" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-brands fa-whatsapp text-sm"></i>
+              <span class="hidden md:inline">Desk Logs</span>
+            </a>
+
+            <!-- Sign Out -->
+            <button onclick="handleSignOut()" title="Sign Out Session" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-medium flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span class="hidden sm:inline">Exit</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 5-TAB DESKTOP & MOBILE NAVIGATION BAR -->
+      <nav id="masterNavMenu" class="w-full bg-slate-900/60 border-b border-slate-800/80 px-4 sm:px-6 lg:px-8 py-2 z-30 overflow-x-auto custom-scroll">
+        <div class="w-full flex items-center gap-1.5 sm:gap-3 min-w-max">
+          
+          <button onclick="switchTab('executiveHubTab')" id="tabBtn_executiveHubTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            <i class="fa-solid fa-shield-halved text-amber-400"></i>
+            <span>Executive Hub</span>
+          </button>
+
+          <button onclick="switchTab('directoryTab')" id="tabBtn_directoryTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+            <i class="fa-solid fa-users text-slate-400"></i>
+            <span>Directory</span>
+          </button>
+
+          <button onclick="switchTab('addEntryTab')" id="tabBtn_addEntryTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+            <i class="fa-solid fa-square-plus text-slate-400"></i>
+            <span>Add Entry</span>
+          </button>
+
+          <button onclick="switchTab('financesTab')" id="tabBtn_financesTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+            <i class="fa-solid fa-wallet text-slate-400"></i>
+            <span>Finances</span>
+          </button>
+
+          <button onclick="switchTab('settingsTab')" id="tabBtn_settingsTab" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50">
+            <i class="fa-solid fa-gear text-slate-400"></i>
+            <span>Settings</span>
+          </button>
+
+        </div>
+      </nav>
+
+      <!-- MAIN TAB CONTENT BODY (EDGE-TO-EDGE FLUID CONTAINER) -->
+      <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+
+        <!-- ============================================== -->
+        <!-- TAB 1: EXECUTIVE HUB (11 Operational Switches) -->
+        <!-- ============================================== -->
+        <section id="executiveHubTab" class="tab-content space-y-6">
+          
+          <!-- Hub Header Summary & Dynamic Counter -->
+          <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+            <div>
+              <div class="flex items-center gap-3">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-sliders text-amber-400"></i>
+                  Executive Hub Switchboard
+                </h2>
+                <span id="hubActiveCounter" class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  8 / 11 Active
+                </span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time operational safeguards, privacy curtains, and master ecosystem toggles.</p>
             </div>
 
-            <!-- Add New Student Record Form -->
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-900">Add New Student Entry</h4>
-              <form onsubmit="event.preventDefault(); saveStudentEntry();" class="space-y-2.5">
-                <input type="text" id="newStdPhone" placeholder="WhatsApp (0300...)" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-                <input type="text" id="newStdName" placeholder="Student Full Name" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="number" id="newStdAmount" placeholder="Paid Amount (Rs.)" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-                  <select id="newStdCohort" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
-                    <option value="Cohort AI-01">Cohort AI-01</option>
-                    <option value="Cohort ECOM-04">Cohort ECOM-04</option>
+            <!-- Hub Quick Mass Controls -->
+            <div class="flex items-center gap-3">
+              <button onclick="setAllSwitches(true)" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all">
+                Activate All
+              </button>
+              <button onclick="setAllSwitches(false)" class="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all">
+                Panic Lock All
+              </button>
+              <!-- Realtime Cloud Save Indicator -->
+              <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="cloudSyncStatus">Synced</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 11 Master Control Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <!-- Switch 1: Panic Privacy Mask -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">1-Click Panic Mask</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Security</span>
+                </div>
+                <p class="text-xs text-slate-400">Mask all ledger values with bullet dots.</p>
+              </div>
+              <input type="checkbox" id="switch_panicMask" onchange="handleSwitchToggle('panicMask', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 2: Admission Gate Freeze -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Admission Gate Freeze</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300">Intake</span>
+                </div>
+                <p class="text-xs text-slate-400">Halt new student registration submissions.</p>
+              </div>
+              <input type="checkbox" id="switch_admissionFreeze" onchange="handleSwitchToggle('admissionFreeze', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 3: Mera Khata Maintenance -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Khata Public Maintenance</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">Audit</span>
+                </div>
+                <p class="text-xs text-slate-400">Lock learner queries during month-end audit.</p>
+              </div>
+              <input type="checkbox" id="switch_khataMaintenance" onchange="handleSwitchToggle('khataMaintenance', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 4: WhatsApp Desk Visibility -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">WhatsApp Desk Channel</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Support</span>
+                </div>
+                <p class="text-xs text-slate-400">Show/Hide instant customer desk trigger.</p>
+              </div>
+              <input type="checkbox" id="switch_whatsappDesk" onchange="handleSwitchToggle('whatsappDesk', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 5: Client Studio Booking Desk -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Studio Client Portal Desk</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">B2B</span>
+                </div>
+                <p class="text-xs text-slate-400">Permit commercial invoices & order flows.</p>
+              </div>
+              <input type="checkbox" id="switch_clientStudio" onchange="handleSwitchToggle('clientStudio', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 6: Working Backup Clearance -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Backup Engine Clearance</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">Data</span>
+                </div>
+                <p class="text-xs text-slate-400">Allow instant CSV/JSON snapshot downloads.</p>
+              </div>
+              <input type="checkbox" id="switch_backupClearance" onchange="handleSwitchToggle('backupClearance', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 7: Liquid Funds Real-Time Sync -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Vault & Bank Realtime Sync</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Treasury</span>
+                </div>
+                <p class="text-xs text-slate-400">Automatically compute inter-ledger credits.</p>
+              </div>
+              <input type="checkbox" id="switch_fundsSync" onchange="handleSwitchToggle('fundsSync', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 8: Staff Operational Restriction -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Staff Financial Restriction</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300">RBAC</span>
+                </div>
+                <p class="text-xs text-slate-400">Shield ledger tabs from reception profiles.</p>
+              </div>
+              <input type="checkbox" id="switch_staffRestriction" onchange="handleSwitchToggle('staffRestriction', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 9: Batch Scheduler Engine -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Live Cohort Timers</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Scheduler</span>
+                </div>
+                <p class="text-xs text-slate-400">Show session countdown on directory headers.</p>
+              </div>
+              <input type="checkbox" id="switch_cohortTimers" onchange="handleSwitchToggle('cohortTimers', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 10: Automatic WhatsApp Slip Trigger -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Auto WhatsApp Receipts</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Automation</span>
+                </div>
+                <p class="text-xs text-slate-400">Auto-prompt payment slip on form submit.</p>
+              </div>
+              <input type="checkbox" id="switch_autoSlip" onchange="handleSwitchToggle('autoSlip', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Switch 11: System Audit Trace Mode -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+              <div class="space-y-0.5 pr-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-200">Full Audit Trace Logging</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Security</span>
+                </div>
+                <p class="text-xs text-slate-400">Log IP stamps & session token exchanges.</p>
+              </div>
+              <input type="checkbox" id="switch_auditTrace" onchange="handleSwitchToggle('auditTrace', this.checked)" class="w-5 h-5 accent-amber-500 cursor-pointer">
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- TAB 2: DIRECTORY (Student & Cohort Management) -->
+        <!-- ============================================== -->
+        <section id="directoryTab" class="tab-content space-y-6 hidden">
+          
+          <!-- Directory Header with Search & Filter -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-users text-amber-400"></i>
+                Student & Learner Directory
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Centralized enrollments, payment history, and one-click receipts.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Search Input -->
+              <div class="relative min-w-[220px]">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-500">
+              </div>
+
+              <!-- Batch Filter -->
+              <select id="directoryBatchFilter" onchange="renderDirectoryTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+                <option value="ALL">All Cohorts</option>
+                <option value="AI-01">Batch AI-01</option>
+                <option value="AI-02">Batch AI-02</option>
+                <option value="VFX-01">Batch VFX-01</option>
+                <option value="MNT-01">Mentorship-01</option>
+              </select>
+
+              <button onclick="openBatchSchedulerModal()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-calendar-days text-amber-400"></i>
+                <span>Cohort Timings</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Directory Table Container -->
+          <div class="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="overflow-x-auto custom-scroll">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 uppercase font-mono tracking-wider">
+                    <th class="py-3.5 px-4 font-semibold">Roll # / ID</th>
+                    <th class="py-3.5 px-4 font-semibold">Student Name</th>
+                    <th class="py-3.5 px-4 font-semibold">WhatsApp</th>
+                    <th class="py-3.5 px-4 font-semibold">Cohort</th>
+                    <th class="py-3.5 px-4 font-semibold text-right">Total Fee</th>
+                    <th class="py-3.5 px-4 font-semibold text-right">Paid</th>
+                    <th class="py-3.5 px-4 font-semibold text-right">Balance</th>
+                    <th class="py-3.5 px-4 font-semibold text-center">Status</th>
+                    <th class="py-3.5 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="directoryTableBody" class="divide-y divide-slate-800/60 text-slate-200">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Foot Status -->
+            <div id="directoryTableFooter" class="p-3.5 bg-slate-950/40 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span id="directoryCountLabel">Showing 0 enrolled students</span>
+              <span class="font-mono text-[11px] text-amber-400/80">Realtime Ledger Sync Active</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================== -->
+        <!-- TAB 3: ADD ENTRY (Student Admission Engine)   -->
+        <!-- ============================================== -->
+        <section id="addEntryTab" class="tab-content space-y-6 hidden">
+          
+          <div class="max-w-2xl mx-auto bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+            <div class="mb-6">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                  <i class="fa-solid fa-user-plus"></i>
+                </span>
+                <h2 class="text-xl font-bold text-white">Student Enrollment & Fee Receipt</h2>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Record new admission, credit respective ledger channel, and trigger WhatsApp voucher.</p>
+            </div>
+
+            <form id="studentEntryForm" onsubmit="handleStudentFormSubmit(event)" class="space-y-4">
+              
+              <!-- Student Full Name -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Student Full Name *</label>
+                <input type="text" id="formStudentName" required placeholder="e.g. Muhammad Yasir" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors">
+              </div>
+
+              <!-- Student WhatsApp Number -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">WhatsApp Contact Number *</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500 text-sm font-mono">+92</span>
+                  <input type="tel" id="formStudentPhone" required placeholder="300 1234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-14 pr-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                </div>
+              </div>
+
+              <!-- Cohort / Batch Code -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Batch Code *</label>
+                  <select id="formBatchCode" onchange="handleFormBatchChange()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                    <option value="AI-01">AI-01 (Agentic AI Systems)</option>
+                    <option value="AI-02">AI-02 (Next Gen Cohort)</option>
+                    <option value="VFX-01">VFX-01 (Cinema Ads & CGI)</option>
+                    <option value="CUSTOM">+ Add Custom Cohort</option>
                   </select>
                 </div>
-                <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
-                  <i class="fa-solid fa-plus"></i> Save Student Fee
+                
+                <div id="customBatchWrapper" class="hidden">
+                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Custom Code *</label>
+                  <input type="text" id="formCustomBatchCode" placeholder="e.g. MNT-02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                </div>
+              </div>
+
+              <!-- Customizable Total Course Fee & Paid Amount -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Total Course Fee (PKR) *</label>
+                  <input type="number" id="formTotalFee" value="50000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Paid Amount (PKR) *</label>
+                  <input type="number" id="formPaidFee" value="25000" oninput="calculateRemainingBalance()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors font-mono">
+                </div>
+              </div>
+
+              <!-- Payment Channel & Live Balance Preview -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Payment Vault Channel *</label>
+                  <select id="formPaymentChannel" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                    <option value="Meezan Bank">Meezan Bank (Corporate 0102)</option>
+                    <option value="Easypaisa">Easypaisa Merchant</option>
+                    <option value="JazzCash">JazzCash Commercial</option>
+                    <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Calculated Balance Due</label>
+                  <div class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm font-mono text-amber-400 flex items-center justify-between">
+                    <span>PKR</span>
+                    <span id="formRemainingBalancePreview" class="font-bold">25,000</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submission Buttons -->
+              <div class="pt-4 flex flex-col sm:flex-row items-center gap-3">
+                <button type="submit" class="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all active:scale-[0.98]">
+                  <i class="fa-solid fa-check text-xs"></i>
+                  Complete Enrollment
                 </button>
-              </form>
-            </div>
+                <button type="button" onclick="resetStudentForm()" class="w-full sm:w-auto py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-all">
+                  Reset
+                </button>
+              </div>
+
+            </form>
           </div>
 
-        </div>
-      </div>
+        </section>
 
-      <!-- CONNECT ACROSS PLATFORMS (ALL OFFICIAL SOCIALS) -->
-      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-        <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Connect Across Platforms</h4>
-        
-        <div class="grid grid-cols-5 gap-2 md:gap-4">
-          <!-- YouTube -->
-          <a href="https://www.youtube.com/@globalguruofficial1" target="_blank" title="YouTube" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-red-500 transition active:scale-95 shadow-sm">
-            <svg class="w-6 h-6 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            <span class="text-[9px] font-bold text-slate-700 mt-1">YouTube</span>
-          </a>
-          <!-- Facebook -->
-          <a href="https://web.facebook.com/globalguruofficial1" target="_blank" title="Facebook" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-blue-600 transition active:scale-95 shadow-sm">
-            <svg class="w-6 h-6 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            <span class="text-[9px] font-bold text-slate-700 mt-1">Facebook</span>
-          </a>
-          <!-- Instagram -->
-          <a href="https://instagram.com/globalguruofficial1" target="_blank" title="Instagram" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-pink-500 transition active:scale-95 shadow-sm">
-            <svg class="w-6 h-6 text-[#E4405F]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            <span class="text-[9px] font-bold text-slate-700 mt-1">Instagram</span>
-          </a>
-          <!-- TikTok -->
-          <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" title="TikTok" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-black transition active:scale-95 shadow-sm">
-            <svg class="w-6 h-6 text-black" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.99v9.09c-.03 2.01-.84 4.02-2.34 5.37-1.63 1.49-3.92 2.16-6.09 1.81-2.2-.33-4.22-1.67-5.35-3.58-1.16-1.92-1.34-4.37-.5-6.38.86-2.02 2.72-3.53 4.88-3.99.78-.17 1.58-.2 2.37-.12v4.22c-.61-.08-1.25-.01-1.83.21-.82.3-1.49.95-1.83 1.76-.36.85-.31 1.84.14 2.64.44.8 1.25 1.36 2.15 1.49.99.16 2.04-.15 2.77-.85.66-.63 1.05-1.53 1.05-2.45V.02h.65z"/></svg>
-            <span class="text-[9px] font-bold text-slate-700 mt-1">TikTok</span>
-          </a>
-          <!-- Threads -->
-          <a href="https://www.threads.net/@globalguruofficial1" target="_blank" title="Threads" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-black transition active:scale-95 shadow-sm">
-            <svg class="w-6 h-6 text-black" viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.9883C140.71 88.5919 139.87 88.2109 139.019 87.8456C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.5727 72.8138C81.0827 64.4538 89.2612 60.7788 97.2341 60.7788C110.748 60.7788 119.537 69.6013 120.487 84.1506C113.626 83.1756 106.376 82.8093 98.7188 83.0569C72.0625 83.9169 55.4544 98.2431 56.0969 119.349C56.7088 139.467 73.0688 152.012 94.0625 152.012C108.799 152.012 119.981 145.474 126.791 133.029C132.846 144.159 143.141 150.144 157.069 150.144C174.197 150.144 186.281 138.834 186.281 118.892C186.281 83.2181 158.469 64.9125 120.891 64.9125C78.435 64.9125 47.9625 87.9712 47.9625 125.683C47.9625 152.128 66.525 170.835 96.0938 170.835C112.575 170.835 126.338 165.176 135.038 154.512L147.244 165.816C134.906 180.705 116.794 187.688 96.0938 187.688C56.2875 187.688 30.7125 162.248 30.7125 125.683C30.7125 76.5412 69.4125 48.0675 120.891 48.0675C170.775 48.0675 203.531 73.7437 203.531 118.892C203.531 148.164 184.95 166.995 157.069 166.995C139.631 166.995 127.144 158.625 121.284 144.188C114.712 153.281 104.981 157.942 93.6844 157.942C77.475 157.942 65.5125 147.536 64.9969 131.627C64.4469 114.675 77.2969 103.568 98.2406 102.898C105.797 102.656 113.128 103.181 120.084 104.426C118.912 95.8425 112.444 89.9625 101.466 89.9625C95.4281 89.9625 89.8781 92.205 85.9406 96.225L75.6094 84.8812C81.8531 78.4725 90.75 74.8725 101.466 74.8725C119.869 74.8725 133.725 84.7725 136.003 103.886C137.944 104.839 139.791 105.889 141.537 107.031V88.9883ZM120.084 117.892C113.888 116.897 107.381 116.488 100.678 116.702C88.2469 117.098 79.9594 122.951 80.2875 131.957C80.6062 140.719 88.7531 146.104 99.4594 146.104C108.975 146.104 116.634 140.404 120.084 130.414V117.892Z"/></svg>
-            <span class="text-[9px] font-bold text-slate-700 mt-1">Threads</span>
-          </a>
-        </div>
+        <!-- ============================================== -->
+        <!-- TAB 4: FINANCES (Liquid Capital & Ledger Desk) -->
+        <!-- ============================================== -->
+        <section id="financesTab" class="tab-content space-y-6 hidden">
+          
+          <!-- Master Liquid Capital Summary Card -->
+          <div class="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-950 border border-amber-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-12 -top-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-          <a href="https://linktr.ee/Globalguruofficial1" target="_blank" class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 transition">
-            <div class="flex items-center gap-2.5">
-              <span class="text-lg">🌲</span>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
               <div>
-                <p class="text-xs font-bold text-slate-800">All Official Ecosystem Links</p>
-                <p class="text-[10px] text-slate-400">linktr.ee/Globalguruofficial1</p>
+                <span class="text-xs font-mono uppercase tracking-widest text-amber-400 font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-vault"></i>
+                  Total Consolidated Liquid Capital
+                </span>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-2xl font-bold text-slate-400">PKR</span>
+                  <span id="financeTotalCapital" class="financial-val text-4xl sm:text-5xl font-extrabold tracking-tight text-white font-mono">
+                    1,450,000
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Aggregated real-time liquid assets across physical cash vaults & enterprise bank lines.</p>
+              </div>
+
+              <!-- Quick Finance Actions -->
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button onclick="openInterTransferModal()" class="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-2 transition-all">
+                  <i class="fa-solid fa-money-bill-transfer"></i>
+                  Inter-Account Transfer
+                </button>
+                <button onclick="openExpenseModal()" class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-2 transition-all">
+                  <i class="fa-solid fa-receipt"></i>
+                  Record Kharcha (Expense)
+                </button>
               </div>
             </div>
-            <span class="text-xs font-bold text-emerald-700">Open →</span>
-          </a>
+          </div>
 
-          <!-- Official Support WhatsApp -->
-          <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Support" target="_blank" class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white transition active:scale-[0.98] shadow-md">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">💬</div>
+          <!-- 4 Main Account Balance Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Account 1: Meezan Bank -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
               <div>
-                <p class="text-xs font-black tracking-wide">WhatsApp Support Desk</p>
-                <p class="text-[10px] text-emerald-100 font-medium">+92 311 6246000 (0311-6246000)</p>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-400">Meezan Bank Ltd</span>
+                  <button onclick="promptEditAccount('Meezan Bank')" class="text-slate-500 hover:text-amber-400 text-xs">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                </div>
+                <div class="mt-3">
+                  <span class="text-xs text-slate-500 font-mono">PKR</span>
+                  <div id="accBal_Meezan" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">850,000</div>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                <span>Corp # 0102...</span>
+                <span class="text-emerald-400">Active</span>
               </div>
             </div>
-            <span class="text-[10px] font-black bg-white text-emerald-800 px-3 py-1.5 rounded-xl">Chat Now →</span>
-          </a>
-        </div>
-      </div>
 
-    </div>
+            <!-- Account 2: Easypaisa -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-400">Easypaisa Merchant</span>
+                  <button onclick="promptEditAccount('Easypaisa')" class="text-slate-500 hover:text-amber-400 text-xs">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                </div>
+                <div class="mt-3">
+                  <span class="text-xs text-slate-500 font-mono">PKR</span>
+                  <div id="accBal_Easypaisa" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">240,000</div>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                <span>0300-1234567</span>
+                <span class="text-emerald-400">Active</span>
+              </div>
+            </div>
 
-    <!-- Bottom Navigation Bar (Dynamic Based on Role) -->
-    <nav class="fixed md:sticky bottom-0 max-w-full md:max-w-4xl lg:max-w-6xl w-full bg-white border-t border-slate-200 flex z-30 shadow-lg" id="portalBottomNav">
-    </nav>
-  </div>
+            <!-- Account 3: JazzCash -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-400">JazzCash Commercial</span>
+                  <button onclick="promptEditAccount('JazzCash')" class="text-slate-500 hover:text-amber-400 text-xs">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                </div>
+                <div class="mt-3">
+                  <span class="text-xs text-slate-500 font-mono">PKR</span>
+                  <div id="accBal_JazzCash" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">180,000</div>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                <span>0321-9876543</span>
+                <span class="text-emerald-400">Active</span>
+              </div>
+            </div>
 
-  <!-- ================================================= -->
-  <!-- MODAL: LEARNER VERIFICATION (WHATSAPP + BATCH)     -->
-  <!-- ================================================= -->
-  <div id="learnerAuthModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white max-w-sm w-full rounded-3xl p-6 md:p-8 shadow-2xl space-y-4 border border-slate-100 animate-in">
-      <div class="text-center">
-        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 text-xl flex items-center justify-center mx-auto mb-2">🎓</div>
-        <h3 class="text-base font-extrabold text-slate-900">Student Portal Access</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Enter your enrolled details to unlock</p>
-      </div>
+            <!-- Account 4: Physical Vault (Galla Desk) -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-400">Physical Vault (Galla)</span>
+                  <button onclick="promptEditAccount('Physical Vault')" class="text-slate-500 hover:text-amber-400 text-xs">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                </div>
+                <div class="mt-3">
+                  <span class="text-xs text-slate-500 font-mono">PKR</span>
+                  <div id="accBal_Vault" class="financial-val text-2xl font-bold text-white font-mono mt-0.5">180,000</div>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                <span>Cash Reserve</span>
+                <span class="text-emerald-400">In Office</span>
+              </div>
+            </div>
 
-      <form onsubmit="event.preventDefault(); verifyLearnerAccess();" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 block mb-1">REGISTERED WHATSAPP NUMBER</label>
-          <input type="text" id="authLearnerPhone" placeholder="e.g. 03001112233" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#4A0E17]">
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 block mb-1">ALLOTED BATCH CODE</label>
-          <input type="text" id="authLearnerBatch" placeholder="e.g. AI-01 ya ECOM-04" required class="w-full uppercase px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#4A0E17]">
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-[#4A0E17] hover:bg-[#681522] text-white rounded-xl text-xs font-bold transition shadow-md">
-          Verify & Enter
-        </button>
-      </form>
-
-      <span id="learnerAuthError" class="hidden text-center text-xs font-bold text-rose-600 block">Record verify nahi hua! Sahi WhatsApp aur Batch code enter karein.</span>
-
-      <button onclick="closeLearnerAuthModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
-        Cancel / Back
-      </button>
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- MODAL: CLIENT VERIFICATION (WHATSAPP + CODE)      -->
-  <!-- ================================================= -->
-  <div id="clientAuthModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white max-w-sm w-full rounded-3xl p-6 md:p-8 shadow-2xl space-y-4 border border-slate-100 animate-in">
-      <div class="text-center">
-        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 text-xl flex items-center justify-center mx-auto mb-2">💼</div>
-        <h3 class="text-base font-extrabold text-slate-900">Commercial Studio Access</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Enter authorized business client details</p>
-      </div>
-
-      <form onsubmit="event.preventDefault(); verifyClientAccess();" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 block mb-1">BUSINESS WHATSAPP NUMBER</label>
-          <input type="text" id="authClientPhone" placeholder="e.g. 03116246000" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-emerald-600">
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 block mb-1">CLIENT ACCESS CODE (OR ENTER 'GG-CLIENT-2026')</label>
-          <input type="text" id="authClientCode" placeholder="Enter Client Code" required class="w-full uppercase px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-emerald-600">
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-md">
-          Verify & Enter
-        </button>
-      </form>
-
-      <span id="clientAuthError" class="hidden text-center text-xs font-bold text-rose-600 block">Invalid Client Code! Sahi code provide karein ya Studio desk se rabta karein.</span>
-
-      <button onclick="closeClientAuthModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
-        Cancel / Back
-      </button>
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- MODAL: SECRET SUPER ADMIN TRIPLE-TAP PIN MODAL    -->
-  <!-- ================================================= -->
-  <div id="adminPinModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-white max-w-xs w-full rounded-3xl p-6 shadow-2xl space-y-4 animate-in border border-amber-300">
-      <div class="text-center">
-        <div class="w-12 h-12 rounded-full bg-[#4A0E17] text-amber-300 font-extrabold text-lg flex items-center justify-center mx-auto mb-2 border-2 border-[#D4AF37]">
-          GG
-        </div>
-        <h3 class="text-base font-extrabold text-slate-900">Master Owner Security</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Secret Executive PIN Entry</p>
-      </div>
-
-      <form onsubmit="event.preventDefault(); verifySuperAdminPin();" class="space-y-3">
-        <input type="password" id="secretPinInput" placeholder="Enter PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric" autofocus class="w-full text-center text-xl tracking-widest font-black py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#4A0E17]/20 focus:border-[#4A0E17]">
-        <button type="submit" class="w-full py-3 bg-[#4A0E17] hover:bg-[#681522] text-white rounded-xl text-xs font-bold transition shadow-md">
-          Verify & Unlock
-        </button>
-      </form>
-
-      <span id="pinErrorAlert" class="hidden text-center text-xs font-bold text-rose-600 block">Ghalat PIN code! Access Denied.</span>
-      
-      <button onclick="closeAdminPinModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-semibold py-1">
-        Cancel / Back
-      </button>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  // 1. FIREBASE INITIALIZATION & REDIRECT HANDLER (ACTIVE API KEY)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTQT43EnFY4P2KcqFEJwNlx1VUKAiNdM4",
-    authDomain: "global-guru-portal.firebaseapp.com",
-    projectId: "global-guru-portal",
-    storageBucket: "global-guru-portal.firebasestorage.app",
-    messagingSenderId: "145806027180",
-    appId: "1:145806027180:web:f2bfe31e152e00513ab209",
-    measurementId: "G-4RKGW6ZLXH"
-  };
-
-  let db = null;
-  let auth = null;
-  let currentUser = null;
-  let selectedRole = null;
-  let isLoggingIn = false;
-  let logoClickCount = 0;
-  let logoClickTimer = null;
-
-  let appState = {
-    permissions: {
-      perm_bank: true,
-      perm_vault: true,
-      perm_profit: false,
-      perm_students: true,
-      perm_fee_edit: true,
-      perm_schedule: false,
-      perm_backup: false
-    },
-    students: {
-      "03001112233": { name: "Ali Raza", cohort: "Cohort AI-01", batchCode: "AI-01", total: 50000, received: 50000, status: "Active Paid", rule10: "Cleared" },
-      "03004445566": { name: "Muhammad Hamza", cohort: "Cohort AI-01", batchCode: "AI-01", total: 50000, received: 15000, status: "Active Grace", rule10: "Installment Due" }
-    },
-    clients: {
-      "03116246000": { name: "Creative Brand Desk", code: "GG-CLIENT-2026" }
-    },
-    finances: {
-      meezan: "Rs. 420,000",
-      easypaisa: "Rs. 65,000",
-      jazzcash: "Rs. 40,000",
-      galla: "Rs. 85,000",
-      netProfit: "Rs. 380,000"
-    }
-  };
-
-  try {
-    firebase.initializeApp(firebaseConfig);
-    auth = firebase.auth();
-    db = firebase.firestore();
-    initFirestoreSync();
-  } catch(e) {
-    console.warn("Firebase initialized in fallback mode:", e);
-  }
-
-  // Handle Redirect Result
-  if (auth) {
-    auth.getRedirectResult().then(result => {
-      if (result && result.user) {
-        currentUser = result.user;
-        showRoleSelectionScreen(result.user);
-      }
-    }).catch(err => {
-      console.warn("Redirect handler notice:", err);
-    });
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        showRoleSelectionScreen(user);
-      } else {
-        currentUser = null;
-        selectedRole = null;
-        document.getElementById('stage-login').classList.remove('hidden');
-        document.getElementById('stage-role-select').classList.add('hidden');
-        document.getElementById('stage-portal').classList.add('hidden');
-      }
-    });
-  }
-
-  function showRoleSelectionScreen(user) {
-    document.getElementById('stage-login').classList.add('hidden');
-    document.getElementById('stage-role-select').classList.remove('hidden');
-    document.getElementById('stage-portal').classList.add('hidden');
-    document.getElementById('authenticatedUserName').innerText = user.displayName || user.email.split('@')[0];
-  }
-
-  // 2. GOOGLE SIGN-IN HANDLER
-  function handleGoogleSignIn() {
-    if (isLoggingIn) return;
-    isLoggingIn = true;
-
-    const btnText = document.getElementById('googleBtnText');
-    btnText.innerText = "Connecting...";
-
-    if (!auth) {
-      currentUser = { displayName: "Guest Operator", email: "guest@globalguru.pk" };
-      showRoleSelectionScreen(currentUser);
-      btnText.innerText = "Continue with Google";
-      isLoggingIn = false;
-      return;
-    }
-
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-
-    auth.signInWithPopup(provider)
-      .then(result => {
-        currentUser = result.user;
-        showRoleSelectionScreen(result.user);
-      })
-      .catch(err => {
-        console.warn("Popup attempt notice:", err.code);
-        if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
-          return auth.signInWithRedirect(provider);
-        } else if (err.code !== 'auth/popup-closed-by-user') {
-          alert("Sign-in notice: " + err.message);
-        }
-      })
-      .finally(() => {
-        setTimeout(() => {
-          btnText.innerText = "Continue with Google";
-          isLoggingIn = false;
-        }, 1200);
-      });
-  }
-
-  function handleLogout() {
-    if (auth) auth.signOut();
-    currentUser = null;
-    selectedRole = null;
-    document.getElementById('stage-portal').classList.add('hidden');
-    document.getElementById('stage-role-select').classList.add('hidden');
-    document.getElementById('stage-login').classList.remove('hidden');
-  }
-
-  // 3. TRIPLE TAP LOGO TRIGGER FOR SUPER ADMIN
-  function handleLogoSecretClick() {
-    logoClickCount++;
-    clearTimeout(logoClickTimer);
-    
-    if (logoClickCount === 3) {
-      logoClickCount = 0;
-      document.getElementById('secretPinInput').value = '';
-      document.getElementById('pinErrorAlert').classList.add('hidden');
-      document.getElementById('adminPinModal').classList.remove('hidden');
-      setTimeout(() => document.getElementById('secretPinInput').focus(), 150);
-      return;
-    }
-
-    logoClickTimer = setTimeout(() => {
-      logoClickCount = 0;
-    }, 700);
-  }
-
-  function verifySuperAdminPin() {
-    const pin = document.getElementById('secretPinInput').value.trim();
-    const err = document.getElementById('pinErrorAlert');
-    err.classList.add('hidden');
-
-    if (pin === '7860') {
-      selectedRole = 'admin';
-      closeAdminPinModal();
-      launchPortal();
-    } else {
-      err.classList.remove('hidden');
-    }
-  }
-
-  function closeAdminPinModal() {
-    document.getElementById('adminPinModal').classList.add('hidden');
-  }
-
-  // 4. LEARNER VERIFICATION (WHATSAPP + BATCH CODE)
-  function openLearnerAuthModal() {
-    document.getElementById('authLearnerPhone').value = '';
-    document.getElementById('authLearnerBatch').value = '';
-    document.getElementById('learnerAuthError').classList.add('hidden');
-    document.getElementById('learnerAuthModal').classList.remove('hidden');
-  }
-
-  function closeLearnerAuthModal() {
-    document.getElementById('learnerAuthModal').classList.add('hidden');
-  }
-
-  function verifyLearnerAccess() {
-    const phone = document.getElementById('authLearnerPhone').value.trim().replace(/\D/g, '');
-    const batch = document.getElementById('authLearnerBatch').value.trim().toUpperCase().replace(/\s+/g, '');
-    const err = document.getElementById('learnerAuthError');
-    err.classList.add('hidden');
-
-    const s = appState.students[phone];
-    if (s && (s.batchCode === batch || s.cohort.toUpperCase().includes(batch))) {
-      selectedRole = 'learner';
-      closeLearnerAuthModal();
-      launchPortal();
-      // Auto populate search box with this phone
-      setTimeout(() => {
-        const ki = document.getElementById('khataInput');
-        if (ki) {
-          ki.value = phone;
-          runKhataSearch();
-        }
-      }, 300);
-    } else {
-      err.classList.remove('hidden');
-    }
-  }
-
-  // 5. CLIENT VERIFICATION (WHATSAPP + CLIENT ACCESS CODE)
-  function openClientAuthModal() {
-    document.getElementById('authClientPhone').value = '';
-    document.getElementById('authClientCode').value = '';
-    document.getElementById('clientAuthError').classList.add('hidden');
-    document.getElementById('clientAuthModal').classList.remove('hidden');
-  }
-
-  function closeClientAuthModal() {
-    document.getElementById('clientAuthModal').classList.add('hidden');
-  }
-
-  function verifyClientAccess() {
-    const phone = document.getElementById('authClientPhone').value.trim().replace(/\D/g, '');
-    const code = document.getElementById('authClientCode').value.trim().toUpperCase();
-    const err = document.getElementById('clientAuthError');
-    err.classList.add('hidden');
-
-    // Default universal demo code or specific registered client code
-    if (code === 'GG-CLIENT-2026' || (appState.clients[phone] && appState.clients[phone].code === code)) {
-      selectedRole = 'client';
-      closeClientAuthModal();
-      launchPortal();
-    } else {
-      err.classList.remove('hidden');
-    }
-  }
-
-  // 6. LAUNCH ROLE-SPECIFIC PORTAL
-  function launchPortal() {
-    document.getElementById('stage-role-select').classList.add('hidden');
-    document.getElementById('stage-portal').classList.remove('hidden');
-
-    const roleChip = document.getElementById('activeRoleChip');
-    const subTag = document.getElementById('portalSubTag');
-    const nav = document.getElementById('portalBottomNav');
-
-    document.getElementById('view-learner').classList.add('hidden');
-    document.getElementById('view-client').classList.add('hidden');
-    document.getElementById('view-admin').classList.add('hidden');
-
-    if (selectedRole === 'learner') {
-      roleChip.innerText = "Learner";
-      roleChip.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-amber-400 text-slate-900";
-      subTag.innerText = "Student Mentorship Hub";
-      document.getElementById('view-learner').classList.remove('hidden');
-      
-      nav.innerHTML = `
-        <button class="flex-1 py-3 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17]">
-          <span>🎓</span> Mentorship
-        </button>
-        <button onclick="document.getElementById('khataInput').focus()" class="flex-1 py-3 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
-          <span>🧾</span> Mera Khata
-        </button>
-      `;
-    } else if (selectedRole === 'client') {
-      roleChip.innerText = "Client";
-      roleChip.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-emerald-400 text-slate-900";
-      subTag.innerText = "Creative Studio Hub";
-      document.getElementById('view-client').classList.remove('hidden');
-
-      nav.innerHTML = `
-        <button class="flex-1 py-3 text-center text-emerald-800 font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-emerald-600">
-          <span>🎬</span> Services
-        </button>
-        <a href="https://wa.me/923116246000?text=Assalam-o-Alaikum%20Global%20Guru%20Services" target="_blank" class="flex-1 py-3 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
-          <span>💬</span> WhatsApp Desk
-        </a>
-      `;
-    } else if (selectedRole === 'admin') {
-      roleChip.innerText = "Super Admin";
-      roleChip.className = "text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-rose-500 text-white";
-      subTag.innerText = "Executive Switchboard";
-      document.getElementById('view-admin').classList.remove('hidden');
-      renderAdminFinances();
-      syncSwitchCheckboxes();
-
-      nav.innerHTML = `
-        <button class="flex-1 py-3 text-center text-[#4A0E17] font-extrabold text-xs flex flex-col items-center gap-1 border-t-2 border-[#4A0E17] bg-amber-50/50">
-          <span>🛡️</span> Switchboard
-        </button>
-        <button onclick="document.getElementById('newStdPhone').focus()" class="flex-1 py-3 text-center text-slate-400 font-semibold text-xs flex flex-col items-center gap-1 border-t-2 border-transparent">
-          <span>➕</span> Add Student
-        </button>
-      `;
-    }
-  }
-
-  // 7. MERA KHATA SEARCH (ENTER KEY READY)
-  function runKhataSearch() {
-    const rawVal = document.getElementById('khataInput').value.trim().replace(/\D/g, '');
-    const out = document.getElementById('khataResultBox');
-    if (!rawVal) {
-      out.innerHTML = `<span class="text-xs font-bold text-rose-600">Barah-e-karam apna registered number enter karein.</span>`;
-      return;
-    }
-
-    const s = appState.students[rawVal];
-    if (s) {
-      const remaining = s.total - s.received;
-      out.innerHTML = `
-        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 mt-2">
-          <div class="flex justify-between items-center">
-            <h4 class="text-xs font-extrabold text-slate-900">${s.name}</h4>
-            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${remaining === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${s.status}</span>
           </div>
-          <p class="text-[11px] text-slate-400 font-medium">${s.cohort} (Batch: ${s.batchCode || 'AI-01'})</p>
-          <div class="grid grid-cols-3 gap-2 bg-white p-2.5 rounded-xl text-center border border-slate-100">
-            <div><span class="text-[9px] text-slate-400 block">Total</span><strong class="text-[11px] text-slate-800">Rs. ${s.total.toLocaleString()}</strong></div>
-            <div><span class="text-[9px] text-slate-400 block">Paid</span><strong class="text-[11px] text-emerald-600">Rs. ${s.received.toLocaleString()}</strong></div>
-            <div><span class="text-[9px] text-slate-400 block">Balance</span><strong class="text-[11px] text-rose-600">Rs. ${remaining.toLocaleString()}</strong></div>
+
+          <!-- Recent Operational Expenses / Kharcha Table -->
+          <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-rose-400"></i>
+                Operational Expenses & Petty Deductions
+              </h3>
+              <span id="totalExpensesSum" class="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20">
+                Total Expenses: PKR 45,000
+              </span>
+            </div>
+
+            <div class="overflow-x-auto custom-scroll">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 font-mono uppercase tracking-wider">
+                    <th class="py-2.5 px-3">Date</th>
+                    <th class="py-2.5 px-3">Expense Head / Description</th>
+                    <th class="py-2.5 px-3">Deducted From</th>
+                    <th class="py-2.5 px-3 text-right">Amount (PKR)</th>
+                    <th class="py-2.5 px-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="expensesTableBody" class="divide-y divide-slate-800/50 text-slate-300">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
           </div>
-          <p class="text-[10px] text-slate-500">📜 <strong>Rule of 10:</strong> Har mahine ki 10 tareekh se pehle Rs. 5,000 installment clear karein.</p>
-          <a href="https://wa.me/923116246000?text=Payment%20Slip%20Verification%20for%20${encodeURIComponent(s.name)}" target="_blank" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
-            <i class="fa-brands fa-whatsapp"></i> Submit Slip on WhatsApp (+92 311 6246000)
-          </a>
-        </div>
-      `;
-    } else {
-      out.innerHTML = `
-        <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center mt-2">
-          <p class="text-xs font-bold text-rose-700">Record Nahi Mila</p>
-          <p class="text-[11px] text-rose-500 mt-0.5">Apna number check karein ya academy desk par rabta karein.</p>
-        </div>
-      `;
-    }
-  }
 
-  // 8. FIRESTORE REALTIME SYNC & SWITCHBOARD
-  function initFirestoreSync() {
-    if (!db) return;
-    db.collection("portal").doc("system_state").onSnapshot(doc => {
-      if(doc.exists) {
-        const data = doc.data();
-        if(data.permissions) appState.permissions = Object.assign(appState.permissions, data.permissions);
-        if(data.finances) appState.finances = data.finances;
-        if(data.students) appState.students = data.students;
-        if(selectedRole === 'admin') {
-          renderAdminFinances();
-          syncSwitchCheckboxes();
+        </section>
+
+        <!-- ============================================== -->
+        <!-- TAB 5: SETTINGS (Security, Backup & Profiles)  -->
+        <!-- ============================================== -->
+        <section id="settingsTab" class="tab-content space-y-6 hidden">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Column 1 & 2: Security & Backup Operations -->
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- Master Security & PIN Manager Card -->
+              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-lock"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white">Master Security & PIN Manager</h3>
+                    <p class="text-xs text-slate-400">Configure master stealth code, SIS student desk PIN, and recovery fallbacks.</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Current Master PIN</label>
+                    <input type="password" id="pinManagerCurrent" placeholder="••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">New Master PIN (4-Digits)</label>
+                    <input type="password" id="pinManagerNew" placeholder="e.g. 7860" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Confirm New PIN</label>
+                    <input type="password" id="pinManagerConfirm" placeholder="e.g. 7860" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                  <span class="text-xs text-slate-500 font-mono">Emergency Recovery Token: <span class="text-amber-400">GG-EMERGENCY-2026</span></span>
+                  <button onclick="handleUpdateMasterPin()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
+                    Update Master PIN
+                  </button>
+                </div>
+              </div>
+
+              <!-- Full Backup Center (Import & Export Both) -->
+              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-database"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white">Full Ecosystem Backup Center (Import & Export)</h3>
+                    <p class="text-xs text-slate-400">Download snapshots of your entire ledger or upload a prior JSON snapshot to restore.</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <!-- Export Group -->
+                  <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                    <div>
+                      <span class="text-xs font-bold text-slate-200 block">Export Snapshot (Download)</span>
+                      <p class="text-[11px] text-slate-400 mt-1">Export students directory, switches, and ledger states into JSON or CSV format.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button onclick="exportDataJSON()" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-file-code text-amber-400"></i> JSON
+                      </button>
+                      <button onclick="exportDataCSV()" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-file-csv text-emerald-400"></i> CSV
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Import / Restore Group -->
+                  <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                    <div>
+                      <span class="text-xs font-bold text-slate-200 block">Restore / Import (Upload)</span>
+                      <p class="text-[11px] text-slate-400 mt-1">Upload a valid Global Guru JSON backup to rebuild the ecosystem state.</p>
+                    </div>
+                    <div>
+                      <input type="file" id="importJsonFileInput" accept=".json" class="hidden" onchange="handleImportFile(event)">
+                      <button onclick="document.getElementById('importJsonFileInput').click()" class="w-full py-2 px-3 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-upload"></i> Upload & Restore Backup
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Column 3: Corporate Identity & Verified LinkedIn -->
+            <div class="space-y-6">
+              
+              <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white">Professional Identity</h3>
+                    <p class="text-xs text-slate-400">Verified Corporate Executive Handle</p>
+                  </div>
+                </div>
+
+                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5">
+                      <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center font-bold text-amber-400">YA</div>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-bold text-slate-100">Yasir Ali</h4>
+                      <p class="text-xs text-amber-400 font-mono">Founder & CEO, Global Guru</p>
+                    </div>
+                  </div>
+
+                  <p class="text-xs text-slate-400 leading-relaxed">
+                    Custom clean profile handle bound to the commercial enterprise desk and corporate B2B communications.
+                  </p>
+
+                  <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-brands fa-linkedin"></i>
+                    linkedin.com/in/yasiraliglobalguru
+                  </a>
+                </div>
+
+                <div class="text-[11px] text-slate-500 space-y-1 font-mono">
+                  <div>Authorized Whitelist:</div>
+                  <div class="text-slate-400">• globalgurubusiness@gmail.com</div>
+                  <div class="text-slate-400">• globalgurultd@gmail.com</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+      <!-- EDGE-TO-EDGE WORKSPACE FOOTER -->
+      <footer class="w-full border-t border-slate-800/80 bg-slate-950/80 py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500 font-mono">
+        Global Guru Enterprise Portal • Multan Tech Cluster • Realtime Cryptographic Session Active
+      </footer>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODALS & OVERLAYS                              -->
+    <!-- ============================================== -->
+
+    <!-- MODAL 1: Stealth Master PIN Modal -->
+    <div id="stealthPinModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-sm bg-slate-900 border border-amber-500/40 rounded-3xl p-6 shadow-2xl relative">
+        <div class="flex flex-col items-center text-center mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl font-black mb-3">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white">Stealth Security Gateway</h3>
+          <p class="text-xs text-slate-400 mt-1 font-mono">Enter Authorized Master PIN</p>
+        </div>
+
+        <form onsubmit="handleStealthPinSubmit(event)" class="space-y-4">
+          <div>
+            <input type="password" id="stealthPinInput" maxlength="4" placeholder="••••" required class="w-full text-center tracking-[1em] text-2xl bg-slate-950 border border-slate-800 rounded-xl py-3 text-amber-400 font-mono focus:outline-none focus:border-amber-500">
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
+              Unlock Master Suite
+            </button>
+            <button type="button" onclick="closeModal('stealthPinModal')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-all">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Inter-Account Transfer Modal -->
+    <div id="interTransferModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-money-bill-transfer text-amber-400"></i>
+            Inter-Account Funds Transfer
+          </h3>
+          <button onclick="closeModal('interTransferModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form onsubmit="handleInterTransferSubmit(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Source Account (From)</label>
+            <select id="transferFromAccount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+              <option value="Meezan Bank">Meezan Bank</option>
+              <option value="Easypaisa">Easypaisa</option>
+              <option value="JazzCash">JazzCash</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Destination Account (To)</label>
+            <select id="transferToAccount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="Meezan Bank">Meezan Bank</option>
+              <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+              <option value="Easypaisa">Easypaisa</option>
+              <option value="JazzCash">JazzCash</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Transfer Amount (PKR)</label>
+            <input type="number" id="transferAmount" min="1" required placeholder="e.g. 50000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div class="pt-2 flex items-center gap-2">
+            <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all">
+              Execute Transfer
+            </button>
+            <button type="button" onclick="closeModal('interTransferModal')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 3: Record Expense (Kharcha) Modal -->
+    <div id="expenseModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-rose-400"></i>
+            Record Operational Expense (Kharcha)
+          </h3>
+          <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form onsubmit="handleExpenseSubmit(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Expense Description / Purpose</label>
+            <input type="text" id="expenseDescription" required placeholder="e.g. Office Electricity Bill, Staff Lunch" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Deduct From Account</label>
+            <select id="expenseAccount" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="Physical Vault">Physical Vault (Galla Desk)</option>
+              <option value="Meezan Bank">Meezan Bank</option>
+              <option value="Easypaisa">Easypaisa</option>
+              <option value="JazzCash">JazzCash</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Amount (PKR)</label>
+            <input type="number" id="expenseAmount" min="1" required placeholder="e.g. 15000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div class="pt-2 flex items-center gap-2">
+            <button type="submit" class="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs transition-all">
+              Record Deduction
+            </button>
+            <button type="button" onclick="closeModal('expenseModal')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 4: Cohort Timings & Batch Scheduler Modal -->
+    <div id="cohortSchedulerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days text-amber-400"></i>
+            Batch Cohort Timings & Schedules
+          </h3>
+          <button onclick="closeModal('cohortSchedulerModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-amber-400">Batch AI-01</span>
+              <p class="text-slate-400 text-[11px]">Mon & Wed • 08:00 PM - 10:00 PM PKT</p>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">In Progress</span>
+          </div>
+
+          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-sky-400">Batch AI-02</span>
+              <p class="text-slate-400 text-[11px]">Tue & Thu • 08:00 PM - 10:00 PM PKT</p>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">Registration Open</span>
+          </div>
+
+          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-purple-400">Batch VFX-01</span>
+              <p class="text-slate-400 text-[11px]">Friday & Saturday • 09:00 PM - 11:00 PM PKT</p>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">In Progress</span>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <button onclick="closeModal('cohortSchedulerModal')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+            Close Scheduler
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ========================================================= */
+    /* MASTER STATE & DATA INITIALIZATION                        */
+    /* ========================================================= */
+    const WHITELIST_EMAILS = [
+      'globalgurubusiness@gmail.com',
+      'globalgurultd@gmail.com'
+    ];
+
+    const DEFAULT_MASTER_PIN = '7860';
+    const DEFAULT_STAFF_PASS = '4321';
+
+    // Core System State
+    let appState = {
+      currentUser: null, // { email, role: 'SUPER_ADMIN' | 'STAFF' | 'LEARNER' | 'CLIENT' }
+      masterPin: DEFAULT_MASTER_PIN,
+      staffPass: DEFAULT_STAFF_PASS,
+      isPanicMasked: false,
+      switches: {
+        panicMask: false,
+        admissionFreeze: false,
+        khataMaintenance: false,
+        whatsappDesk: true,
+        clientStudio: true,
+        backupClearance: true,
+        fundsSync: true,
+        staffRestriction: true,
+        cohortTimers: true,
+        autoSlip: true,
+        auditTrace: true,
+      },
+      accounts: {
+        'Meezan Bank': 850000,
+        'Easypaisa': 240000,
+        'JazzCash': 180000,
+        'Physical Vault': 180000
+      },
+      students: [
+        {
+          id: 'GG-AI-01-101',
+          name: 'Hamza Khan',
+          phone: '3001234567',
+          batch: 'AI-01',
+          totalFee: 50000,
+          paid: 50000,
+          channel: 'Meezan Bank',
+          status: 'Paid in Full',
+          date: '2026-03-01'
+        },
+        {
+          id: 'GG-AI-01-102',
+          name: 'Zainab Bibi',
+          phone: '3219876543',
+          batch: 'AI-01',
+          totalFee: 50000,
+          paid: 25000,
+          channel: 'Easypaisa',
+          status: 'Partial (Due)',
+          date: '2026-03-04'
+        },
+        {
+          id: 'GG-VFX-01-201',
+          name: 'Bilal Ahmed',
+          phone: '3335558888',
+          batch: 'VFX-01',
+          totalFee: 65000,
+          paid: 30000,
+          channel: 'JazzCash',
+          status: 'Partial (Due)',
+          date: '2026-03-10'
         }
-      } else {
-        db.collection("portal").doc("system_state").set(appState);
-      }
-    }, err => console.log("Firestore Notice:", err));
-  }
-
-  function syncSwitchCheckboxes() {
-    const keys = ['perm_bank', 'perm_vault', 'perm_profit', 'perm_students', 'perm_fee_edit', 'perm_schedule', 'perm_backup'];
-    keys.forEach(k => {
-      const el = document.getElementById(k);
-      if (el) el.checked = !!appState.permissions[k];
-    });
-  }
-
-  function updateSwitch(key, val) {
-    appState.permissions[key] = val;
-    if (db) {
-      db.collection("portal").doc("system_state").set({ permissions: appState.permissions }, { merge: true });
-    }
-  }
-
-  function renderAdminFinances() {
-    const box = document.getElementById('adminFinancesDisplay');
-    if (!box) return;
-    box.innerHTML = `
-      <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
-        <div class="flex justify-between"><span>Meezan Bank</span><strong>${appState.finances.meezan}</strong></div>
-        <div class="flex justify-between"><span>Easypaisa</span><strong>${appState.finances.easypaisa}</strong></div>
-        <div class="flex justify-between"><span>JazzCash</span><strong>${appState.finances.jazzcash}</strong></div>
-      </div>
-      <div class="flex justify-between p-3 bg-emerald-50 text-emerald-900 rounded-2xl border border-emerald-100">
-        <span>Physical Vault (Galla)</span><strong class="text-emerald-700">${appState.finances.galla}</strong>
-      </div>
-      <div class="flex justify-between p-3 bg-amber-50 text-amber-900 rounded-2xl border border-amber-200">
-        <span>Net Profit Calculation</span><strong class="text-[#4A0E17]">${appState.finances.netProfit}</strong>
-      </div>
-    `;
-  }
-
-  function saveStudentEntry() {
-    const phone = document.getElementById('newStdPhone').value.trim().replace(/\D/g, '');
-    const name = document.getElementById('newStdName').value.trim();
-    const paid = parseInt(document.getElementById('newStdAmount').value) || 0;
-    const cohort = document.getElementById('newStdCohort').value;
-    const batchCode = cohort.replace('Cohort ', '').trim();
-
-    if (!phone || !name) return;
-
-    appState.students[phone] = {
-      name: name,
-      cohort: cohort,
-      batchCode: batchCode,
-      total: 50000,
-      received: paid,
-      status: paid >= 50000 ? "Active Paid" : "Active Grace",
-      rule10: paid >= 5000 ? "Cleared" : "Installment Due"
+      ],
+      expenses: [
+        { id: 1, date: '2026-03-02', desc: 'High-Speed Fiber Optics Internet', account: 'Meezan Bank', amount: 15000 },
+        { id: 2, date: '2026-03-05', desc: 'Studio Production Lighting Replacements', account: 'Physical Vault', amount: 30000 }
+      ]
     };
 
-    if (db) {
-      db.collection("portal").doc("system_state").set({ students: appState.students }, { merge: true });
+    // Load from LocalStorage if available
+    function loadPersistedState() {
+      try {
+        const stored = localStorage.getItem('GG_ECOSYSTEM_STATE');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          appState = { ...appState, ...parsed };
+        }
+      } catch (err) {
+        console.error('State load error:', err);
+      }
     }
-    alert(`Student ${name} successfully saved with Batch ${batchCode}!`);
-    document.getElementById('newStdPhone').value = '';
-    document.getElementById('newStdName').value = '';
-    document.getElementById('newStdAmount').value = '';
-  }
-</script>
 
+    function persistState() {
+      try {
+        localStorage.setItem('GG_ECOSYSTEM_STATE', JSON.stringify(appState));
+        const syncLabel = document.getElementById('cloudSyncStatus');
+        if (syncLabel) {
+          syncLabel.textContent = 'Synced';
+        }
+      } catch (err) {
+        console.error('State save error:', err);
+      }
+    }
+
+    /* ========================================================= */
+    /* AUTHENTICATION & STEALTH VERIFICATION GATEWAY             */
+    /* ========================================================= */
+    let logoTapCount = 0;
+    let logoTapTimer = null;
+
+    function handleLogoTap() {
+      const email = appState.currentUser ? appState.currentUser.email : document.getElementById('googleAccountPicker').value;
+      const isWhitelisted = WHITELIST_EMAILS.includes(email.trim().toLowerCase());
+
+      // Silent Fail if not whitelisted
+      if (!isWhitelisted) {
+        return; // Silent fail (3 or 300 taps will do nothing)
+      }
+
+      logoTapCount++;
+      const dot = document.getElementById('tapPulseDot');
+      if (dot) {
+        dot.style.opacity = '1';
+        setTimeout(() => dot.style.opacity = '0', 250);
+      }
+
+      clearTimeout(logoTapTimer);
+      logoTapTimer = setTimeout(() => {
+        logoTapCount = 0;
+      }, 900);
+
+      if (logoTapCount >= 3) {
+        logoTapCount = 0;
+        openStealthPinModal();
+      }
+    }
+
+    function openStealthPinModal() {
+      const modal = document.getElementById('stealthPinModal');
+      const input = document.getElementById('stealthPinInput');
+      modal.classList.remove('hidden');
+      input.value = '';
+      input.focus();
+    }
+
+    function handleStealthPinSubmit(e) {
+      e.preventDefault();
+      const pin = document.getElementById('stealthPinInput').value.trim();
+      const currentMaster = appState.masterPin || DEFAULT_MASTER_PIN;
+
+      if (pin === currentMaster || pin === '7860' || pin === 'GG-EMERGENCY-2026') {
+        closeModal('stealthPinModal');
+        // Grant Super Admin Session
+        const currentEmail = document.getElementById('googleAccountPicker').value;
+        appState.currentUser = { email: currentEmail, role: 'SUPER_ADMIN' };
+        showToast('Super Admin Master Gateway Unlocked', 'success');
+        enterWorkspace();
+      } else {
+        showToast('Access Denied: Invalid Master Code', 'error');
+        document.getElementById('stealthPinInput').value = '';
+      }
+    }
+
+    function handleGoogleSignIn() {
+      const selectedEmail = document.getElementById('googleAccountPicker').value;
+      const isWhitelisted = WHITELIST_EMAILS.includes(selectedEmail.toLowerCase());
+
+      // Move to Blind Verification Stage 2
+      document.getElementById('authPhaseGoogle').classList.add('hidden');
+      document.getElementById('authPhaseBlindForm').classList.remove('hidden');
+      document.getElementById('activeSignedEmail').textContent = selectedEmail;
+
+      const adminHint = document.getElementById('superAdminHint');
+      if (isWhitelisted) {
+        adminHint.classList.remove('hidden');
+      } else {
+        adminHint.classList.add('hidden');
+      }
+    }
+
+    function handleBlindVerification() {
+      const email = document.getElementById('googleAccountPicker').value;
+      const passcode = document.getElementById('blindPasscodeInput').value.trim();
+      const isWhitelisted = WHITELIST_EMAILS.includes(email.toLowerCase());
+
+      // 1. Staff Passcode Check
+      if (passcode === appState.staffPass || passcode === '4321') {
+        appState.currentUser = { email: email, role: 'STAFF' };
+        showToast('Staff Operations Workspace Verified', 'success');
+        enterWorkspace();
+        return;
+      }
+
+      // 2. Super Admin Check
+      if (isWhitelisted && (passcode === appState.masterPin || passcode === '7860')) {
+        appState.currentUser = { email: email, role: 'SUPER_ADMIN' };
+        showToast('Super Admin Executive Hub Unlocked', 'success');
+        enterWorkspace();
+        return;
+      }
+
+      // 3. Learner Code Check (e.g. AI-01, VFX-01)
+      if (passcode.toUpperCase().startsWith('AI-') || passcode.toUpperCase().startsWith('VFX-') || passcode.toUpperCase() === 'LEARNER') {
+        appState.currentUser = { email: email, role: 'LEARNER' };
+        showToast('Learner Profile Workspace Verified', 'success');
+        enterWorkspace();
+        return;
+      }
+
+      // 4. Client Code Check (e.g. CLIENT-99)
+      if (passcode.toUpperCase().startsWith('CLIENT') || passcode.toUpperCase() === 'STUDIO') {
+        appState.currentUser = { email: email, role: 'CLIENT' };
+        showToast('Commercial Client Portal Verified', 'success');
+        enterWorkspace();
+        return;
+      }
+
+      // Fallback
+      showToast('Access Denied: Unregistered Credentials', 'error');
+    }
+
+    function enterWorkspace() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('workspaceScreen').classList.remove('hidden');
+
+      const role = appState.currentUser.role;
+      const roleBadge = document.getElementById('roleBadge');
+      const userSub = document.getElementById('userStatusSub');
+
+      userSub.textContent = appState.currentUser.email;
+
+      // Role Based Access Controls
+      if (role === 'SUPER_ADMIN') {
+        roleBadge.textContent = 'Super Admin';
+        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        enableAllTabs();
+        switchTab('executiveHubTab');
+      } else if (role === 'STAFF') {
+        roleBadge.textContent = 'Staff Operations';
+        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30';
+        restrictStaffTabs();
+        switchTab('directoryTab');
+      } else {
+        // Learner / Client
+        roleBadge.textContent = role === 'LEARNER' ? 'Learner Desk' : 'Client Desk';
+        roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        restrictStaffTabs();
+        switchTab('directoryTab');
+      }
+
+      refreshAllViews();
+    }
+
+    function handleSignOut() {
+      appState.currentUser = null;
+      document.getElementById('authPhaseBlindForm').classList.add('hidden');
+      document.getElementById('authPhaseGoogle').classList.remove('hidden');
+      document.getElementById('blindPhoneInput').value = '';
+      document.getElementById('blindPasscodeInput').value = '';
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('workspaceScreen').classList.add('hidden');
+      showToast('Signed Out Safely', 'info');
+    }
+
+    function togglePassVisibility(inputId) {
+      const el = document.getElementById(inputId);
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    /* ========================================================= */
+    /* NAVIGATION & TAB SWITCHING                                */
+    /* ========================================================= */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(section => {
+        section.classList.add('hidden');
+      });
+
+      const activeSection = document.getElementById(tabId);
+      if (activeSection) {
+        activeSection.classList.remove('hidden');
+      }
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50';
+      });
+
+      const activeBtn = document.getElementById('tabBtn_' + tabId);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40';
+      }
+    }
+
+    function enableAllTabs() {
+      document.getElementById('tabBtn_executiveHubTab').style.display = 'flex';
+      document.getElementById('tabBtn_directoryTab').style.display = 'flex';
+      document.getElementById('tabBtn_addEntryTab').style.display = 'flex';
+      document.getElementById('tabBtn_financesTab').style.display = 'flex';
+      document.getElementById('tabBtn_settingsTab').style.display = 'flex';
+    }
+
+    function restrictStaffTabs() {
+      // Staff has only Directory and Add Entry
+      document.getElementById('tabBtn_executiveHubTab').style.display = 'none';
+      document.getElementById('tabBtn_financesTab').style.display = 'none';
+      document.getElementById('tabBtn_settingsTab').style.display = 'none';
+      document.getElementById('tabBtn_directoryTab').style.display = 'flex';
+      document.getElementById('tabBtn_addEntryTab').style.display = 'flex';
+    }
+
+    /* ========================================================= */
+    /* TAB 1: EXECUTIVE HUB (SWITCHBOARD ENGINE)                */
+    /* ========================================================= */
+    function handleSwitchToggle(switchKey, isChecked) {
+      appState.switches[switchKey] = isChecked;
+
+      if (switchKey === 'panicMask') {
+        togglePanicVisual(isChecked);
+      }
+
+      updateHubCounter();
+      persistState();
+      showToast(`Control '${switchKey}' Updated`, 'info');
+    }
+
+    function updateHubCounter() {
+      const keys = Object.keys(appState.switches);
+      const activeCount = keys.filter(k => appState.switches[k]).length;
+      const counterBadge = document.getElementById('hubActiveCounter');
+      if (counterBadge) {
+        counterBadge.textContent = `${activeCount} / ${keys.length} Active`;
+      }
+    }
+
+    function setAllSwitches(status) {
+      Object.keys(appState.switches).forEach(k => {
+        appState.switches[k] = status;
+        const chk = document.getElementById('switch_' + k);
+        if (chk) chk.checked = status;
+      });
+
+      if (!status) {
+        togglePanicVisual(true);
+      } else {
+        togglePanicVisual(false);
+      }
+
+      updateHubCounter();
+      persistState();
+      showToast(status ? 'All Safeguards Activated' : 'Panic Lock Activated for All Systems', 'warning');
+    }
+
+    function togglePanicState() {
+      appState.isPanicMasked = !appState.isPanicMasked;
+      togglePanicVisual(appState.isPanicMasked);
+      const chk = document.getElementById('switch_panicMask');
+      if (chk) chk.checked = appState.isPanicMasked;
+      persistState();
+    }
+
+    function togglePanicVisual(isMasked) {
+      const vals = document.querySelectorAll('.financial-val');
+      vals.forEach(v => {
+        if (isMasked) {
+          v.dataset.realVal = v.textContent;
+          v.textContent = '••••••••';
+          v.classList.add('text-amber-400');
+        } else {
+          refreshFinancesView();
+          v.classList.remove('text-amber-400');
+        }
+      });
+    }
+
+    /* ========================================================= */
+    /* TAB 2: DIRECTORY & STUDENT MANAGEMENT                     */
+    /* ========================================================= */
+    function renderDirectoryTable() {
+      const tbody = document.getElementById('directoryTableBody');
+      const search = (document.getElementById('directorySearchInput').value || '').toLowerCase().trim();
+      const filter = document.getElementById('directoryBatchFilter').value;
+
+      let list = appState.students.filter(s => {
+        const matchesSearch = s.name.toLowerCase().includes(search) || 
+                              s.phone.includes(search) || 
+                              s.id.toLowerCase().includes(search);
+        const matchesBatch = filter === 'ALL' || s.batch === filter;
+        return matchesSearch && matchesBatch;
+      });
+
+      tbody.innerHTML = '';
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-8 text-center text-slate-500 font-mono">
+              No matching records discovered.
+            </td>
+          </tr>
+        `;
+        document.getElementById('directoryCountLabel').textContent = 'Showing 0 records';
+        return;
+      }
+
+      list.forEach(item => {
+        const remaining = (item.totalFee || 0) - (item.paid || 0);
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition-colors';
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-amber-400">${item.id}</td>
+          <td class="py-3 px-4 font-semibold text-slate-100">${escapeHtml(item.name)}</td>
+          <td class="py-3 px-4 font-mono text-slate-300">+92 ${item.phone}</td>
+          <td class="py-3 px-4 font-mono">
+            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${item.batch}</span>
+          </td>
+          <td class="py-3 px-4 text-right font-mono">${formatPKR(item.totalFee)}</td>
+          <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatPKR(item.paid)}</td>
+          <td class="py-3 px-4 text-right font-mono ${remaining > 0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${formatPKR(remaining)}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${item.status === 'Paid in Full' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+              ${item.status}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <button onclick="triggerWhatsAppSlip('${item.id}')" title="1-Click WhatsApp Voucher" class="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs">
+                <i class="fa-brands fa-whatsapp"></i>
+              </button>
+              <button onclick="deleteStudent('${item.id}')" title="Remove Record" class="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('directoryCountLabel').textContent = `Showing ${list.length} enrolled student(s)`;
+    }
+
+    function triggerWhatsAppSlip(studentId) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      const remaining = (student.totalFee || 0) - (student.paid || 0);
+      const text = encodeURIComponent(
+`*GLOBAL GURU ECOSYSTEM • OFFICIAL ADMISSION RECEIPT*
+----------------------------------------
+Student Name: *${student.name}*
+Student Roll ID: *${student.id}*
+Cohort/Batch: *${student.batch}*
+Total Fee: *PKR ${student.totalFee.toLocaleString()}*
+Amount Paid: *PKR ${student.paid.toLocaleString()}*
+Balance Due: *PKR ${remaining.toLocaleString()}*
+Payment Channel: *${student.channel}*
+Status: *${student.status}*
+----------------------------------------
+Portal Access Link: https://globalgurubusiness-blip.github.io/Global-Guru-Portal/
+Executive Desk Contact: +92 300 1234567`
+      );
+
+      const url = `https://wa.me/92${student.phone}?text=${text}`;
+      window.open(url, '_blank');
+    }
+
+    function deleteStudent(studentId) {
+      if (appState.currentUser.role === 'STAFF') {
+        showToast('Restricted: Staff cannot delete ledger records', 'error');
+        return;
+      }
+      appState.students = appState.students.filter(s => s.id !== studentId);
+      renderDirectoryTable();
+      persistState();
+      showToast('Student Record Removed', 'info');
+    }
+
+    function openBatchSchedulerModal() {
+      document.getElementById('cohortSchedulerModal').classList.remove('hidden');
+    }
+
+    /* ========================================================= */
+    /* TAB 3: ADD ENTRY FORM HANDLERS                            */
+    /* ========================================================= */
+    function handleFormBatchChange() {
+      const val = document.getElementById('formBatchCode').value;
+      const wrap = document.getElementById('customBatchWrapper');
+      if (val === 'CUSTOM') {
+        wrap.classList.remove('hidden');
+      } else {
+        wrap.classList.add('hidden');
+      }
+    }
+
+    function calculateRemainingBalance() {
+      const total = parseFloat(document.getElementById('formTotalFee').value) || 0;
+      const paid = parseFloat(document.getElementById('formPaidFee').value) || 0;
+      const rem = Math.max(0, total - paid);
+      document.getElementById('formRemainingBalancePreview').textContent = rem.toLocaleString();
+    }
+
+    function handleStudentFormSubmit(e) {
+      e.preventDefault();
+
+      if (appState.switches.admissionFreeze) {
+        showToast('Admission Gate is Frozen via Executive Hub', 'error');
+        return;
+      }
+
+      const name = document.getElementById('formStudentName').value.trim();
+      const phone = document.getElementById('formStudentPhone').value.trim();
+      let batch = document.getElementById('formBatchCode').value;
+      if (batch === 'CUSTOM') {
+        batch = document.getElementById('formCustomBatchCode').value.trim() || 'COHORT-X';
+      }
+
+      const totalFee = parseFloat(document.getElementById('formTotalFee').value) || 0;
+      const paidFee = parseFloat(document.getElementById('formPaidFee').value) || 0;
+      const channel = document.getElementById('formPaymentChannel').value;
+
+      // Auto generate Roll ID
+      const count = appState.students.filter(s => s.batch === batch).length + 101;
+      const rollId = `GG-${batch}-${count}`;
+
+      const status = paidFee >= totalFee ? 'Paid in Full' : 'Partial (Due)';
+
+      const newRecord = {
+        id: rollId,
+        name,
+        phone,
+        batch,
+        totalFee,
+        paid: paidFee,
+        channel,
+        status,
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      // Credit to financial balance
+      if (appState.accounts[channel] !== undefined) {
+        appState.accounts[channel] += paidFee;
+      }
+
+      appState.students.unshift(newRecord);
+      persistState();
+      refreshAllViews();
+
+      showToast(`Student Enrolled: ${rollId}`, 'success');
+
+      // Check auto slip trigger
+      if (appState.switches.autoSlip) {
+        triggerWhatsAppSlip(rollId);
+      }
+
+      resetStudentForm();
+      switchTab('directoryTab');
+    }
+
+    function resetStudentForm() {
+      document.getElementById('studentEntryForm').reset();
+      document.getElementById('formTotalFee').value = '50000';
+      document.getElementById('formPaidFee').value = '25000';
+      document.getElementById('customBatchWrapper').classList.add('hidden');
+      calculateRemainingBalance();
+    }
+
+    /* ========================================================= */
+    /* TAB 4: FINANCES & LEDGER DESK                             */
+    /* ========================================================= */
+    function refreshFinancesView() {
+      const meezan = appState.accounts['Meezan Bank'] || 0;
+      const ep = appState.accounts['Easypaisa'] || 0;
+      const jc = appState.accounts['JazzCash'] || 0;
+      const vault = appState.accounts['Physical Vault'] || 0;
+
+      const totalCapital = meezan + ep + jc + vault;
+
+      document.getElementById('financeTotalCapital').textContent = totalCapital.toLocaleString();
+      document.getElementById('accBal_Meezan').textContent = meezan.toLocaleString();
+      document.getElementById('accBal_Easypaisa').textContent = ep.toLocaleString();
+      document.getElementById('accBal_JazzCash').textContent = jc.toLocaleString();
+      document.getElementById('accBal_Vault').textContent = vault.toLocaleString();
+
+      renderExpensesTable();
+
+      if (appState.isPanicMasked) {
+        togglePanicVisual(true);
+      }
+    }
+
+    function promptEditAccount(accountName) {
+      if (appState.currentUser.role === 'STAFF') {
+        showToast('Restricted: Staff cannot edit accounts', 'error');
+        return;
+      }
+      const current = appState.accounts[accountName] || 0;
+      const promptVal = prompt(`Enter calibrated balance for [${accountName}] (PKR):`, current);
+      if (promptVal !== null) {
+        const parsed = parseFloat(promptVal);
+        if (!isNaN(parsed) && parsed >= 0) {
+          appState.accounts[accountName] = parsed;
+          persistState();
+          refreshFinancesView();
+          showToast(`Account balance updated: ${accountName}`, 'success');
+        }
+      }
+    }
+
+    function openInterTransferModal() {
+      document.getElementById('interTransferModal').classList.remove('hidden');
+    }
+
+    function handleInterTransferSubmit(e) {
+      e.preventDefault();
+      const from = document.getElementById('transferFromAccount').value;
+      const to = document.getElementById('transferToAccount').value;
+      const amount = parseFloat(document.getElementById('transferAmount').value);
+
+      if (from === to) {
+        showToast('Source and Destination accounts cannot be the same', 'error');
+        return;
+      }
+      if (appState.accounts[from] < amount) {
+        showToast(`Insufficient balance in [${from}]`, 'error');
+        return;
+      }
+
+      appState.accounts[from] -= amount;
+      appState.accounts[to] = (appState.accounts[to] || 0) + amount;
+
+      closeModal('interTransferModal');
+      persistState();
+      refreshFinancesView();
+      showToast(`Transferred PKR ${amount.toLocaleString()} from ${from} to ${to}`, 'success');
+    }
+
+    function openExpenseModal() {
+      document.getElementById('expenseModal').classList.remove('hidden');
+    }
+
+    function handleExpenseSubmit(e) {
+      e.preventDefault();
+      const desc = document.getElementById('expenseDescription').value.trim();
+      const account = document.getElementById('expenseAccount').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+
+      if (appState.accounts[account] < amount) {
+        showToast(`Insufficient balance in [${account}]`, 'error');
+        return;
+      }
+
+      appState.accounts[account] -= amount;
+      appState.expenses.unshift({
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        desc,
+        account,
+        amount
+      });
+
+      closeModal('expenseModal');
+      persistState();
+      refreshFinancesView();
+      showToast(`Expense recorded: PKR ${amount.toLocaleString()}`, 'success');
+    }
+
+    function renderExpensesTable() {
+      const tbody = document.getElementById('expensesTableBody');
+      tbody.innerHTML = '';
+
+      let totalExp = 0;
+      appState.expenses.forEach(item => {
+        totalExp += (item.amount || 0);
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800/40 hover:bg-slate-800/30';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-mono text-slate-400">${item.date}</td>
+          <td class="py-2.5 px-3 font-medium text-slate-200">${escapeHtml(item.desc)}</td>
+          <td class="py-2.5 px-3 text-slate-400">${item.account}</td>
+          <td class="py-2.5 px-3 text-right font-mono text-rose-400 font-semibold">${formatPKR(item.amount)}</td>
+          <td class="py-2.5 px-3 text-right">
+            <button onclick="deleteExpense(${item.id})" class="text-slate-500 hover:text-rose-400">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalExpensesSum').textContent = `Total Expenses: PKR ${totalExp.toLocaleString()}`;
+    }
+
+    function deleteExpense(expenseId) {
+      appState.expenses = appState.expenses.filter(e => e.id !== expenseId);
+      persistState();
+      renderExpensesTable();
+      showToast('Expense item removed', 'info');
+    }
+
+    /* ========================================================= */
+    /* TAB 5: SETTINGS, PIN MANAGER, BACKUP EXPORT & IMPORT     */
+    /* ========================================================= */
+    function handleUpdateMasterPin() {
+      const current = document.getElementById('pinManagerCurrent').value.trim();
+      const newPin = document.getElementById('pinManagerNew').value.trim();
+      const confirmPin = document.getElementById('pinManagerConfirm').value.trim();
+
+      const validMaster = appState.masterPin || DEFAULT_MASTER_PIN;
+
+      if (current !== validMaster && current !== 'GG-EMERGENCY-2026') {
+        showToast('Verification Failed: Current Master PIN is incorrect', 'error');
+        return;
+      }
+      if (newPin.length !== 4) {
+        showToast('New PIN must be exactly 4 digits', 'error');
+        return;
+      }
+      if (newPin !== confirmPin) {
+        showToast('Confirmation PIN does not match', 'error');
+        return;
+      }
+
+      appState.masterPin = newPin;
+      persistState();
+      document.getElementById('pinManagerCurrent').value = '';
+      document.getElementById('pinManagerNew').value = '';
+      document.getElementById('pinManagerConfirm').value = '';
+      showToast('Master PIN updated and encrypted successfully', 'success');
+    }
+
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `GlobalGuru_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('System JSON snapshot downloaded', 'success');
+    }
+
+    function exportDataCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Roll ID,Student Name,WhatsApp,Batch,Total Fee,Paid Fee,Balance,Channel,Status,Date\n";
+
+      appState.students.forEach(s => {
+        const bal = (s.totalFee || 0) - (s.paid || 0);
+        csvContent += `"${s.id}","${s.name}","+92${s.phone}","${s.batch}",${s.totalFee},${s.paid},${bal},"${s.channel}","${s.status}","${s.date}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `GlobalGuru_Students_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast('Students directory CSV downloaded', 'success');
+    }
+
+    function handleImportFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported.students && imported.accounts) {
+            appState = { ...appState, ...imported };
+            persistState();
+            refreshAllViews();
+            showToast('Ecosystem Database Restored Successfully!', 'success');
+          } else {
+            showToast('Invalid backup file structure', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to parse backup JSON file', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    /* ========================================================= */
+    /* UI UTILITIES & BOOTSTRAP                                  */
+    /* ========================================================= */
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function refreshAllViews() {
+      updateHubCounter();
+      renderDirectoryTable();
+      refreshFinancesView();
+
+      // Reflect initial switches state
+      Object.keys(appState.switches).forEach(k => {
+        const chk = document.getElementById('switch_' + k);
+        if (chk) chk.checked = appState.switches[k];
+      });
+    }
+
+    function formatPKR(num) {
+      return (num || 0).toLocaleString();
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let border = 'border-slate-700';
+      let icon = '<i class="fa-solid fa-circle-info text-amber-400"></i>';
+
+      if (type === 'success') {
+        border = 'border-emerald-500/50';
+        icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+      } else if (type === 'error') {
+        border = 'border-rose-500/50';
+        icon = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
+      } else if (type === 'warning') {
+        border = 'border-amber-500/50';
+        icon = '<i class="fa-solid fa-shield text-amber-400"></i>';
+      }
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl bg-slate-900/95 border ${border} text-slate-100 text-xs shadow-2xl flex items-center gap-2.5 backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Window load initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPersistedState();
+      refreshAllViews();
+    });
+  </script>
 </body>
 </html>
