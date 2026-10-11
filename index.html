@@ -66,6 +66,9 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
+    /* Core Visibility Fix: Prevents All Screens from Stacking */
+    .hidden { display: none !important; }
+
     .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
     a { color: inherit; text-decoration: none; }
     button, input, select, textarea { font: inherit; }
@@ -77,7 +80,7 @@
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 99px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
 
-    /* Layout Components */
+    /* Shell Architecture */
     #shell { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; width: 100%; }
     .sidebar {
       background: var(--card);
@@ -136,7 +139,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 11px;
+      padding: 8.5px 11px;
       border-radius: 8px;
       font-size: 12.5px;
       font-weight: 600;
@@ -170,7 +173,7 @@
       flex-shrink: 0;
     }
 
-    /* Main Container */
+    /* Content Area */
     .content-area {
       min-width: 0;
       display: flex;
@@ -365,11 +368,11 @@
     }
     .input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
 
-    /* Footer & Overlap Fix */
+    /* Natural Flex Footer */
     footer.app-footer {
       background: var(--card);
       border-top: 1px solid var(--line);
-      padding: 12px 20px;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -463,7 +466,7 @@
 </head>
 
 <body>
-  <!-- TOAST CONTAINER -->
+  <!-- TOAST NOTIFICATIONS -->
   <div id="toastStack" class="toast-stack"></div>
 
   <!-- MOBILE SIDEBAR BACKDROP -->
@@ -475,20 +478,19 @@
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-[#070b12]" style="display: flex;">
     <div class="card" style="width: min(440px, 100%); box-shadow: var(--shadow-lg); border-radius: 20px; padding: 24px;">
       
-      <!-- Logo Lockup with Triple Click Stealth -->
+      <!-- Real Logo with Triple-Tap Stealth Support -->
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
         <img class="brand-logo-img" src="logo.png" alt="GG" onclick="handleLogoTap()" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="brand-logo-fallback" onclick="handleLogoTap()">GG</div>
         <div>
           <h2 style="font-size: 18px; font-weight: 800; margin: 0; line-height: 1.2;">Global Guru Portal</h2>
-          <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" class="mono">ENTERPRISE GATEWAY • V6.0</p>
+          <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" class="mono">ENTERPRISE GATEWAY • V6.1</p>
         </div>
       </div>
 
-      <!-- Auth Form -->
       <div id="authLoginForm">
         <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">
-          Enter your registered WhatsApp number / User ID and personal 4-6 digit passcode to unlock your workspace.
+          Enter your registered WhatsApp number / User ID and personal passcode to unlock your workspace.
         </p>
 
         <form onsubmit="handleAuthSubmit(event)">
@@ -526,7 +528,7 @@
               <span class="mono">PIN: 5555</span>
             </button>
             <button type="button" onclick="fillAuth('03112223344', '4321')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Staff Desk</b> (Reception & Intake)</span>
+              <span><b>Staff Desk</b> (Reception)</span>
               <span class="mono">PIN: 4321</span>
             </button>
             <button type="button" onclick="fillAuth('03224445566', '8888')" class="btn sm" style="justify-content: space-between;">
@@ -572,7 +574,7 @@
       <!-- Navigation Links -->
       <nav id="sidebarNav" class="side-nav"></nav>
 
-      <!-- Sidebar User Profile Info -->
+      <!-- User Profile Box -->
       <div class="side-user-card">
         <div id="sideUserAvatar" class="user-avatar">YA</div>
         <div style="min-width: 0; flex: 1;">
@@ -583,7 +585,7 @@
       </div>
     </aside>
 
-    <!-- RIGHT WORKSPACE CONTENT -->
+    <!-- RIGHT WORKSPACE AREA -->
     <div class="content-area">
       
       <!-- TOP EXECUTIVE BAR -->
@@ -613,14 +615,13 @@
         </div>
       </header>
 
-      <!-- MAIN SCROLLABLE CONTENT BODY -->
+      <!-- MAIN CONTENT BODY (Tab Isolated via .hidden) -->
       <main class="main-body">
         
         <!-- ============================================== -->
-        <!-- VIEW 1: EXECUTIVE HUB (OWNER / ADMIN)          -->
+        <!-- VIEW 1: EXECUTIVE HUB (OWNER / ADMIN ONLY)     -->
         <!-- ============================================== -->
         <section id="view-executive" class="view-panel hidden">
-          <!-- Stats Summary -->
           <div class="grid-stats">
             <div class="stat-card">
               <div class="stat-head"><span>TOTAL LIQUID ASSETS</span><div class="stat-icon"><i class="fa-solid fa-vault"></i></div></div>
@@ -647,7 +648,6 @@
             </div>
           </div>
 
-          <!-- 11 Animated Master Controls Grid -->
           <div class="card">
             <div class="card-head">
               <h4><i class="fa-solid fa-sliders" style="color: var(--brand); margin-right: 6px;"></i> Executive Switchboard & Safeguards</h4>
@@ -661,7 +661,7 @@
 
 
         <!-- ============================================== -->
-        <!-- VIEW 2: PRIVATE LEARNER LMS (DEDICATED)        -->
+        <!-- VIEW 2: PRIVATE LEARNER LMS (STUDENTS ONLY)    -->
         <!-- ============================================== -->
         <section id="view-learner" class="view-panel hidden">
           <div class="card">
@@ -730,6 +730,9 @@
               </div>
             </div>
           </div>
+
+          <!-- Official Executive Social Handle Card (Visible to Learner for Trust) -->
+          <div id="learnerSocialMount"></div>
         </section>
 
 
@@ -754,7 +757,7 @@
                 </div>
 
                 <div class="stat-card">
-                  <div class="stat-head"><span>TOTAL VALUE</span><div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div></div>
+                  <div class="stat-head"><span>TOTAL CONTRACT VALUE</span><div class="stat-icon"><i class="fa-solid fa-file-invoice"></i></div></div>
                   <div class="stat-val mono financial-num" id="clientTotalBilled">PKR 85,000</div>
                   <div class="stat-sub">Commercial contract sum</div>
                 </div>
@@ -774,7 +777,6 @@
             </div>
           </div>
 
-          <!-- 13 Services Showcase Catalogue & Approved Portfolio Samples -->
           <div class="card">
             <div class="card-head">
               <h4>13 Global Guru Official Services & Portfolio Work</h4>
@@ -784,6 +786,9 @@
               <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;" id="clientServicesCatalogueGrid"></div>
             </div>
           </div>
+
+          <!-- Official Executive Social Handle Card (Visible to Client for B2B Verification) -->
+          <div id="clientSocialMount"></div>
         </section>
 
 
@@ -823,10 +828,9 @@
 
 
         <!-- ============================================== -->
-        <!-- VIEW 5: CENTRAL LEDGER & FINANCES              -->
+        <!-- VIEW 5: CENTRAL GENERAL LEDGER & VAULTS        -->
         <!-- ============================================== -->
         <section id="view-finance" class="view-panel hidden">
-          <!-- 4 Bank / Cash Vaults Summary -->
           <div class="grid-stats">
             <div class="stat-card">
               <div class="stat-head"><span>MEEZAN BANK LTD</span><div class="stat-icon"><i class="fa-solid fa-building-columns"></i></div></div>
@@ -914,12 +918,12 @@
 
 
         <!-- ============================================== -->
-        <!-- VIEW 7: SECURITY CENTER, AUDIT & IDENTITY      -->
+        <!-- VIEW 7: SECURITY CENTER, AUDIT & SNAPSHOTS     -->
         <!-- ============================================== -->
         <section id="view-settings" class="view-panel hidden">
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
             
-            <!-- Master PIN & Recovery -->
+            <!-- Master PIN & Recovery (Owner Alone) -->
             <div class="card">
               <div class="card-head"><h4><i class="fa-solid fa-lock" style="color: var(--brand); margin-right: 6px;"></i> Master PIN & Recovery Token</h4></div>
               <div class="card-body">
@@ -947,40 +951,30 @@
               </div>
             </div>
 
-            <!-- Corporate Identity & Social Handles -->
+            <!-- System Information & Maintenance Card -->
             <div class="card">
-              <div class="card-head"><h4><i class="fa-solid fa-id-badge" style="color: var(--brand); margin-right: 6px;"></i> Corporate Executive Handle</h4></div>
-              <div class="card-body">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-                  <div class="user-avatar" style="width: 44px; height: 44px; font-size: 16px;">YA</div>
-                  <div>
-                    <strong style="display: block; font-size: 14px;">Yasir Ali</strong>
-                    <span style="font-size: 11px; color: var(--gold); font-weight: 700;">Founder & CEO • Global Guru</span>
-                  </div>
+              <div class="card-head"><h4><i class="fa-solid fa-server" style="color: var(--brand); margin-right: 6px;"></i> Node Status & Environment</h4></div>
+              <div class="card-body" style="font-size: 12px; display: grid; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
+                  <span style="color: var(--muted);">Cluster:</span>
+                  <span class="mono font-bold">Multan Tech Cluster (PK-01)</span>
                 </div>
-
-                <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="btn sm" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">
-                  <i class="fa-brands fa-linkedin" style="color: #0a66c2;"></i> <span>linkedin.com/in/yasiraliglobalguru</span>
-                </a>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11.5px;">
-                  <a href="https://www.youtube.com/@GlobalGuruBusiness" target="_blank" class="btn sm" style="justify-content: flex-start;">
-                    <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> <span>YouTube</span>
-                  </a>
-                  <a href="https://www.instagram.com/globalgurubusiness" target="_blank" class="btn sm" style="justify-content: flex-start;">
-                    <i class="fa-brands fa-instagram" style="color: #ec4899;"></i> <span>Instagram</span>
-                  </a>
-                  <a href="https://www.facebook.com/globalgurubusiness" target="_blank" class="btn sm" style="justify-content: flex-start;">
-                    <i class="fa-brands fa-facebook" style="color: #2563eb;"></i> <span>Facebook</span>
-                  </a>
-                  <a href="https://www.tiktok.com/@globalgurubusiness" target="_blank" class="btn sm" style="justify-content: flex-start;">
-                    <i class="fa-brands fa-tiktok"></i> <span>TikTok</span>
-                  </a>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
+                  <span style="color: var(--muted);">Protocol:</span>
+                  <span class="mono font-bold">TLS 1.3 / PBKDF2 Encrypted</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
+                  <span style="color: var(--muted);">Ledger Model:</span>
+                  <span class="mono font-bold">Immutable Double-Entry Sync</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--muted);">Primary Root:</span>
+                  <span class="mono font-bold" style="color: var(--brand);">Permanently Protected</span>
                 </div>
               </div>
             </div>
 
-            <!-- Backup & Snapshots -->
+            <!-- Backup & Snapshots (Full Width) -->
             <div class="card" style="grid-column: 1 / -1;">
               <div class="card-head">
                 <h4><i class="fa-solid fa-database" style="color: var(--brand); margin-right: 6px;"></i> System Backups & Audit Trace</h4>
@@ -1015,38 +1009,38 @@
 
       </main>
 
-      <!-- NATURAL FLEX FOOTER (ZERO OVERLAP) -->
+      <!-- OFFICIAL BRAND FOOTER (NATURAL FLOW, ZERO OVERLAP) -->
       <footer class="app-footer">
-        <div>Global Guru Enterprise Ecosystem • Multan Tech Cluster • Pakistan</div>
-        <div class="mono" style="font-size: 10.5px;">Version 6.0 Stable • Cloud Ledger Sync Active</div>
+        <div>Global Guru Enterprise Ecosystem • Powered by Global Guru</div>
+        <div class="mono" style="font-size: 10.5px;">Multan Tech Cluster • Version 6.1 Production</div>
       </footer>
 
     </div>
   </div>
 
-  <!-- MODAL MOUNT CONTAINER -->
+  <!-- MODAL CONTAINER -->
   <div id="modalMount"></div>
 
   <script>
     /* ======================================================== */
     /* MASTER DATA & STATE ENGINE                               */
     /* ======================================================== */
-    const STORAGE_KEY = 'GG_ECOSYSTEM_MASTER_V6';
-    const SESSION_KEY = 'GG_SESSION_USER_ID_V6';
+    const STORAGE_KEY = 'GG_ECOSYSTEM_MASTER_V6_1';
+    const SESSION_KEY = 'GG_SESSION_USER_ID_V6_1';
 
     const ALL_13_SERVICES = [
       { id: 'SVC-01', name: 'Social Media Management', desc: 'Monthly content publishing, grid branding & organic reach strategy.', icon: 'fa-share-nodes', price: 'PKR 35,000 / mo', sample: 'https://drive.google.com' },
-      { id: 'SVC-02', name: 'Social Media Setup', desc: 'Corporate handles, profile verification, bio optimization & layout.', icon: 'fa-sliders', price: 'PKR 15,000', sample: 'https://instagram.com' },
-      { id: 'SVC-03', name: 'UGC Ads Creation', desc: 'Direct-response creator advertisement videos crafted for ecommerce.', icon: 'fa-video', price: 'PKR 25,000', sample: 'https://tiktok.com' },
-      { id: 'SVC-04', name: 'CGI & 3D Ads', desc: 'Cinematic 3D VFX product visuals & hyper-realistic camera trajectories.', icon: 'fa-cube', price: 'Starting PKR 65,000', sample: 'https://youtube.com' },
-      { id: 'SVC-05', name: 'Digital Marketing & PPC', desc: 'Meta & Google paid advertising campaigns with lead funnels.', icon: 'fa-bullhorn', price: 'Custom Quote', sample: 'https://facebook.com' },
+      { id: 'SVC-02', name: 'Social Media Setup', desc: 'Corporate handles, profile verification, bio optimization & layout.', icon: 'fa-sliders', price: 'PKR 15,000', sample: 'https://instagram.com/globalguruofficial1' },
+      { id: 'SVC-03', name: 'UGC Ads Creation', desc: 'Direct-response creator advertisement videos crafted for ecommerce.', icon: 'fa-video', price: 'PKR 25,000', sample: 'https://tiktok.com/@globalguruofficial' },
+      { id: 'SVC-04', name: 'CGI & 3D Ads', desc: 'Cinematic 3D VFX product visuals & hyper-realistic camera trajectories.', icon: 'fa-cube', price: 'Starting PKR 65,000', sample: 'https://youtube.com/@GlobalGuruofficial1' },
+      { id: 'SVC-05', name: 'Digital Marketing & PPC', desc: 'Meta & Google paid advertising campaigns with lead funnels.', icon: 'fa-bullhorn', price: 'Custom Quote', sample: 'https://facebook.com/globalguruofficial1' },
       { id: 'SVC-06', name: 'Business Branding & Identity', desc: 'Logos, color hierarchy, brand books & vector trademark collateral.', icon: 'fa-pen-ruler', price: 'PKR 45,000', sample: 'https://drive.google.com' },
-      { id: 'SVC-07', name: 'Personal Branding', desc: 'Executive LinkedIn authority positioning, podcasts & articles.', icon: 'fa-user-tie', price: 'PKR 50,000 / mo', sample: 'https://linkedin.com' },
+      { id: 'SVC-07', name: 'Personal Branding', desc: 'Executive LinkedIn authority positioning, podcasts & articles.', icon: 'fa-user-tie', price: 'PKR 50,000 / mo', sample: 'https://linkedin.com/in/yasiraliglobalguru/' },
       { id: 'SVC-08', name: 'Business Profile & Catalogue', desc: 'Sales-ready digital interactive PDF profiles & product booklets.', icon: 'fa-book-open', price: 'PKR 25,000', sample: 'https://drive.google.com' },
       { id: 'SVC-09', name: 'Business 1-on-1 Consultation', desc: 'Growth systems, operational workflows & sales architecture review.', icon: 'fa-comments', price: 'PKR 20,000 / session', sample: 'https://meet.google.com' },
       { id: 'SVC-10', name: 'Prompt Engineering', desc: 'Structured generative prompting protocols & private agent workflows.', icon: 'fa-terminal', price: 'PKR 30,000', sample: 'https://drive.google.com' },
-      { id: 'SVC-11', name: 'AI Content Creation', desc: 'Midjourney art, voice cloning, localized scripts & digital avatars.', icon: 'fa-wand-magic-sparkles', price: 'PKR 40,000', sample: 'https://youtube.com' },
-      { id: 'SVC-12', name: 'E-commerce Management', desc: 'eBay global accounts, product hunting & Amazon dropshipping operations.', icon: 'fa-cart-shopping', price: 'Revenue Share / Retainer', sample: 'https://drive.google.com' },
+      { id: 'SVC-11', name: 'AI Content Creation', desc: 'Midjourney art, voice cloning, localized scripts & digital avatars.', icon: 'fa-wand-magic-sparkles', price: 'PKR 40,000', sample: 'https://youtube.com/@GlobalGuruofficial1' },
+      { id: 'SVC-12', name: 'E-commerce Management', desc: 'eBay global accounts, product hunting & dropshipping operations.', icon: 'fa-cart-shopping', price: 'Revenue Share / Retainer', sample: 'https://drive.google.com' },
       { id: 'SVC-13', name: 'Custom Business App & Portal', desc: 'One-time development fee with lifetime usage; GG Digi Book & Khata.', icon: 'fa-laptop-code', price: 'Custom Development', sample: 'https://github.com' }
     ];
 
@@ -1112,7 +1106,7 @@
         { id: 'TXN-903', receipt: 'GG-R-882196', date: '2026-10-08', type: 'EXPENSE', category: 'Fiber Optics Internet', party: 'PTCL Enterprise', account: 'Meezan Bank', amount: 15000, status: 'POSTED' }
       ],
       audit: [
-        { time: '2026-10-11 05:40', actor: 'Yasir Ali', action: 'PORTAL_BOOT', detail: 'System initialized on secure protocol', target: 'SYSTEM' }
+        { time: '2026-10-11 05:40 PKT', actor: 'Yasir Ali', action: 'PORTAL_BOOT', detail: 'System initialized on secure protocol', target: 'SYSTEM' }
       ]
     };
 
@@ -1139,10 +1133,15 @@
       }
     }
 
+    function getPKTTimeFormatted() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())} PKT`;
+    }
+
     function addAudit(action, detail, target = 'SYSTEM') {
-      const now = new Intl.DateTimeFormat('en-PK', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Karachi' }).format(new Date());
       state.audit.unshift({
-        time: now,
+        time: getPKTTimeFormatted(),
         actor: state.currentUser ? state.currentUser.name : 'System',
         action,
         detail,
@@ -1193,7 +1192,7 @@
     }
 
     /* ======================================================== */
-    /* AUTHENTICATION & TRIPLE-CLICK STEALTH                    */
+    /* AUTHENTICATION & STEALTH                                 */
     /* ======================================================== */
     let logoTaps = 0;
     let tapTimeout = null;
@@ -1220,7 +1219,7 @@
         const pin = $('#stealthMasterCode').value.trim();
         if (pin === state.masterPin || pin === '7860' || pin === 'GG-EMERGENCY-2026') {
           const owner = state.users.find(u => u.role === 'PRIMARY_OWNER') || state.users[0];
-          setCurrentSession(owner);
+          setCurrentSession(owner, true);
           closeModal();
           showToast('Root Master Suite Authorized', 'good');
         } else {
@@ -1243,19 +1242,22 @@
 
       if (user) {
         if (user.status !== 'ACTIVE') return showToast('Account is suspended. Contact Primary Owner.', 'bad');
-        setCurrentSession(user);
-        showToast(`Welcome, ${user.name} (${user.role})`, 'good');
+        setCurrentSession(user, true); // true = record login event
+        showToast(`Welcome, ${user.name} (${user.role.replace('_', ' ')})`, 'good');
       } else {
         showToast('Invalid WhatsApp / User ID or PIN', 'bad');
       }
     }
 
-    function setCurrentSession(user) {
+    function setCurrentSession(user, shouldLogAudit = false) {
       state.currentUser = user;
       sessionStorage.setItem(SESSION_KEY, user.id);
       user.lastActive = 'Just now';
       saveState();
-      addAudit('USER_LOGIN', `Authenticated as ${user.role}`, user.id);
+
+      if (shouldLogAudit) {
+        addAudit('USER_LOGIN', `Authenticated as ${user.role}`, user.id);
+      }
       
       $('#authScreen').classList.add('hidden');
       $('#shell').classList.remove('hidden');
@@ -1266,11 +1268,15 @@
 
       buildSidebarNav();
 
-      // Route to dedicated primary view according to role
+      // Route strictly according to role
       if (user.role === 'LEARNER') {
         navigateTo('learner');
       } else if (user.role === 'CLIENT') {
         navigateTo('client');
+      } else if (user.role === 'STAFF') {
+        navigateTo('directory');
+      } else if (user.role === 'ACCOUNTS') {
+        navigateTo('finance');
       } else {
         navigateTo('executive');
       }
@@ -1284,7 +1290,7 @@
     }
 
     /* ======================================================== */
-    /* DYNAMIC 6-TIER NAVIGATION ENGINE                         */
+    /* DYNAMIC NAVIGATION & TAB SWITCHING                       */
     /* ======================================================== */
     function buildSidebarNav() {
       const role = state.currentUser ? state.currentUser.role : 'GUEST';
@@ -1334,9 +1340,11 @@
     }
 
     function navigateTo(viewId) {
+      // Hide all panels cleanly
       $$('.view-panel').forEach(p => p.classList.add('hidden'));$$
 ('.nav-btn').forEach(b => b.classList.remove('active'));
 
+      // Show requested panel
       const target = $('#view-' + viewId);
       if (target) target.classList.remove('hidden');
 
@@ -1370,8 +1378,47 @@
     }
 
     /* ======================================================== */
-    /* VIEW DATA RENDERING                                      */
+    /* VIEW DATA RENDERING & VERIFICATION CARD HTML             */
     /* ======================================================== */
+    function getExecutiveSocialCardHTML() {
+      return `
+        <div class="card" style="margin-top: 18px;">
+          <div class="card-head">
+            <h4><i class="fa-solid fa-id-badge" style="color: var(--brand); margin-right: 6px;"></i> Official Executive Leadership & Verification</h4>
+            <span class="badge good">Verified Lead</span>
+          </div>
+          <div class="card-body">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+              <div class="user-avatar" style="width: 44px; height: 44px; font-size: 16px;">YA</div>
+              <div>
+                <strong style="display: block; font-size: 14px;">Yasir Ali</strong>
+                <span style="font-size: 11px; color: var(--gold); font-weight: 700;">Founder & CEO • Global Guru</span>
+              </div>
+            </div>
+
+            <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="btn sm" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">
+              <i class="fa-brands fa-linkedin" style="color: #0a66c2;"></i> <span>linkedin.com/in/yasiraliglobalguru</span>
+            </a>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; font-size: 11.5px;">
+              <a href="https://www.youtube.com/@GlobalGuruofficial1" target="_blank" class="btn sm" style="justify-content: flex-start;">
+                <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> <span>YouTube</span>
+              </a>
+              <a href="https://www.instagram.com/globalguruofficial1" target="_blank" class="btn sm" style="justify-content: flex-start;">
+                <i class="fa-brands fa-instagram" style="color: #ec4899;"></i> <span>Instagram</span>
+              </a>
+              <a href="https://www.facebook.com/globalguruofficial1" target="_blank" class="btn sm" style="justify-content: flex-start;">
+                <i class="fa-brands fa-facebook" style="color: #2563eb;"></i> <span>Facebook</span>
+              </a>
+              <a href="https://www.tiktok.com/@globalguruofficial" target="_blank" class="btn sm" style="justify-content: flex-start;">
+                <i class="fa-brands fa-tiktok"></i> <span>TikTok</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function refreshViewData(viewId) {
       if (viewId === 'executive') renderExecutiveView();
       if (viewId === 'directory') renderDirectoryTable();
@@ -1384,7 +1431,6 @@
     }
 
     function renderExecutiveView() {
-      // Liquid Assets Calculation
       const totalLiquid = Object.values(state.accounts).reduce((a, b) => a + b, 0);
       const receivables = state.learners.reduce((a, l) => a + Math.max(0, l.totalFee - l.paid), 0) +
                           state.clients.reduce((a, c) => a + Math.max(0, c.totalValue - c.paid), 0);
@@ -1510,12 +1556,11 @@
     }
 
     function renderLearnerView() {
-      // If student logged in, find linked learner record
       let learner = null;
       if (state.currentUser.role === 'LEARNER') {
         learner = state.learners.find(l => l.id === state.currentUser.linkedId) || state.learners[0];
       } else {
-        learner = state.learners[0]; // fallback demo learner
+        learner = state.learners[0]; // Admin preview
       }
 
       if (!learner) return;
@@ -1540,6 +1585,9 @@
 
       $('#learnerCourseName').textContent = learner.mentorship;
       $('#learnerStartDate').textContent = learner.startDate;
+
+      // Mount Social Handle for Learner Authority
+      $('#learnerSocialMount').innerHTML = getExecutiveSocialCardHTML();
     }
 
     function renderClientView() {
@@ -1547,7 +1595,7 @@
       if (state.currentUser.role === 'CLIENT') {
         client = state.clients.find(c => c.id === state.currentUser.linkedId) || state.clients[0];
       } else {
-        client = state.clients[0]; // fallback demo
+        client = state.clients[0];
       }
 
       if (!client) return;
@@ -1586,6 +1634,9 @@
         `;
         catGrid.appendChild(card);
       });
+
+      // Mount Social Handle for Client B2B Verification
+      $('#clientSocialMount').innerHTML = getExecutiveSocialCardHTML();
     }
 
     function renderUsersTable() {
@@ -1648,7 +1699,6 @@
         state.accounts[account] = (state.accounts[account] || 0) + amount;
       }
 
-      // Update party balances
       if (partyType === 'LEARNER' && type === 'INCOME') {
         const l = state.learners.find(x => x.id === partyId);
         if (l) {
@@ -1681,7 +1731,6 @@
       return tx;
     }
 
-    // Mathematical Fix: Clean Reversal without Double-Deduction
     function reverseLedgerEntry(txId) {
       const tx = state.transactions.find(t => t.id === txId);
       if (!tx || tx.status !== 'POSTED') return;
@@ -1690,7 +1739,6 @@
         if ((state.accounts[tx.account] || 0) < tx.amount) {
           return showToast(`Cannot reverse: [${tx.account}] does not have PKR ${tx.amount.toLocaleString()} balance`, 'bad');
         }
-        // Deduct back
         state.accounts[tx.account] -= tx.amount;
         if (tx.partyType === 'LEARNER') {
           const l = state.learners.find(x => x.id === tx.partyId);
@@ -1703,7 +1751,6 @@
           if (c) c.paid = Math.max(0, c.paid - tx.amount);
         }
       } else if (tx.type === 'EXPENSE') {
-        // Credit back
         state.accounts[tx.account] += tx.amount;
       }
 
@@ -1742,7 +1789,6 @@
       $('#modalMount').innerHTML = '';
     }
 
-    // Modal: Inter-Vault Transfer
     function openTransferModal() {
       openModal('Inter-Vault Funds Transfer', `
         <div class="field">
@@ -1781,7 +1827,6 @@
       }, 'Execute Transfer');
     }
 
-    // Modal: Record Expense (Kharcha)
     function openExpenseModal() {
       openModal('Record Operational Expense (Kharcha)', `
         <div class="field">
@@ -1822,7 +1867,6 @@
       }, 'Record Deduction');
     }
 
-    // Modal: New Student Enrollment
     function openEnrollStudentModal() {
       if (state.switches.admissionFreeze) {
         return showToast('Admission Gate is currently frozen in Executive Hub', 'bad');
@@ -1900,7 +1944,6 @@
       }, 'Enroll & Post Fee');
     }
 
-    // Modal: Receive Installment
     function openReceivePaymentModal(partyId, partyType) {
       const party = partyType === 'LEARNER' 
         ? state.learners.find(l => l.id === partyId) 
@@ -1955,6 +1998,7 @@ Total Paid: *PKR ${l.paid.toLocaleString()}*
 Remaining Balance: *PKR ${rem.toLocaleString()}*
 Status: *${l.status}*
 ====================================
+Global Guru Enterprise Ecosystem • Powered by Global Guru
 Multan Tech Cluster • Multan, Pakistan
 Executive Helpline: +92 300 1234567`
       );
@@ -2013,7 +2057,7 @@ Executive Helpline: +92 300 1234567`
     function purgeDemoRecordsSafe() {
       if (state.currentUser.role !== 'PRIMARY_OWNER') return showToast('Only Primary Owner can purge data', 'bad');
       
-      // Preserve real bank balances! Only clear demo student and client records
+      // Protects vault balances! Only clears demo records
       state.learners = state.learners.filter(l => !l.rollId.includes('DEMO'));
       state.clients = state.clients.filter(c => !c.id.includes('DEMO'));
       addAudit('DEMO_PURGED', 'Demo records cleaned safely. Vaults intact.');
@@ -2068,7 +2112,7 @@ Executive Helpline: +92 300 1234567`
       const activeSid = sessionStorage.getItem(SESSION_KEY);
       if (activeSid) {
         const u = state.users.find(x => x.id === activeSid && x.status === 'ACTIVE');
-        if (u) setCurrentSession(u);
+        if (u) setCurrentSession(u, false); // false = do not duplicate audit login log
       }
     });
   </script>
