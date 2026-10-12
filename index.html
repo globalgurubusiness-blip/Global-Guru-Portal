@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#651c2b">
-  <title>Global Guru Enterprise Ecosystem</title>
+  <title>Global Guru Enterprise Portal v7</title>
   
   <!-- FontAwesome 6.5.2 CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -360,6 +360,12 @@
       white-space: nowrap;
     }
     tbody tr:hover { background: var(--brand-soft); }
+    #view-directory.financial-shield th:nth-child(6),
+    #view-directory.financial-shield th:nth-child(7),
+    #view-directory.financial-shield th:nth-child(8),
+    #view-directory.financial-shield td:nth-child(6),
+    #view-directory.financial-shield td:nth-child(7),
+    #view-directory.financial-shield td:nth-child(8) { display: none; }
 
     /* Switch Toggles */
     .switch-ui {
@@ -498,6 +504,74 @@
       gap: 8px;
       animation: modalFade 0.2s ease;
     }
+
+    /* V7 layout system: replaces the missing utility-framework classes */
+    #authScreen {
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: var(--bg);
+    }
+    .demo-notice {
+      padding: 9px 12px;
+      margin-bottom: 14px;
+      border: 1px solid var(--brand-border);
+      border-radius: 9px;
+      background: var(--brand-soft);
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.45;
+    }
+    .mobile-only { display: none; }
+    .action-cluster { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .finance-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .finance-grid .grand-total { grid-column: span 4; }
+    .mobile-card-label { display: none; }
+
+    @media (max-width: 700px) {
+      :root { --topbar-h: 58px; }
+      .main-body { padding: 12px; }
+      .topbar { padding: 0 12px; }
+      .topbar h2 { font-size: 13px !important; }
+      #topbarSubtitle { display: none; }
+      #privacyBtn span, .topbar .btn.good span { display: none; }
+      #privacyBtn, .topbar .btn.good { width: 34px; padding: 0; }
+      .grid-stats, .kpi-strip, .dashboard-grid, .finance-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .finance-grid .grand-total { grid-column: span 2; }
+      .stat-card { padding: 12px; }
+      .stat-val { font-size: 17px; }
+      .card-head { padding: 12px; align-items: stretch; }
+      .card-head > .action-cluster, .card-head > div:not(:only-child) { width: 100%; }
+      .card-head .input { width: 100% !important; }
+      .btn { min-height: 40px; height: auto; }
+      .btn.sm { min-height: 36px; height: auto; }
+      .icon-btn { width: 40px; height: 40px; }
+      footer.app-footer { flex-direction: column; align-items: flex-start; padding: 12px; }
+      .settings-grid { grid-template-columns: 1fr !important; }
+      .services-grid { grid-template-columns: 1fr !important; }
+      .services-grid > * { grid-column: auto !important; }
+      .toast-stack { left: 12px; right: 12px; top: 12px; }
+      .toast { width: 100%; }
+    }
+    @media (max-width: 420px) {
+      .grid-stats, .kpi-strip, .dashboard-grid, .finance-grid { grid-template-columns: 1fr; }
+      .finance-grid .grand-total { grid-column: auto; }
+      #authScreen { padding: 10px; align-items: flex-start; }
+      #authScreen > .card { margin-top: 16px; padding: 18px !important; }
+    }
+
+    @media print {
+      .sidebar, .topbar, .app-footer, .btn, #learnerAdminInspectorBar,
+      #learnerSocialMount, #toastStack { display: none !important; }
+      #shell, .content-area, .main-body, #view-learner { display: block !important; }
+      .view-panel:not(#view-learner) { display: none !important; }
+      body, .card, .stat-card { background: #fff !important; color: #111 !important; box-shadow: none !important; }
+      .card { break-inside: avoid; border: 1px solid #bbb; }
+      .main-body { max-width: none; padding: 0; }
+      .financial-num { color: #111 !important; }
+    }
   </style>
 </head>
 
@@ -525,6 +599,9 @@
       </div>
 
       <div id="authLoginForm">
+        <div class="demo-notice">
+          <b>Single-file local edition:</b> records remain on this device. Real multi-device login, encrypted credentials and bank sync require the production backend.
+        </div>
         <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">
           Enter your registered WhatsApp number or GG User ID and personal passcode to access your workspace.
         </p>
@@ -547,45 +624,10 @@
           </div>
         </form>
 
-        <!-- Quick Workspace Credentials Drawer -->
-        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);">
-          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); cursor: pointer;" onclick="$('#demoDrawer').classList.toggle('hidden')">
-            <span class="mono"><i class="fa-solid fa-key"></i> Quick Workspace Credentials</span>
-            <i class="fa-solid fa-chevron-down" style="font-size: 9px;"></i>
-          </div>
-
-          <div id="demoDrawer" class="hidden" style="margin-top: 10px; display: grid; gap: 6px; font-size: 11px;">
-            <button type="button" onclick="fillAuth('+92 300 1234567', '7860')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Primary Owner</b> (Yasir Ali)</span>
-              <span class="mono">PIN: 7860</span>
-            </button>
-            <button type="button" onclick="fillAuth('+92 300 9998877', '5555')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Second Admin</b> (Operations)</span>
-              <span class="mono">PIN: 5555</span>
-            </button>
-            <button type="button" onclick="fillAuth('+92 311 2223344', '4321')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Staff Desk</b> (Reception)</span>
-              <span class="mono">PIN: 4321</span>
-            </button>
-            <button type="button" onclick="fillAuth('+92 322 4445566', '8888')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Accounts Desk</b> (Ledger Officer)</span>
-              <span class="mono">PIN: 8888</span>
-            </button>
-            <button type="button" onclick="fillAuth('+92 300 5556677', 'AI01')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Learner</b> (Ayesha Khan)</span>
-              <span class="mono">Pass: AI01</span>
-            </button>
-            <button type="button" onclick="fillAuth('+92 333 7778899', 'CLIENT')" class="btn sm" style="justify-content: space-between;">
-              <span><b>Client</b> (Raza Traders)</span>
-              <span class="mono">Pass: CLIENT</span>
-            </button>
-          </div>
-        </div>
-
       </div>
 
       <div style="margin-top: 16px; text-align: center; font-size: 10px; color: var(--muted);" class="mono">
-        Secured Ecosystem • Central Double-Entry Sync Engine
+        Local Single-File Edition • Double-Entry Journal Engine
       </div>
     </div>
   </div>
@@ -645,7 +687,7 @@
             <i class="fa-solid fa-eye-slash"></i> <span class="mono">Privacy Mask</span>
           </button>
           
-          <a href="https://wa.me/923001234567?text=Global%20Guru%20Executive%20Support" target="_blank" class="btn sm good" title="Instant WhatsApp Support">
+          <a id="supportDeskBtn" href="https://wa.me/923001234567?text=Global%20Guru%20Executive%20Support" target="_blank" rel="noopener" class="btn sm good" title="Instant WhatsApp Support">
             <i class="fa-brands fa-whatsapp"></i> <span>Support Desk</span>
           </a>
 
@@ -747,7 +789,7 @@
                 </select>
 
                 <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="input" style="width: 200px; height: 32px; font-size: 11.5px;">
-                <button class="btn primary sm" onclick="openEnrollStudentModal()"><i class="fa-solid fa-user-plus"></i> New Enrollment</button>
+                <button id="newEnrollmentBtn" class="btn primary sm" onclick="openEnrollStudentModal()"><i class="fa-solid fa-user-plus"></i> New Enrollment</button>
               </div>
             </div>
             <div class="table-container">
@@ -783,8 +825,8 @@
         <!-- ============================================== -->
         <section id="view-finance" class="view-panel hidden">
           <!-- Master Grand Total + 4 Vaults -->
-          <div class="grid-stats">
-            <div class="stat-card" style="border-left: 4px solid var(--gold);">
+          <div class="finance-grid">
+            <div class="stat-card grand-total" style="border-left: 4px solid var(--gold);">
               <div class="stat-head"><span>CONSOLIDATED CAPITAL</span><div class="stat-icon"><i class="fa-solid fa-coins"></i></div></div>
               <div class="stat-val mono financial-num" style="color: var(--gold);" id="vaultBalConsolidated">PKR 1,450,000</div>
               <div class="stat-sub">Net liquid reserve across vaults</div>
@@ -835,8 +877,8 @@
 
                 <input type="text" id="ledgerSearchInput" oninput="renderFinanceView()" placeholder="Search receipt, party..." class="input" style="width: 190px; height: 32px; font-size: 11.5px;">
 
-                <button class="btn sm" onclick="openTransferModal()"><i class="fa-solid fa-money-bill-transfer"></i> Inter-Vault</button>
-                <button class="btn danger sm" onclick="openExpenseModal()"><i class="fa-solid fa-receipt"></i> Record Expense</button>
+                <button id="transferBtn" class="btn sm" onclick="openTransferModal()"><i class="fa-solid fa-money-bill-transfer"></i> Inter-Vault</button>
+                <button id="expenseBtn" class="btn danger sm" onclick="openExpenseModal()"><i class="fa-solid fa-receipt"></i> Record Expense</button>
                 <button class="btn sm" onclick="exportLedgerCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
               </div>
             </div>
@@ -860,8 +902,8 @@
             </div>
             <!-- Monthly Reconciliation Strip -->
             <div style="padding: 12px 18px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; background: var(--brand-soft); flex-wrap: wrap; gap: 10px;">
-              <div><b>October Reconciliation:</b> Total Inflow: <span class="mono" style="color: var(--emerald-text); font-weight: 700;">+PKR 75,000</span> | Total Outflow: <span class="mono" style="color: var(--danger); font-weight: 700;">-PKR 15,000</span></div>
-              <div><b>Net Monthly Cashflow:</b> <span class="mono" style="color: var(--gold); font-weight: 800;">+PKR 60,000</span></div>
+              <div><b id="reconMonthLabel">Current Month Reconciliation:</b> Total Inflow: <span id="reconInflow" class="mono" style="color: var(--emerald-text); font-weight: 700;">PKR 0</span> | Total Outflow: <span id="reconOutflow" class="mono" style="color: var(--danger); font-weight: 700;">PKR 0</span></div>
+              <div><b>Net Monthly Cashflow:</b> <span id="reconNet" class="mono" style="color: var(--gold); font-weight: 800;">PKR 0</span></div>
             </div>
           </div>
         </section>
@@ -888,7 +930,10 @@
                 <h4 id="learnerProfileName">Learner Mentorship Dashboard</h4>
                 <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" class="mono" id="learnerProfileMeta">Batch AI-01 • Roll ID: GG-L-101</p>
               </div>
-              <a id="learnerMeetLinkBtn" href="#" target="_blank" class="btn good sm"><i class="fa-solid fa-video"></i> Join Live Lecture</a>
+              <div class="action-cluster">
+                <button id="learnerEditBtn" class="btn sm hidden" onclick="openUpdateLearnerModal()"><i class="fa-solid fa-pen"></i> Update Record</button>
+                <a id="learnerMeetLinkBtn" href="#" target="_blank" rel="noopener" class="btn good sm"><i class="fa-solid fa-video"></i> Join Live Lecture</a>
+              </div>
             </div>
             <div class="card-body">
               <div class="grid-stats" style="margin-bottom: 0;">
@@ -941,11 +986,11 @@
                 </div>
                 <div style="padding: 12px; border: 1px solid var(--line); border-radius: 8px;">
                   <span style="color: var(--muted); display: block;">Next Scheduled Lecture:</span>
-                  <strong style="color: var(--gold);">Monday @ 08:00 PM PKT</strong>
+                  <strong id="learnerNextLecture" style="color: var(--gold);">Monday @ 08:00 PM PKT</strong>
                 </div>
                 <div style="padding: 12px; border: 1px solid var(--line); border-radius: 8px;">
                   <span style="color: var(--muted); display: block;">Topic:</span>
-                  <strong>Midjourney Cinematic Lighting</strong>
+                  <strong id="learnerNextTopic">Midjourney Cinematic Lighting</strong>
                 </div>
               </div>
             </div>
@@ -999,7 +1044,10 @@
                 <h4 id="clientBusinessTitle">Commercial Client Workspace</h4>
                 <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" id="clientAccountStage">Active Partner • Production Desk Active</p>
               </div>
-              <button class="btn primary sm" onclick="openServiceRequestModal()"><i class="fa-solid fa-plus"></i> Request New Service</button>
+              <div class="action-cluster">
+                <button id="clientReceivePaymentBtn" class="btn good sm" onclick="receiveCurrentClientPayment()"><i class="fa-solid fa-money-bill-wave"></i> Receive Payment</button>
+                <button class="btn primary sm" onclick="openServiceRequestModal()"><i class="fa-solid fa-plus"></i> Request New Service</button>
+              </div>
             </div>
             <div class="card-body">
               <div class="grid-stats" style="margin-bottom: 0;">
@@ -1034,7 +1082,7 @@
           <div class="card">
             <div class="card-head">
               <h4>Active Production Deliverables & Render Status</h4>
-              <span class="badge brand">Live Cloud Sync</span>
+              <div class="action-cluster"><span class="badge brand">Project Tracking</span><button id="addDeliverableBtn" class="btn sm hidden" onclick="openAddDeliverableModal()"><i class="fa-solid fa-plus"></i> Add Deliverable</button></div>
             </div>
             <div class="table-container">
               <table>
@@ -1044,12 +1092,17 @@
                     <th>Assigned Service</th>
                     <th>Status</th>
                     <th>Due Date</th>
-                    <th>Approved Download</th>
+                    <th>Review / Action</th>
                   </tr>
                 </thead>
                 <tbody id="clientDeliverablesTableBody"></tbody>
               </table>
             </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h4>Service Requests</h4><span class="badge brand">Saved Workflow</span></div>
+            <div class="table-container"><table><thead><tr><th>Request</th><th>Service</th><th>Date</th><th>Status</th><th>Notes</th></tr></thead><tbody id="clientRequestsTableBody"></tbody></table></div>
           </div>
 
           <!-- 13 Services Catalogue (13th Card Featured Banner) -->
@@ -1059,7 +1112,7 @@
               <span class="badge brand">Approved Live Samples</span>
             </div>
             <div class="card-body">
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;" id="clientServicesCatalogueGrid"></div>
+              <div class="services-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;" id="clientServicesCatalogueGrid"></div>
             </div>
           </div>
 
@@ -1088,7 +1141,7 @@
 
                 <input type="text" id="usersSearchInput" oninput="renderUsersTable()" placeholder="Search user ID, name..." class="input" style="width: 200px; height: 32px; font-size: 11.5px;">
 
-                <button class="btn primary sm" onclick="openCreateUserModal()"><i class="fa-solid fa-user-plus"></i> Add Ecosystem User</button>
+                <button id="addUserBtn" class="btn primary sm" onclick="openCreateUserModal()"><i class="fa-solid fa-user-plus"></i> Add Ecosystem User</button>
               </div>
             </div>
             <div class="table-container">
@@ -1120,7 +1173,7 @@
         <!-- VIEW 7: SECURITY CENTER, AUDIT & SNAPSHOTS     -->
         <!-- ============================================== -->
         <section id="view-settings" class="view-panel hidden">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
+          <div class="settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
             
             <!-- Master PIN & Recovery (Owner Alone) -->
             <div class="card">
@@ -1142,12 +1195,19 @@
 
                   <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); flex-wrap: wrap; gap: 8px;">
                     <div style="font-size: 11px; color: var(--muted);" class="mono">
-                      Token: <span id="emergencyTokenLabel" style="font-weight: 700; color: var(--gold);">••••••••••••••••</span>
-                      <button type="button" class="icon-btn" style="width: 24px; height: 24px; font-size: 10px; margin-left: 4px;" onclick="toggleTokenMask()" title="Reveal/Mask Token"><i id="tokenEyeIcon" class="fa-solid fa-eye"></i></button>
-                      <button type="button" class="icon-btn" style="width: 24px; height: 24px; font-size: 10px; margin-left: 2px;" onclick="copyEmergencyToken()" title="Copy Token"><i class="fa-solid fa-copy"></i></button>
+                      Recovery token: <span id="emergencyTokenLabel" style="font-weight: 700; color: var(--gold);">HASHED & HIDDEN</span>
+                      <button type="button" class="btn sm" style="margin-left: 4px;" onclick="regenerateRecoveryToken()">Generate New</button>
                     </div>
                     <button type="submit" class="btn primary sm">Update Master PIN</button>
                   </div>
+                </form>
+                <form onsubmit="handleUpdateLoginPin(event)" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);">
+                  <div class="field"><label>Current Login PIN / Passcode</label><input type="password" id="curLoginPin" required class="input mono"></div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div class="field"><label>New Login PIN</label><input type="password" id="newLoginPin" required minlength="4" class="input mono"></div>
+                    <div class="field"><label>Confirm</label><input type="password" id="confLoginPin" required minlength="4" class="input mono"></div>
+                  </div>
+                  <button type="submit" class="btn sm">Update My Login PIN</button>
                 </form>
               </div>
             </div>
@@ -1161,23 +1221,23 @@
               <div class="card-body" style="font-size: 12px; display: grid; gap: 10px;">
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
                   <span style="color: var(--muted);">Cluster Node:</span>
-                  <span class="mono font-bold">Multan Tech Cluster (PK-01)</span>
+                  <span class="mono font-bold">Local Browser Workspace</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
                   <span style="color: var(--muted);">Protocol Encryption:</span>
-                  <span class="mono font-bold">TLS 1.3 / PBKDF2 Master Hash</span>
+                  <span class="mono font-bold">Web Crypto PBKDF2 (120k) Credential Hashes</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
                   <span style="color: var(--muted);">Ledger Model:</span>
-                  <span class="mono font-bold">Immutable Double-Entry Sync</span>
+                  <span class="mono font-bold">Local Double-Entry Journal</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
                   <span style="color: var(--muted);">Active Workstation Sessions:</span>
-                  <span class="badge good">1 Root Active (Zero Anomalies)</span>
+                  <span class="badge warn">This Browser Session</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                   <span style="color: var(--muted);">Root Access:</span>
-                  <span class="badge good" style="font-weight: 800;"><i class="fa-solid fa-shield"></i> Permanently Protected</span>
+                  <span class="badge warn" style="font-weight: 800;"><i class="fa-solid fa-shield"></i> Local Prototype Protection</span>
                 </div>
               </div>
             </div>
@@ -1199,7 +1259,7 @@
                 <!-- Audit Filter Header -->
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; flex-wrap: wrap;">
                   <p style="font-size: 11.5px; color: var(--muted); margin: 0;">
-                    All logins, vault reversals, and credential updates are cryptographically tracked in this immutable journal.
+                    Logins, reversals and credential updates are tracked locally. Production deployment should move this audit trail to an append-only server database.
                   </p>
                   <div style="display: flex; gap: 8px;">
                     <select id="auditFilterAction" class="input" style="width: 140px; height: 30px; font-size: 11px;" onchange="renderAuditTable()">
@@ -1251,8 +1311,19 @@
     /* ======================================================== */
     /* MASTER DATA & STATE ENGINE                               */
     /* ======================================================== */
-    const STORAGE_KEY = 'GG_ECOSYSTEM_MASTER_V6_2';
-    const SESSION_KEY = 'GG_SESSION_USER_ID_V6_2';
+    const STORAGE_KEY = 'GG_ECOSYSTEM_MASTER_V7';
+    const SESSION_KEY = 'GG_SESSION_USER_ID_V7';
+    const SESSION_STARTED_KEY = 'GG_SESSION_STARTED_V7';
+    const SESSION_MAX_MS = 8 * 60 * 60 * 1000;
+
+    const ROLE_PERMISSIONS = {
+      PRIMARY_OWNER: ['*'],
+      SECOND_ADMIN: ['dashboard.view','students.view','students.create','students.payment','finance.view','finance.expense','finance.transfer','finance.reverse','clients.view','clients.manage','clients.payment','users.view'],
+      STAFF: ['students.view','students.create','students.payment'],
+      ACCOUNTS: ['finance.view','finance.expense','finance.transfer','finance.reverse','students.view','students.payment','clients.view','clients.payment'],
+      LEARNER: ['learner.self'],
+      CLIENT: ['client.self','service.request']
+    };
 
     const ALL_13_SERVICES = [
       { id: 'SVC-01', name: 'Social Media Management', desc: 'Monthly content publishing, grid branding & organic reach strategy.', icon: 'fa-share-nodes', price: 'PKR 35,000 / mo', sample: 'https://drive.google.com' },
@@ -1289,8 +1360,9 @@
     let state = {
       theme: 'dark',
       privacyMask: false,
-      masterPin: '7860',
-      emergencyToken: 'GG-EMERGENCY-2026',
+      masterPinHash: '6c62e3f979ae413c24155d4d25b29a6d87ef915a9d4f57542031b46690f8c63b',
+      emergencyTokenHash: 'b542dd94f15e8694ed51e568c2cac2e8fb68de019dddb356cc390539fff82290',
+      failedLogins: {},
       currentUser: null,
       impersonator: null,
       selectedInspectLearnerId: 'LRN-101',
@@ -1316,12 +1388,12 @@
         'Physical Vault': 180000
       },
       users: [
-        { id: 'GG-OWNER-001', name: 'Yasir Ali', phone: '+92 300 1234567', pin: '7860', role: 'PRIMARY_OWNER', status: 'ACTIVE', lastActive: 'Just now' },
-        { id: 'GG-ADM-002', name: 'Zohaib Hassan', phone: '+92 300 9998877', pin: '5555', role: 'SECOND_ADMIN', status: 'ACTIVE', lastActive: '12 mins ago' },
-        { id: 'GG-STF-003', name: 'Bilal Reception', phone: '+92 311 2223344', pin: '4321', role: 'STAFF', status: 'ACTIVE', lastActive: '2 hours ago' },
-        { id: 'GG-ACC-004', name: 'Farhan Accounts', phone: '+92 322 4445566', pin: '8888', role: 'ACCOUNTS', status: 'ACTIVE', lastActive: 'Yesterday' },
-        { id: 'GG-LRN-005', name: 'Ayesha Khan', phone: '+92 300 5556677', pin: 'AI01', role: 'LEARNER', linkedId: 'LRN-101', status: 'ACTIVE', lastActive: '3 hours ago' },
-        { id: 'GG-CLT-006', name: 'Raza Traders', phone: '+92 333 7778899', pin: 'CLIENT', role: 'CLIENT', linkedId: 'CLT-201', status: 'ACTIVE', lastActive: '2 days ago' }
+        { id: 'GG-OWNER-001', name: 'Yasir Ali', phone: '+92 300 1234567', pinHash: 'd6ed42ba69ad3dc23bfe3e3083864d73f3c00e05ea9335df9e6bfc085aa53cdf', role: 'PRIMARY_OWNER', status: 'ACTIVE', lastActive: 'Just now' },
+        { id: 'GG-ADM-002', name: 'Zohaib Hassan', phone: '+92 300 9998877', pinHash: 'a1e64a577d87d45607b8997ce3866c4b2caef9b34f1cf2f2324ce0f918a8e786', role: 'SECOND_ADMIN', status: 'ACTIVE', lastActive: '12 mins ago' },
+        { id: 'GG-STF-003', name: 'Bilal Reception', phone: '+92 311 2223344', pinHash: 'a8cf67ee6799b91f63d935da0741d93b6d12ed599dc105de36d512864787a3ed', role: 'STAFF', status: 'ACTIVE', lastActive: '2 hours ago' },
+        { id: 'GG-ACC-004', name: 'Farhan Accounts', phone: '+92 322 4445566', pinHash: '1925b7e6b41d62d49708885c84de5037ed4a14904350fcbaf33ef6ee30efe7b4', role: 'ACCOUNTS', status: 'ACTIVE', lastActive: 'Yesterday' },
+        { id: 'GG-LRN-005', name: 'Ayesha Khan', phone: '+92 300 5556677', pinHash: 'd12ee9efc84365300c94c464b0630ca3c7819ec6ab3ce4ab6bda8195e2030004', role: 'LEARNER', linkedId: 'LRN-101', status: 'ACTIVE', lastActive: '3 hours ago' },
+        { id: 'GG-CLT-006', name: 'Raza Traders', phone: '+92 333 7778899', pinHash: '7f242983445c173402f358c611bfae5ef56ec419f3e7851803c4a2a74730c463', role: 'CLIENT', linkedId: 'CLT-201', status: 'ACTIVE', lastActive: '2 days ago' }
       ],
       learners: [
         { id: 'LRN-101', rollId: 'GG-AI-01-101', name: 'Ayesha Khan', phone: '+92 300 5556677', batch: 'AI-01', mentorship: 'AI Content Creation', startDate: '2026-09-01', nextDue: '2026-10-25', totalFee: 50000, paid: 25000, lectures: 12, attended: 10, meetLink: 'https://meet.google.com/abc-defg-hij', status: 'Active' },
@@ -1340,6 +1412,8 @@
         { id: 'TXN-902', receipt: 'GG-R-882195', date: '2026-10-04', type: 'INCOME', category: 'Client Payment', party: 'Raza Traders', account: 'Meezan Bank', amount: 50000, status: 'POSTED', partyType: 'CLIENT', partyId: 'CLT-201' },
         { id: 'TXN-903', receipt: 'GG-R-882196', date: '2026-10-08', type: 'EXPENSE', category: 'Fiber Optics Internet', party: 'PTCL Enterprise', account: 'Meezan Bank', amount: 15000, status: 'POSTED' }
       ],
+      serviceRequests: [],
+      journals: [],
       audit: [
         { time: '2026-10-12 01:40 PKT', actor: 'Yasir Ali', action: 'PORTAL_BOOT', detail: 'System initialized on secure protocol', target: 'SYSTEM' }
       ]
@@ -1348,12 +1422,58 @@
     const $ = (sel, parent = document) => parent.querySelector(sel);
     const $$ = (sel, parent = document) => [...parent.querySelectorAll(sel)];
 
+    function normalizePhone(value) {
+      let p = String(value || '').replace(/\D/g, '');
+      if (p.startsWith('0')) p = '92' + p.slice(1);
+      if (!p.startsWith('92') && p.length === 10) p = '92' + p;
+      return p;
+    }
+
+    async function pbkdf2(value, saltLabel) {
+      const enc = new TextEncoder();
+      const material = await crypto.subtle.importKey('raw', enc.encode(String(value)), 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(`GG-V7:${saltLabel}`), iterations: 120000 }, material, 256);
+      return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function hashUserPin(userId, pin) { return pbkdf2(pin, userId); }
+    async function hashMasterPin(pin) { return pbkdf2(pin, 'MASTER'); }
+    async function hashRecoveryToken(token) { return pbkdf2(token, 'RECOVERY'); }
+
+    function hasPermission(permission) {
+      const u = state.currentUser;
+      if (!u) return false;
+      const custom = Array.isArray(u.permissions) ? u.permissions : null;
+      const allowed = custom || ROLE_PERMISSIONS[u.role] || [];
+      return allowed.includes('*') || allowed.includes(permission);
+    }
+
+    function requirePermission(permission) {
+      if (hasPermission(permission)) return true;
+      showToast('Aap ke account ko is action ki permission nahi.', 'bad');
+      addAudit('ACCESS_DENIED', `Permission denied: ${permission}`, state.currentUser?.id || 'GUEST');
+      return false;
+    }
+
+    function uniqueId(prefix, collection) {
+      let id;
+      do { id = `${prefix}-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`; }
+      while (collection.some(x => x.id === id));
+      return id;
+    }
+
     function loadState() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          state = { ...state, ...parsed };
+          state = {
+            ...state, ...parsed,
+            switches: { ...state.switches, ...(parsed.switches || {}) },
+            failedLogins: parsed.failedLogins || {},
+            serviceRequests: Array.isArray(parsed.serviceRequests) ? parsed.serviceRequests : [],
+            journals: Array.isArray(parsed.journals) ? parsed.journals : []
+          };
         }
       } catch (e) {
         console.error('State load error', e);
@@ -1362,22 +1482,26 @@
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const persisted = { ...state, currentUser: null, impersonator: null };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
       } catch (e) {
         console.error('State save error', e);
       }
     }
 
     function getPKTTimeFormatted() {
-      const d = new Date();
-      const pad = n => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())} PKT`;
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false
+      }).formatToParts(new Date()).reduce((o, p) => (o[p.type] = p.value, o), {});
+      return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute} PKT`;
     }
 
     function addAudit(action, detail, target = 'SYSTEM') {
+      if (state.switches && state.switches.auditLogging === false && action !== 'SWITCH_TOGGLE') return;
       state.audit.unshift({
         time: getPKTTimeFormatted(),
-        actor: state.currentUser ? state.currentUser.name : 'System',
+        actor: state.impersonator ? `${state.impersonator.name} as ${state.currentUser?.name}` : (state.currentUser ? state.currentUser.name : 'System'),
         action,
         detail,
         target
@@ -1414,8 +1538,15 @@
 
     function applyPrivacyMaskDOM() {
       $$('.financial-num').forEach(el => {
-        if (!el.dataset.origVal) el.dataset.origVal = el.textContent;
-        el.textContent = state.privacyMask ? 'PKR ••••••' : el.dataset.origVal;
+        const isMaskedText = el.textContent.includes('••••');
+        if (state.privacyMask) {
+          if (!isMaskedText) el.dataset.origVal = el.textContent;
+          el.textContent = 'PKR ••••••';
+        } else if (isMaskedText) {
+          el.textContent = el.dataset.origVal || 'PKR 0';
+        } else {
+          el.dataset.origVal = el.textContent;
+        }
       });
       const btn = $('#privacyBtn');
       if (btn) {
@@ -1448,11 +1579,13 @@
         <div style="text-align: center; padding: 10px 0;">
           <div class="stat-icon" style="width: 48px; height: 48px; margin: 0 auto 12px; font-size: 20px;"><i class="fa-solid fa-shield-halved"></i></div>
           <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">Enter Root Master PIN for emergency executive authorization.</p>
-          <input type="password" id="stealthMasterCode" placeholder="••••" maxlength="4" class="input mono" style="font-size: 22px; text-align: center; letter-spacing: 0.5em; width: 160px; margin: 0 auto;" autofocus>
+          <input type="password" id="stealthMasterCode" placeholder="Master PIN or recovery token" maxlength="64" class="input mono" style="font-size: 16px; text-align: center; width: min(360px, 100%); margin: 0 auto;" autofocus>
         </div>
-      `, () => {
+      `, async () => {
         const pin = $('#stealthMasterCode').value.trim();
-        if (pin === state.masterPin || pin === '7860' || pin === 'GG-EMERGENCY-2026') {
+        const validMaster = (await hashMasterPin(pin)) === state.masterPinHash;
+        const validRecovery = (await hashRecoveryToken(pin)) === state.emergencyTokenHash;
+        if (validMaster || validRecovery) {
           const owner = state.users.find(u => u.role === 'PRIMARY_OWNER') || state.users[0];
           setCurrentSession(owner, true);
           closeModal();
@@ -1468,21 +1601,40 @@
       $('#authPinInput').value = pin;
     }
 
-    function handleAuthSubmit(e) {
+    async function handleAuthSubmit(e) {
       e.preventDefault();
-      const ident = $('#authIdentityInput').value.trim().replace(/\s+/g, '');
+      const rawIdent = $('#authIdentityInput').value.trim();
+      const identId = rawIdent.toUpperCase();
+      const identPhone = normalizePhone(rawIdent);
       const pin = $('#authPinInput').value.trim();
 
       const user = state.users.find(u => {
-        const pClean = u.phone.replace(/\s+/g, '');
-        return (pClean === ident || pClean.endsWith(ident) || u.id === ident) && u.pin.toUpperCase() === pin.toUpperCase();
+        return normalizePhone(u.phone) === identPhone || u.id.toUpperCase() === identId;
       });
 
-      if (user) {
+      const attemptKey = user?.id || identId;
+      const failure = state.failedLogins[attemptKey] || { count: 0, lockedUntil: 0 };
+      if (failure.lockedUntil > Date.now()) {
+        const mins = Math.ceil((failure.lockedUntil - Date.now()) / 60000);
+        return showToast(`Too many attempts. ${mins} minute baad dobara try karein.`, 'bad');
+      }
+
+      const pinMatches = user && (await hashUserPin(user.id, pin)) === user.pinHash;
+
+      if (user && pinMatches) {
         if (user.status !== 'ACTIVE') return showToast('Account is suspended. Contact Primary Owner.', 'bad');
+        if (user.role === 'CLIENT' && state.switches.studioPortalDesk === false) return showToast('Client portal temporarily unavailable hai.', 'bad');
+        delete state.failedLogins[attemptKey];
         setCurrentSession(user, true);
         showToast(`Welcome, ${user.name} (${user.role.replace('_', ' ')})`, 'good');
       } else {
+        failure.count += 1;
+        if (failure.count >= 5) {
+          failure.count = 0;
+          failure.lockedUntil = Date.now() + 15 * 60 * 1000;
+        }
+        state.failedLogins[attemptKey] = failure;
+        saveState();
         showToast('Invalid WhatsApp number or PIN code', 'bad');
       }
     }
@@ -1490,6 +1642,7 @@
     function setCurrentSession(user, shouldLogAudit = false) {
       state.currentUser = user;
       sessionStorage.setItem(SESSION_KEY, user.id);
+      sessionStorage.setItem(SESSION_STARTED_KEY, String(Date.now()));
       user.lastActive = 'Just now';
       saveState();
 
@@ -1503,20 +1656,17 @@
       $('#sideUserName').textContent = user.name;
       $('#sideUserRoleBadge').textContent = user.role.replace('_', ' ');
       $('#sideUserAvatar').textContent = user.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+      $('#supportDeskBtn')?.classList.toggle('hidden', state.switches.whatsappChannel === false);
 
       buildSidebarNav();
 
-      if (user.role === 'LEARNER') {
-        navigateTo('learner');
-      } else if (user.role === 'CLIENT') {
-        navigateTo('client');
-      } else if (user.role === 'STAFF') {
-        navigateTo('directory');
-      } else if (user.role === 'ACCOUNTS') {
-        navigateTo('finance');
-      } else {
-        navigateTo('executive');
-      }
+      if (hasPermission('learner.self')) navigateTo('learner');
+      else if (hasPermission('client.self')) navigateTo('client');
+      else if (hasPermission('dashboard.view')) navigateTo('executive');
+      else if (hasPermission('students.view')) navigateTo('directory');
+      else if (hasPermission('finance.view')) navigateTo('finance');
+      else if (hasPermission('clients.view')) navigateTo('client');
+      else showToast('Account active hai lekin koi workspace permission assigned nahi.', 'bad');
     }
 
     function logout() {
@@ -1524,6 +1674,7 @@
       state.currentUser = null;
       state.impersonator = null;
       sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_STARTED_KEY);
       location.reload();
     }
 
@@ -1536,6 +1687,10 @@
       state.impersonator = state.currentUser;
       state.currentUser = target;
 
+      $('#sideUserName').textContent = target.name;
+      $('#sideUserRoleBadge').textContent = target.role.replace('_', ' ');
+      $('#sideUserAvatar').textContent = target.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+
       $('#impersonationChip').classList.remove('hidden');
       $('#impersonationLabel').textContent = `Viewing as ${target.name} (${target.role.replace('_', ' ')})`;
 
@@ -1544,6 +1699,8 @@
 
       if (target.role === 'LEARNER') navigateTo('learner');
       else if (target.role === 'CLIENT') navigateTo('client');
+      else if (target.role === 'STAFF') navigateTo('directory');
+      else if (target.role === 'ACCOUNTS') navigateTo('finance');
       else navigateTo('executive');
     }
 
@@ -1553,6 +1710,9 @@
       state.impersonator = null;
 
       $('#impersonationChip').classList.add('hidden');
+      $('#sideUserName').textContent = state.currentUser.name;
+      $('#sideUserRoleBadge').textContent = state.currentUser.role.replace('_', ' ');
+      $('#sideUserAvatar').textContent = state.currentUser.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
       buildSidebarNav();
       navigateTo('users');
       showToast('Returned to Primary Owner session', 'good');
@@ -1568,25 +1728,25 @@
 
       const items = [];
 
-      if (['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
+      if (hasPermission('dashboard.view')) {
         items.push({ group: 'EXECUTIVE', id: 'executive', icon: 'fa-shield-halved', label: 'Executive Hub' });
       }
-      if (['PRIMARY_OWNER', 'SECOND_ADMIN', 'STAFF'].includes(role)) {
+      if (hasPermission('students.view')) {
         items.push({ group: 'MANAGEMENT', id: 'directory', icon: 'fa-users', label: 'Student Directory' });
       }
-      if (['PRIMARY_OWNER', 'SECOND_ADMIN', 'ACCOUNTS'].includes(role)) {
+      if (hasPermission('finance.view')) {
         items.push({ group: 'FINANCE', id: 'finance', icon: 'fa-wallet', label: 'Ledger & Vaults' });
       }
-      if (role === 'LEARNER' || ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
+      if (hasPermission('learner.self') || hasPermission('students.view')) {
         items.push({ group: 'ACADEMY', id: 'learner', icon: 'fa-graduation-cap', label: role === 'LEARNER' ? 'My Mentorship LMS' : 'Learners Portal' });
       }
-      if (role === 'CLIENT' || ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
+      if (hasPermission('client.self') || hasPermission('clients.view')) {
         items.push({ group: 'COMMERCIAL', id: 'client', icon: 'fa-briefcase', label: role === 'CLIENT' ? 'My B2B Workspace' : 'Client Desk' });
       }
-      if (['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
+      if (hasPermission('users.view')) {
         items.push({ group: 'GOVERNANCE', id: 'users', icon: 'fa-user-gear', label: 'Users & Roles' });
       }
-      if (['PRIMARY_OWNER'].includes(role)) {
+      if (hasPermission('settings.manage')) {
         items.push({ group: 'SYSTEM', id: 'settings', icon: 'fa-sliders', label: 'Security & Audit' });
       }
 
@@ -1609,6 +1769,13 @@
     }
 
     function navigateTo(viewId) {
+      const viewPermission = {
+        executive: 'dashboard.view', directory: 'students.view', finance: 'finance.view',
+        learner: state.currentUser?.role === 'LEARNER' ? 'learner.self' : 'students.view',
+        client: state.currentUser?.role === 'CLIENT' ? 'client.self' : 'clients.view',
+        users: 'users.view', settings: 'settings.manage'
+      };
+      if (viewPermission[viewId] && !hasPermission(viewPermission[viewId])) return showToast('Is section ki access permission nahi.', 'bad');
       $$('.view-panel').forEach(p => p.classList.add('hidden'));
       $$('.nav-btn').forEach(b => b.classList.remove('active'));
 
@@ -1649,7 +1816,7 @@
     /* ======================================================== */
     function getExecutiveSocialCardHTML() {
       // RULE: Do not render to Owner or Second Admin!
-      if (state.currentUser && ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(state.currentUser.role)) {
+      if (state.currentUser && !['LEARNER', 'CLIENT'].includes(state.currentUser.role)) {
         return '';
       }
 
@@ -1753,6 +1920,9 @@
         state.privacyMask = state.switches.panicMask;
         applyPrivacyMaskDOM();
       }
+      if (switchId === 'whatsappChannel') {
+        $('#supportDeskBtn')?.classList.toggle('hidden', !state.switches.whatsappChannel);
+      }
 
       saveState();
       addAudit('SWITCH_TOGGLE', `${switchId} is now ${state.switches[switchId] ? 'ON' : 'OFF'}`);
@@ -1761,6 +1931,10 @@
     }
 
     function renderDirectoryTable() {
+      $('#newEnrollmentBtn')?.classList.toggle('hidden', !hasPermission('students.create'));
+      const staffShielded = state.currentUser.role === 'STAFF' && state.switches.staffLedgerShield;
+      $('#view-directory').classList.toggle('financial-shield', staffShielded);
+      $('#directoryKpiStrip').classList.toggle('hidden', staffShielded);
       // Update Top Financial Strip
       const totAgreed = state.learners.reduce((a, b) => a + Number(b.totalFee || 0), 0);
       const totPaid = state.learners.reduce((a, b) => a + Number(b.paid || 0), 0);
@@ -1814,7 +1988,7 @@
           <td style="text-align: right;">
             <div style="display: inline-flex; gap: 4px;">
               <button class="btn sm good" onclick="sendWhatsAppSlip('${l.id}')" title="Send WhatsApp Receipt Voucher"><i class="fa-brands fa-whatsapp"></i> Slip</button>
-              <button class="btn sm" onclick="openReceivePaymentModal('${l.id}', 'LEARNER')" title="Receive Installment"><i class="fa-solid fa-money-bill-wave"></i> Pay</button>
+              ${hasPermission('students.payment') ? `<button class="btn sm" onclick="openReceivePaymentModal('${l.id}', 'LEARNER')" title="Receive Installment"><i class="fa-solid fa-money-bill-wave"></i> Pay</button>` : ''}
             </div>
           </td>
         `;
@@ -1824,12 +1998,24 @@
     }
 
     function renderFinanceView() {
+      $('#transferBtn')?.classList.toggle('hidden', !hasPermission('finance.transfer'));
+      $('#expenseBtn')?.classList.toggle('hidden', !hasPermission('finance.expense'));
       const tot = Object.values(state.accounts).reduce((a, b) => a + b, 0);
       $('#vaultBalConsolidated').textContent = `PKR ${tot.toLocaleString()}`;
       $('#vaultBalMeezan').textContent = `PKR ${state.accounts['Meezan Bank'].toLocaleString()}`;
       $('#vaultBalEasypaisa').textContent = `PKR ${state.accounts['Easypaisa'].toLocaleString()}`;
       $('#vaultBalJazzCash').textContent = `PKR ${state.accounts['JazzCash'].toLocaleString()}`;
       $('#vaultBalVault').textContent = `PKR ${state.accounts['Physical Vault'].toLocaleString()}`;
+
+      const nowPkt = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Karachi' }));
+      const monthKey = `${nowPkt.getFullYear()}-${String(nowPkt.getMonth()+1).padStart(2,'0')}`;
+      const monthTx = state.transactions.filter(t => String(t.date).startsWith(monthKey) && t.status === 'POSTED');
+      const inflow = monthTx.filter(t => t.type === 'INCOME').reduce((s,t) => s + Number(t.amount || 0), 0);
+      const outflow = monthTx.filter(t => t.type === 'EXPENSE').reduce((s,t) => s + Number(t.amount || 0), 0);
+      $('#reconMonthLabel').textContent = `${nowPkt.toLocaleString('en-US',{month:'long'})} Reconciliation:`;
+      $('#reconInflow').textContent = `+PKR ${inflow.toLocaleString()}`;
+      $('#reconOutflow').textContent = `-PKR ${outflow.toLocaleString()}`;
+      $('#reconNet').textContent = `${inflow - outflow >= 0 ? '+' : '-'}PKR ${Math.abs(inflow-outflow).toLocaleString()}`;
 
       const q = ($('#ledgerSearchInput')?.value || '').toLowerCase().trim();
       const typeFilter = $('#ledgerFilterType')?.value || 'ALL';
@@ -1855,16 +2041,16 @@
         tr.innerHTML = `
           <td class="mono font-bold" style="color: var(--gold); font-weight: 700;">${t.receipt}</td>
           <td class="mono" style="font-size: 11px;">${t.date}</td>
-          <td><span class="badge ${t.type === 'INCOME' ? 'good' : 'bad'}">${t.type}</span></td>
+          <td><span class="badge ${t.type === 'INCOME' ? 'good' : t.type === 'TRANSFER' ? 'brand' : 'bad'}">${t.type}</span></td>
           <td>${escapeHtml(t.category)}</td>
           <td><b>${escapeHtml(t.party)}</b></td>
           <td class="mono">${t.account}</td>
-          <td class="mono financial-num" style="text-align: right; font-weight: 700; color: ${t.type === 'INCOME' ? 'var(--emerald-text)' : 'var(--danger)'};">
-            ${t.type === 'INCOME' ? '+' : '-'} PKR ${t.amount.toLocaleString()}
+          <td class="mono financial-num" style="text-align: right; font-weight: 700; color: ${t.type === 'INCOME' ? 'var(--emerald-text)' : t.type === 'TRANSFER' ? 'var(--gold)' : 'var(--danger)'};">
+            ${t.type === 'INCOME' ? '+' : t.type === 'EXPENSE' ? '-' : '↔'} PKR ${t.amount.toLocaleString()}
           </td>
           <td><span class="badge ${t.status === 'POSTED' ? 'good' : 'bad'}">${t.status}</span></td>
           <td style="text-align: right;">
-            ${t.status === 'POSTED' && ['PRIMARY_OWNER', 'SECOND_ADMIN', 'ACCOUNTS'].includes(state.currentUser.role) ? `
+            ${t.status === 'POSTED' && t.type !== 'TRANSFER' && hasPermission('finance.reverse') ? `
               <button class="btn sm danger" onclick="confirmReverseTransaction('${t.id}')"><i class="fa-solid fa-rotate-left"></i> Reverse</button>
             ` : '—'}
           </td>
@@ -1876,7 +2062,7 @@
 
     function renderLearnerView() {
       // If admin/owner viewing, show inspector bar
-      const isAdmin = ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(state.currentUser.role);
+      const isAdmin = state.currentUser.role !== 'LEARNER' && hasPermission('students.view');
       $('#learnerAdminInspectorBar').classList.toggle('hidden', !isAdmin);
 
       if (isAdmin) {
@@ -1908,6 +2094,9 @@
       $('#learnerProgressBar').style.width = `${attPct}%`;
 
       $('#learnerCourseName').textContent = learner.mentorship;
+      $('#learnerNextLecture').textContent = learner.nextLecture || 'Schedule not assigned';
+      $('#learnerNextTopic').textContent = learner.nextTopic || 'Topic not assigned';
+      $('#learnerEditBtn').classList.toggle('hidden', !isAdmin);
 
       // Render Student Payment Voucher Statements Table
       const studentTxns = state.transactions.filter(t => t.partyType === 'LEARNER' && t.partyId === learner.id);
@@ -1935,8 +2124,37 @@
       renderLearnerView();
     }
 
+    function openUpdateLearnerModal() {
+      if (!requirePermission('students.create')) return;
+      const learner = state.learners.find(l => l.id === state.selectedInspectLearnerId);
+      if (!learner) return;
+      openModal(`Update Learner — ${learner.name}`, `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field"><label>Total Lectures</label><input id="updLectures" type="number" min="0" class="input" value="${Number(learner.lectures||0)}"></div>
+          <div class="field"><label>Attended</label><input id="updAttended" type="number" min="0" class="input" value="${Number(learner.attended||0)}"></div>
+        </div>
+        <div class="field"><label>Next Due Date</label><input id="updDueDate" type="date" class="input" value="${escapeHtml(learner.nextDue||'')}"></div>
+        <div class="field"><label>Next Lecture</label><input id="updNextLecture" class="input" value="${escapeHtml(learner.nextLecture||'')}" placeholder="Monday @ 08:00 PM PKT"></div>
+        <div class="field"><label>Next Topic</label><input id="updNextTopic" class="input" value="${escapeHtml(learner.nextTopic||'')}" placeholder="Lecture topic"></div>
+        <div class="field"><label>Meeting Link</label><input id="updMeet" type="url" class="input" value="${escapeHtml(learner.meetLink||'')}"></div>
+      `, () => {
+        const lectures = Number($('#updLectures').value);
+        const attended = Number($('#updAttended').value);
+        const meetLink = $('#updMeet').value.trim();
+        if (lectures < 0 || attended < 0 || attended > lectures) return showToast('Attendance values valid nahi.', 'bad');
+        if (meetLink && !/^https:\/\//i.test(meetLink)) return showToast('Meeting link HTTPS hona chahiye.', 'bad');
+        learner.lectures = lectures; learner.attended = attended;
+        learner.nextDue = $('#updDueDate').value;
+        learner.nextLecture = $('#updNextLecture').value.trim();
+        learner.nextTopic = $('#updNextTopic').value.trim();
+        learner.meetLink = meetLink;
+        saveState(); addAudit('LEARNER_UPDATED', `Attendance/schedule updated for ${learner.name}`, learner.id);
+        closeModal(); renderLearnerView(); showToast('Learner record updated', 'good');
+      }, 'Save Learner Update');
+    }
+
     function renderClientView() {
-      const isAdmin = ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(state.currentUser.role);
+      const isAdmin = state.currentUser.role !== 'CLIENT' && hasPermission('clients.view');
       $('#clientAdminInspectorBar').classList.toggle('hidden', !isAdmin);
 
       if (isAdmin) {
@@ -1958,6 +2176,9 @@
       $('#clientTotalBilled').textContent = `PKR ${client.totalValue.toLocaleString()}`;
       $('#clientPaidAmount').textContent = `PKR ${client.paid.toLocaleString()}`;
       $('#clientPendingAmount').textContent = `PKR ${bal.toLocaleString()}`;
+      const receiveBtn = $('#clientReceivePaymentBtn');
+      if (receiveBtn) receiveBtn.classList.toggle('hidden', !hasPermission('clients.payment'));
+      $('#addDeliverableBtn').classList.toggle('hidden', state.currentUser.role === 'CLIENT' || !hasPermission('clients.manage'));
 
       // Render Active Deliverables Table
       const dTable = $('#clientDeliverablesTableBody');
@@ -1965,16 +2186,24 @@
       if (deliverables.length === 0) {
         dTable.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 14px;">No live project deliverables in review.</td></tr>`;
       } else {
-        dTable.innerHTML = deliverables.map(d => `
+        dTable.innerHTML = deliverables.map((d, idx) => `
           <tr>
             <td><b>${escapeHtml(d.title)}</b></td>
             <td><span class="badge brand">${escapeHtml(d.service)}</span></td>
             <td><span class="badge good">${escapeHtml(d.status)}</span></td>
             <td class="mono">${d.due}</td>
-            <td><a href="${d.link}" target="_blank" class="btn sm"><i class="fa-solid fa-cloud-arrow-down"></i> Review Cut</a></td>
+            <td><div class="action-cluster">
+              <a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" class="btn sm"><i class="fa-solid fa-cloud-arrow-down"></i> Review</a>
+              ${state.currentUser.role === 'CLIENT' && d.status !== 'Approved' ? `<button class="btn sm good" onclick="updateDeliverableStatus('${client.id}',${idx},'Approved')">Approve</button><button class="btn sm" onclick="updateDeliverableStatus('${client.id}',${idx},'Revision Requested')">Revision</button>` : ''}
+            </div></td>
           </tr>
         `).join('');
       }
+
+      // Render 13 Official Services
+      const requestBody = $('#clientRequestsTableBody');
+      const requests = state.serviceRequests.filter(r => r.clientId === client.id);
+      requestBody.innerHTML = requests.length ? requests.map(r => `<tr><td class="mono">${escapeHtml(r.id)}</td><td>${escapeHtml(r.serviceName)}</td><td class="mono">${escapeHtml(r.createdAt)}</td><td><span class="badge brand">${escapeHtml(r.status)}</span></td><td>${escapeHtml(r.notes || '—')}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">No service requests yet.</td></tr>';
 
       // Render 13 Official Services
       const catGrid = $('#clientServicesCatalogueGrid');
@@ -2017,7 +2246,39 @@
       renderClientView();
     }
 
+    function updateDeliverableStatus(clientId, index, status) {
+      if (state.currentUser.role === 'CLIENT' && state.currentUser.linkedId !== clientId) return showToast('Unauthorized client record.', 'bad');
+      if (!['Approved','Revision Requested'].includes(status)) return;
+      const client = state.clients.find(c => c.id === clientId);
+      const deliverable = client?.deliverables?.[index];
+      if (!deliverable) return;
+      deliverable.status = status;
+      saveState(); addAudit('DELIVERABLE_STATUS', `${deliverable.title}: ${status}`, clientId);
+      renderClientView(); showToast(`Deliverable ${status}`, 'good');
+    }
+
+    function openAddDeliverableModal() {
+      if (!requirePermission('clients.manage')) return;
+      const client = state.clients.find(c => c.id === state.selectedInspectClientId);
+      if (!client) return;
+      openModal(`Add Deliverable — ${client.business}`, `
+        <div class="field"><label>Title</label><input id="delTitle" class="input"></div>
+        <div class="field"><label>Service</label><input id="delService" class="input"></div>
+        <div class="field"><label>Due Date</label><input id="delDue" type="date" class="input"></div>
+        <div class="field"><label>Review Link</label><input id="delLink" type="url" class="input" placeholder="https://..."></div>
+      `, () => {
+        const title = $('#delTitle').value.trim(), service = $('#delService').value.trim();
+        const due = $('#delDue').value, link = $('#delLink').value.trim();
+        if (!title || !service || !due || !/^https:\/\//i.test(link)) return showToast('Complete valid details aur HTTPS link enter karein.', 'bad');
+        client.deliverables = client.deliverables || [];
+        client.deliverables.push({ title, service, due, link, status: 'In Production' });
+        saveState(); addAudit('DELIVERABLE_CREATED', title, client.id);
+        closeModal(); renderClientView(); showToast('Deliverable added', 'good');
+      }, 'Add Deliverable');
+    }
+
     function renderUsersTable() {
+      $('#addUserBtn')?.classList.toggle('hidden', !hasPermission('users.manage'));
       const q = ($('#usersSearchInput')?.value || '').toLowerCase().trim();
       const roleFilter = $('#usersFilterRole')?.value || 'ALL';
 
@@ -2031,6 +2292,9 @@
       });
 
       $('#usersTotalCounter').textContent = `${state.users.length} Registered Accounts`;
+      const roleCounts = state.users.reduce((a,u) => (a[u.role] = (a[u.role] || 0) + 1, a), {});
+      $('#usersDistributionSummary').textContent = Object.entries(roleCounts)
+        .map(([role,count]) => `${count} ${role.replaceAll('_',' ')}`).join(' • ');
 
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">No ecosystem users matched your search.</td></tr>`;
@@ -2103,6 +2367,7 @@
     /* TRANSACTION & ACCOUNTING BUSINESS LOGIC                  */
     /* ======================================================== */
     function postLedgerTransaction({ type, category, party, account, amount, partyType, partyId }) {
+      if (state.switches.khataMaintenance) throw new Error('Khata month-end lockdown active hai. Posting temporarily blocked.');
       amount = Number(amount);
       if (!amount || amount <= 0) throw new Error('Amount must be positive');
 
@@ -2126,11 +2391,13 @@
         if (c) c.paid = Number(c.paid || 0) + amount;
       }
 
-      const receiptId = 'GG-R-' + Math.floor(100000 + Math.random() * 900000);
+      let receiptId;
+      do { receiptId = 'GG-R-' + Math.floor(100000 + Math.random() * 900000); }
+      while (state.transactions.some(t => t.receipt === receiptId));
       const tx = {
-        id: 'TXN-' + Date.now(),
+        id: uniqueId('TXN', state.transactions),
         receipt: receiptId,
-        date: new Date().toISOString().split('T')[0],
+        date: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date()),
         type,
         category,
         party,
@@ -2142,12 +2409,21 @@
       };
 
       state.transactions.unshift(tx);
+      state.journals.unshift({
+        id: uniqueId('JRN', state.journals), transactionId: tx.id, receipt: receiptId,
+        date: tx.date,
+        lines: type === 'INCOME'
+          ? [{ account, debit: amount, credit: 0 }, { account: category, debit: 0, credit: amount }]
+          : [{ account: category, debit: amount, credit: 0 }, { account, debit: 0, credit: amount }],
+        status: 'POSTED'
+      });
       addAudit('TRANSACTION_POSTED', `${type}: PKR ${amount.toLocaleString()} via ${account}`, receiptId);
       saveState();
       return tx;
     }
 
     function confirmReverseTransaction(txId) {
+      if (!requirePermission('finance.reverse')) return;
       const tx = state.transactions.find(t => t.id === txId);
       if (!tx || tx.status !== 'POSTED') return;
 
@@ -2161,14 +2437,17 @@
             Party: <b>${tx.party}</b>
           </div>
           <p style="color: var(--danger); font-size: 11px;">* Double-entry bookkeeping will automatically credit/debit the respective account and reset dues cleanly.</p>
+          <div class="field"><label>Correction / Reversal Reason</label><textarea id="reversalReason" class="input" style="height:70px;padding:8px" placeholder="Reason is required for audit"></textarea></div>
         </div>
       `, () => {
-        reverseLedgerEntry(txId);
+        const reason = $('#reversalReason').value.trim();
+        if (state.switches.autoReversalGuard && reason.length < 5) return showToast('Reversal reason kam az kam 5 characters ka ho.', 'bad');
+        reverseLedgerEntry(txId, reason || 'No reason supplied');
         closeModal();
       }, 'Yes, Execute Reversal');
     }
 
-    function reverseLedgerEntry(txId) {
+    function reverseLedgerEntry(txId, reason = '') {
       const tx = state.transactions.find(t => t.id === txId);
       if (!tx || tx.status !== 'POSTED') return;
 
@@ -2192,7 +2471,16 @@
       }
 
       tx.status = 'REVERSED';
-      addAudit('TRANSACTION_REVERSED', `Receipt ${tx.receipt} cancelled cleanly. Funds restored.`, tx.id);
+      const originalJournal = state.journals.find(j => j.transactionId === tx.id && j.status === 'POSTED');
+      if (originalJournal) {
+        state.journals.unshift({
+          id: uniqueId('JRN', state.journals), transactionId: tx.id, receipt: `${tx.receipt}-REV`,
+          date: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date()),
+          lines: originalJournal.lines.map(l => ({ account: l.account, debit: l.credit, credit: l.debit })),
+          status: 'REVERSAL'
+        });
+      }
+      addAudit('TRANSACTION_REVERSED', `Receipt ${tx.receipt} reversed. Reason: ${reason}`, tx.id);
       saveState();
       refreshViewData('finance');
       refreshViewData('directory');
@@ -2208,7 +2496,7 @@
         <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
           <div class="modal-box">
             <div class="modal-head">
-              <h3>${title}</h3>
+              <h3>${escapeHtml(title)}</h3>
               <button class="icon-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">${htmlBody}</div>
@@ -2227,6 +2515,8 @@
     }
 
     function openTransferModal() {
+      if (!requirePermission('finance.transfer')) return;
+      if (state.switches.khataMaintenance) return showToast('Khata lockdown ke duran transfer blocked hai.', 'bad');
       openModal('Inter-Vault Funds Transfer', `
         <div class="field">
           <label>Source Vault (From)</label>
@@ -2256,6 +2546,19 @@
         state.accounts[from] -= amt;
         state.accounts[to] += amt;
 
+        const transferTx = {
+          id: uniqueId('TXN', state.transactions), receipt: 'GG-T-' + Date.now(),
+          date: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi' }).format(new Date()),
+          type: 'TRANSFER', category: 'Inter-Vault Transfer', party: `${from} → ${to}`,
+          account: `${from} → ${to}`, fromAccount: from, toAccount: to,
+          amount: amt, status: 'POSTED'
+        };
+        state.transactions.unshift(transferTx);
+        state.journals.unshift({
+          id: uniqueId('JRN', state.journals), transactionId: transferTx.id, receipt: transferTx.receipt,
+          date: transferTx.date, lines: [{ account: to, debit: amt, credit: 0 }, { account: from, debit: 0, credit: amt }], status: 'POSTED'
+        });
+
         addAudit('INTER_TRANSFER', `Transferred PKR ${amt.toLocaleString()} from ${from} to ${to}`);
         saveState();
         closeModal();
@@ -2265,6 +2568,7 @@
     }
 
     function openExpenseModal() {
+      if (!requirePermission('finance.expense')) return;
       openModal('Record Operational Expense (Kharcha)', `
         <div class="field">
           <label>Expense Head / Purpose</label>
@@ -2305,6 +2609,7 @@
     }
 
     function openEnrollStudentModal() {
+      if (!requirePermission('students.create')) return;
       if (state.switches.admissionFreeze) {
         return showToast('Admission Gate is currently frozen in Executive Hub', 'bad');
       }
@@ -2312,6 +2617,7 @@
       openModal('New Student Admission & Intake', `
         <div class="field"><label>Student Full Name</label><input type="text" id="enrName" required class="input"></div>
         <div class="field"><label>WhatsApp Number</label><input type="tel" id="enrPhone" required placeholder="+92 300 1234567" class="input mono"></div>
+        <div class="field"><label>Email (optional)</label><input type="email" id="enrEmail" class="input" placeholder="student@example.com"></div>
         <div class="field"><label>Cohort</label>
           <select id="enrBatch" class="input">
             <option value="AI-01">AI-01 (Agentic AI Systems)</option>
@@ -2326,9 +2632,10 @@
         <div class="field"><label>Payment Vault Channel</label>
           <select id="enrAcc" class="input">${Object.keys(state.accounts).map(a=>`<option value="${a}">${a}</option>`).join('')}</select>
         </div>
-      `, () => {
+      `, async () => {
         const name = $('#enrName').value.trim();
         let phone = $('#enrPhone').value.trim();
+        const email = $('#enrEmail').value.trim();
         const batch = $('#enrBatch').value;
         const total = Number($('#enrTotal').value) || 0;
         const paid = Number($('#enrPaid').value) || 0;
@@ -2336,15 +2643,20 @@
 
         if (!name || !phone) return showToast('Name and WhatsApp number are required', 'bad');
         if (!phone.startsWith('+92')) phone = '+92 ' + phone.replace(/^0+/, '');
+        if (total <= 0) return showToast('Total fee zero se zyada honi chahiye.', 'bad');
+        if (paid < 0 || paid > total) return showToast('Advance total fee se zyada nahi ho sakta.', 'bad');
+        if (state.learners.some(l => normalizePhone(l.phone) === normalizePhone(phone))) return showToast('Is number par learner pehle se enrolled hai.', 'bad');
 
-        const newId = 'LRN-' + Date.now();
-        const rollId = `GG-${batch}-${state.learners.length + 101}`;
+        const newId = uniqueId('LRN', state.learners);
+        const batchSequence = state.learners.filter(l => l.batch === batch).length + 101;
+        const rollId = `GG-${batch}-${String(batchSequence).padStart(3,'0')}`;
 
         const student = {
           id: newId,
           rollId,
           name,
           phone,
+          email,
           batch,
           mentorship: batch.startsWith('AI') ? 'AI Content Creation' : 'Cinema VFX & 3D Ads',
           startDate: new Date().toISOString().split('T')[0],
@@ -2358,6 +2670,13 @@
         };
 
         state.learners.unshift(student);
+
+        const tempPin = String(Math.floor(1000 + Math.random() * 9000));
+        const userId = uniqueId('GG-LRN', state.users);
+        state.users.push({
+          id: userId, name, phone, role: 'LEARNER', linkedId: newId,
+          pinHash: await hashUserPin(userId, tempPin), status: 'ACTIVE', lastActive: 'Never'
+        });
 
         if (paid > 0) {
           postLedgerTransaction({
@@ -2374,7 +2693,7 @@
         saveState();
         closeModal();
         refreshViewData('directory');
-        showToast(`Student Enrolled: ${rollId}`, 'good');
+        openModal('Enrollment Complete', `<div class="demo-notice">Temporary login PIN learner ko secure tareeqay se dein. Pehli login ke baad PIN change karwana recommended hai.</div><p><b>Roll ID:</b> <span class="mono">${rollId}</span></p><p><b>User ID:</b> <span class="mono">${userId}</span></p><p><b>Temporary PIN:</b> <span class="mono" style="font-size:20px;color:var(--gold);font-weight:800;">${tempPin}</span></p>`, closeModal, 'Done');
 
         if (state.switches.autoWhatsAppReceipts) {
           sendWhatsAppSlip(newId);
@@ -2383,12 +2702,15 @@
     }
 
     function openReceivePaymentModal(partyId, partyType) {
+      const perm = partyType === 'LEARNER' ? 'students.payment' : 'clients.payment';
+      if (!requirePermission(perm)) return;
       const party = partyType === 'LEARNER' 
         ? state.learners.find(l => l.id === partyId) 
         : state.clients.find(c => c.id === partyId);
 
       if (!party) return;
       const due = (partyType === 'LEARNER' ? party.totalFee : party.totalValue) - party.paid;
+      if (due <= 0) return showToast('Is account ka koi outstanding balance nahi.', 'good');
 
       openModal(`Receive Payment (${party.name || party.business})`, `
         <div style="margin-bottom: 12px; font-size: 12px; color: var(--muted);">
@@ -2401,6 +2723,8 @@
       `, () => {
         const amt = Number($('#recAmt').value);
         const acc = $('#recAcc').value;
+        if (!amt || amt <= 0) return showToast('Valid amount enter karein.', 'bad');
+        if (amt > due) return showToast(`Amount outstanding PKR ${due.toLocaleString()} se zyada nahi ho sakta.`, 'bad');
 
         postLedgerTransaction({
           type: 'INCOME',
@@ -2417,6 +2741,11 @@
         refreshViewData('finance');
         showToast('Payment credited to ledger', 'good');
       }, 'Credit Account');
+    }
+
+    function receiveCurrentClientPayment() {
+      const clientId = state.currentUser.role === 'CLIENT' ? state.currentUser.linkedId : state.selectedInspectClientId;
+      openReceivePaymentModal(clientId, 'CLIENT');
     }
 
     function sendWhatsAppSlip(learnerId) {
@@ -2444,10 +2773,19 @@ Executive Helpline: +92 300 1234567`
       window.open(`https://wa.me/${cleanP}?text=${text}`, '_blank');
     }
 
-    function requestSpecificService(svcId) {
+    function requestSpecificService(svcId, notes = '') {
       const s = ALL_13_SERVICES.find(x => x.id === svcId);
+      if (!s) return;
+      const clientId = state.currentUser.role === 'CLIENT' ? state.currentUser.linkedId : state.selectedInspectClientId;
+      const client = state.clients.find(c => c.id === clientId);
+      state.serviceRequests.unshift({
+        id: uniqueId('REQ', state.serviceRequests), clientId, clientName: client?.business || state.currentUser.name,
+        serviceId: svcId, serviceName: s.name, notes: String(notes || '').slice(0, 1000),
+        status: 'NEW', createdAt: getPKTTimeFormatted()
+      });
+      saveState();
       addAudit('SERVICE_REQUEST', `Requested: ${s.name}`, svcId);
-      showToast(`Request for [${s.name}] forwarded to Yasir Ali's Desk`, 'good');
+      showToast(`Request for [${s.name}] saved and forwarded`, 'good');
     }
 
     function openServiceRequestModal() {
@@ -2460,39 +2798,33 @@ Executive Helpline: +92 300 1234567`
         </div>
       `, () => {
         const sid = $('#reqSvcId').value;
-        requestSpecificService(sid);
+        const notes = $('#reqNotes').value.trim();
+        requestSpecificService(sid, notes);
         closeModal();
       }, 'Submit Request');
     }
 
-    function toggleTokenMask() {
-      const el = $('#emergencyTokenLabel');
-      const icon = $('#tokenEyeIcon');
-      if (el.textContent === '••••••••••••••••') {
-        el.textContent = state.emergencyToken;
-        icon.className = 'fa-solid fa-eye-slash';
-      } else {
-        el.textContent = '••••••••••••••••';
-        icon.className = 'fa-solid fa-eye';
-      }
+    async function regenerateRecoveryToken() {
+      if (!requirePermission('settings.manage')) return;
+      const bytes = crypto.getRandomValues(new Uint8Array(12));
+      const token = 'GG-' + [...bytes].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      state.emergencyTokenHash = await hashRecoveryToken(token);
+      saveState();
+      addAudit('RECOVERY_TOKEN_RESET', 'Recovery token regenerated; plaintext displayed once');
+      openModal('New Recovery Token — Save It Now', `<div class="demo-notice">Yeh token dobara display nahi hoga. Isay secure offline jagah save karein.</div><div class="mono" style="font-size:18px;font-weight:800;word-break:break-all;text-align:center;padding:18px;border:1px dashed var(--gold);border-radius:10px;">${token}</div>`, closeModal, 'I Have Saved It');
     }
 
-    function copyEmergencyToken() {
-      navigator.clipboard.writeText(state.emergencyToken);
-      showToast('Emergency Token copied to clipboard', 'good');
-    }
-
-    function handleUpdateMasterPin(e) {
+    async function handleUpdateMasterPin(e) {
       e.preventDefault();
       const cur = $('#curMasterPin').value.trim();
       const n1 = $('#newMasterPin').value.trim();
       const n2 = $('#confMasterPin').value.trim();
 
-      if (cur !== state.masterPin && cur !== state.emergencyToken) return showToast('Current Master PIN incorrect', 'bad');
-      if (n1.length !== 4) return showToast('PIN must be exactly 4 digits', 'bad');
+      if ((await hashMasterPin(cur)) !== state.masterPinHash) return showToast('Current Master PIN incorrect', 'bad');
+      if (!/^\d{4}$/.test(n1)) return showToast('PIN must be exactly 4 digits', 'bad');
       if (n1 !== n2) return showToast('PIN confirmation does not match', 'bad');
 
-      state.masterPin = n1;
+      state.masterPinHash = await hashMasterPin(n1);
       saveState();
       addAudit('MASTER_PIN_UPDATED', 'Executive master code was updated');
       $('#curMasterPin').value = '';
@@ -2501,7 +2833,23 @@ Executive Helpline: +92 300 1234567`
       showToast('Master PIN updated successfully', 'good');
     }
 
+    async function handleUpdateLoginPin(e) {
+      e.preventDefault();
+      const user = state.users.find(u => u.id === state.currentUser.id);
+      const current = $('#curLoginPin').value;
+      const next = $('#newLoginPin').value;
+      const confirm = $('#confLoginPin').value;
+      if (!user || (await hashUserPin(user.id, current)) !== user.pinHash) return showToast('Current login PIN incorrect.', 'bad');
+      if (next.length < 4 || next.length > 32) return showToast('New PIN 4–32 characters ka ho.', 'bad');
+      if (next !== confirm) return showToast('PIN confirmation match nahi karti.', 'bad');
+      user.pinHash = await hashUserPin(user.id, next);
+      state.currentUser = user;
+      saveState(); addAudit('LOGIN_PIN_UPDATED', 'User updated own login PIN', user.id);
+      e.target.reset(); showToast('Login PIN updated successfully.', 'good');
+    }
+
     function openCreateUserModal() {
+      if (!requirePermission('users.manage')) return;
       openModal('Add Ecosystem Authorized User', `
         <div class="field"><label>Full Name</label><input type="text" id="newUName" required class="input"></div>
         <div class="field"><label>WhatsApp Number</label><input type="tel" id="newUPhone" required placeholder="+92 300 1234567" class="input mono"></div>
@@ -2514,23 +2862,37 @@ Executive Helpline: +92 300 1234567`
             <option value="CLIENT">Commercial Client</option>
           </select>
         </div>
+        <div class="field"><label>Linked Learner/Client Record (required for portal roles)</label>
+          <select id="newULinked" class="input">
+            <option value="">Not linked</option>
+            ${state.learners.map(x => `<option value="${x.id}" data-kind="LEARNER">Learner — ${escapeHtml(x.name)} (${x.rollId})</option>`).join('')}
+            ${state.clients.map(x => `<option value="${x.id}" data-kind="CLIENT">Client — ${escapeHtml(x.business)}</option>`).join('')}
+          </select>
+        </div>
         <div class="field"><label>Access PIN / Passcode</label><input type="text" id="newUPin" required placeholder="e.g. 5555" class="input mono"></div>
-      `, () => {
+      `, async () => {
         const name = $('#newUName').value.trim();
         let phone = $('#newUPhone').value.trim();
         const role = $('#newURole').value;
         const pin = $('#newUPin').value.trim();
+        const linkedId = $('#newULinked').value;
 
         if (!name || !phone || !pin) return showToast('All fields are required', 'bad');
         if (!phone.startsWith('+92')) phone = '+92 ' + phone.replace(/^0+/, '');
+        if (state.users.some(u => normalizePhone(u.phone) === normalizePhone(phone))) return showToast('Is WhatsApp number ka account pehle se mojood hai.', 'bad');
+        if (['LEARNER','CLIENT'].includes(role) && !linkedId) return showToast('Learner/Client role ke liye linked record select karein.', 'bad');
+        if (role === 'LEARNER' && !state.learners.some(x => x.id === linkedId)) return showToast('Selected record learner nahi hai.', 'bad');
+        if (role === 'CLIENT' && !state.clients.some(x => x.id === linkedId)) return showToast('Selected record client nahi hai.', 'bad');
 
-        const newId = 'GG-' + role.slice(0,3) + '-' + (state.users.length + 101);
+        const newId = uniqueId('GG-' + role.slice(0,3), state.users);
+        const pinHash = await hashUserPin(newId, pin);
         state.users.push({
           id: newId,
           name,
           phone,
-          pin,
+          pinHash,
           role,
+          linkedId: linkedId || undefined,
           status: 'ACTIVE',
           lastActive: 'Just registered'
         });
@@ -2544,39 +2906,41 @@ Executive Helpline: +92 300 1234567`
     }
 
     function openPermissionsModal(userId) {
+      if (!requirePermission('users.manage')) return;
       const u = state.users.find(x => x.id === userId);
       if (!u) return;
 
+      const defaults = ROLE_PERMISSIONS[u.role] || [];
+      const active = Array.isArray(u.permissions) ? u.permissions : defaults;
+      const options = [
+        ['dashboard.view','Executive dashboard'], ['students.view','View students'],
+        ['students.create','Create admissions'], ['students.payment','Receive student payments'],
+        ['finance.view','View ledger and vaults'], ['finance.expense','Record expenses'],
+        ['finance.transfer','Transfer between vaults'], ['finance.reverse','Reverse transactions'],
+        ['clients.view','View client accounts'], ['clients.manage','Manage deliverables'], ['clients.payment','Receive client payments'],
+        ['users.view','View users'], ['users.manage','Manage users and permissions'],
+        ['settings.manage','Security, backups and audit']
+      ];
+
       openModal(`Permissions: ${u.name} (${u.role})`, `
         <div style="font-size: 12px; display: grid; gap: 8px;">
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
-            <span>View General Ledger & Vaults</span>
-            <input type="checkbox" ${['PRIMARY_OWNER', 'SECOND_ADMIN', 'ACCOUNTS'].includes(u.role) ? 'checked' : ''}>
-          </label>
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
-            <span>Student Intake & Admissions</span>
-            <input type="checkbox" ${['PRIMARY_OWNER', 'SECOND_ADMIN', 'STAFF'].includes(u.role) ? 'checked' : ''}>
-          </label>
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
-            <span>Execute Transaction Reversals</span>
-            <input type="checkbox" ${['PRIMARY_OWNER', 'ACCOUNTS'].includes(u.role) ? 'checked' : ''}>
-          </label>
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
-            <span>Modify Master Safeguard Switches</span>
-            <input type="checkbox" ${['PRIMARY_OWNER'].includes(u.role) ? 'checked' : ''}>
-          </label>
+          ${options.map(([key,label]) => `<label style="display:flex;align-items:center;justify-content:space-between;padding:8px;border:1px solid var(--line);border-radius:8px;"><span>${label}</span><input class="permission-check" type="checkbox" value="${key}" ${active.includes('*') || active.includes(key) ? 'checked' : ''}></label>`).join('')}
         </div>
       `, () => {
+        u.permissions = $$('.permission-check').filter(x => x.checked).map(x => x.value);
+        addAudit('PERMISSIONS_UPDATED', `Permissions updated for ${u.name}`, u.id);
+        saveState();
         closeModal();
         showToast('Permissions updated for ' + u.name, 'good');
       }, 'Save Permissions');
     }
 
-    function resetUserPin(userId) {
+    async function resetUserPin(userId) {
+      if (!requirePermission('users.manage')) return;
       const u = state.users.find(x => x.id === userId);
       if (!u) return;
       const newPin = Math.floor(1000 + Math.random() * 9000).toString();
-      u.pin = newPin;
+      u.pinHash = await hashUserPin(u.id, newPin);
       addAudit('PIN_RESET', `PIN reset for ${u.name}`, u.id);
       saveState();
       renderUsersTable();
@@ -2589,6 +2953,7 @@ Executive Helpline: +92 300 1234567`
     }
 
     function toggleUserStatus(userId) {
+      if (!requirePermission('users.manage')) return;
       const u = state.users.find(x => x.id === userId);
       if (!u || u.role === 'PRIMARY_OWNER') return;
       u.status = u.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
@@ -2615,7 +2980,10 @@ Executive Helpline: +92 300 1234567`
     }
 
     function exportBackupJSON() {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      if (!requirePermission('settings.manage')) return;
+      if (!state.switches.backupClearance) return showToast('Backup clearance switch OFF hai.', 'bad');
+      const exportState = { ...state, currentUser: null, impersonator: null, failedLogins: {} };
+      const blob = new Blob([JSON.stringify(exportState, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `GlobalGuru_Snapshot_${new Date().toISOString().split('T')[0]}.json`;
@@ -2624,6 +2992,8 @@ Executive Helpline: +92 300 1234567`
     }
 
     function importBackupJSON(e) {
+      if (!requirePermission('settings.manage')) return;
+      if (!state.switches.backupClearance) return showToast('Backup restore clearance OFF hai.', 'bad');
       const file = e.target.files[0];
       if (!file) return;
 
@@ -2631,7 +3001,17 @@ Executive Helpline: +92 300 1234567`
       reader.onload = function(evt) {
         try {
           const parsed = JSON.parse(evt.target.result);
-          if (!parsed.accounts || !parsed.users) throw new Error('Invalid schema');
+          if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Invalid schema');
+          if (!parsed.accounts || !Array.isArray(parsed.users) || !Array.isArray(parsed.learners) || !Array.isArray(parsed.transactions)) throw new Error('Invalid schema');
+          if (/[<>]|javascript:|onerror\s*=|onload\s*=/i.test(JSON.stringify(parsed))) throw new Error('Unsafe backup content');
+          const requiredVaults = ['Meezan Bank','Easypaisa','JazzCash','Physical Vault'];
+          if (!requiredVaults.every(k => Number.isFinite(Number(parsed.accounts[k])) && Number(parsed.accounts[k]) >= 0)) throw new Error('Invalid vault balances');
+          if (parsed.users.some(u => !u.id || !u.role || !u.pinHash)) throw new Error('Invalid users');
+          delete parsed.__proto__;
+          delete parsed.constructor;
+          parsed.currentUser = null;
+          parsed.impersonator = null;
+          parsed.failedLogins = {};
           state = { ...state, ...parsed };
           saveState();
           addAudit('BACKUP_RESTORED', 'System snapshot restored from JSON');
@@ -2645,9 +3025,10 @@ Executive Helpline: +92 300 1234567`
     }
 
     function exportLedgerCSV() {
+      if (!requirePermission('finance.view')) return;
       let csv = 'Receipt,Date,Type,Category,Party,Account,Amount,Status\n';
       state.transactions.forEach(t => {
-        csv += `"${t.receipt}","${t.date}","${t.type}","${t.category}","${t.party}","${t.account}",${t.amount},"${t.status}"\n`;
+        csv += [t.receipt,t.date,t.type,t.category,t.party,t.account,t.amount,t.status].map(csvCell).join(',') + '\n';
       });
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
@@ -2655,6 +3036,12 @@ Executive Helpline: +92 300 1234567`
       a.download = `GlobalGuru_Ledger_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       showToast('Ledger CSV exported', 'good');
+    }
+
+    function csvCell(value) {
+      let s = String(value ?? '');
+      if (/^[=+\-@]/.test(s)) s = "'" + s;
+      return `"${s.replace(/"/g, '""')}"`;
     }
 
     function escapeHtml(str) {
@@ -2667,7 +3054,9 @@ Executive Helpline: +92 300 1234567`
       toast.className = 'toast';
       if (type === 'good') toast.style.borderLeftColor = 'var(--emerald)';
       if (type === 'bad') toast.style.borderLeftColor = 'var(--danger)';
-      toast.innerHTML = `<span>${msg}</span>`;
+      const span = document.createElement('span');
+      span.textContent = String(msg);
+      toast.appendChild(span);
       stack.appendChild(toast);
       setTimeout(() => toast.remove(), 3200);
     }
@@ -2678,9 +3067,15 @@ Executive Helpline: +92 300 1234567`
       applyTheme();
 
       const activeSid = sessionStorage.getItem(SESSION_KEY);
-      if (activeSid) {
+      const sessionStarted = Number(sessionStorage.getItem(SESSION_STARTED_KEY) || 0);
+      const sessionFresh = sessionStarted && (Date.now() - sessionStarted < SESSION_MAX_MS);
+      if (activeSid && sessionFresh) {
         const u = state.users.find(x => x.id === activeSid && x.status === 'ACTIVE');
         if (u) setCurrentSession(u, false);
+      } else if (activeSid) {
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_STARTED_KEY);
+        showToast('Session expired. Dobara login karein.', 'bad');
       }
     });
   </script>
