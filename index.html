@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en" class="h-full">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#651c2b">
-  <title>Global Guru Enterprise Portal</title>
+  <title>Global Guru Enterprise Ecosystem</title>
   
   <!-- FontAwesome 6.5.2 CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -22,6 +22,11 @@
       --brand-border: #f2d6dc;
       --gold: #d97706;
       --gold-soft: #fef3c7;
+      --emerald: #059669;
+      --emerald-soft: #ecfdf5;
+      --emerald-text: #047857;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
       --bg: #f8fafc;
       --card: #ffffff;
       --line: #e2e8f0;
@@ -38,10 +43,15 @@
     .dark {
       --brand: #8c2f43;
       --brand-hover: #a33850;
-      --brand-soft: rgba(140, 47, 67, 0.15);
-      --brand-border: rgba(140, 47, 67, 0.3);
+      --brand-soft: rgba(140, 47, 67, 0.2);
+      --brand-border: rgba(140, 47, 67, 0.45);
       --gold: #f59e0b;
       --gold-soft: rgba(245, 158, 11, 0.15);
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.15);
+      --emerald-text: #34d399;
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.15);
       --bg: #070b12;
       --card: #0f1726;
       --line: #1e293b;
@@ -66,7 +76,7 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Core Visibility Fix: Prevents All Screens from Stacking */
+    /* Core Visibility Fix: Prevents Views from Stacking */
     .hidden { display: none !important; }
 
     .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
@@ -80,7 +90,7 @@
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 99px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
 
-    /* Shell Architecture */
+    /* Shell Architecture with Fixed Sticky Sidebar */
     #shell { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; width: 100%; }
     .sidebar {
       background: var(--card);
@@ -91,6 +101,7 @@
       top: 0;
       height: 100vh;
       z-index: 40;
+      overflow: hidden;
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .side-brand {
@@ -139,7 +150,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8.5px 11px;
+      padding: 9px 12px;
       border-radius: 8px;
       font-size: 12.5px;
       font-weight: 600;
@@ -148,8 +159,15 @@
       margin: 1px 0;
     }
     .nav-btn i { width: 18px; text-align: center; font-size: 13px; }
-    .nav-btn:hover { background: var(--brand-soft); color: var(--brand); }
-    .nav-btn.active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+    .nav-btn:hover { background: var(--brand-soft); color: var(--ink); }
+    /* High Contrast Active Sidebar Button */
+    .nav-btn.active {
+      background: var(--brand);
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(101, 28, 43, 0.4);
+    }
+    .nav-btn.active i { color: #ffffff !important; }
 
     .side-user-card {
       border-top: 1px solid var(--line);
@@ -158,6 +176,7 @@
       align-items: center;
       gap: 10px;
       background: var(--card);
+      flex-shrink: 0;
     }
     .user-avatar {
       width: 34px;
@@ -197,7 +216,7 @@
     .main-body { flex: 1; padding: 20px; max-width: 1400px; width: 100%; margin: 0 auto; }
 
     /* UI Cards & Grids */
-    .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px; }
     .stat-card {
       background: var(--card);
       border: 1px solid var(--line);
@@ -209,17 +228,19 @@
       justify-content: space-between;
     }
     .stat-head { display: flex; align-items: center; justify-content: space-between; }
-    .stat-head span { font-size: 11px; font-weight: 600; color: var(--muted); }
+    .stat-head span { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.03em; }
+    /* High Contrast Stat Card Icon Badge */
     .stat-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      background: var(--brand-soft);
-      color: var(--brand);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(217, 119, 6, 0.15);
+      border: 1px solid rgba(217, 119, 6, 0.35);
+      color: var(--gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 13px;
     }
     .stat-val { font-size: 22px; font-weight: 800; margin: 6px 0 2px; }
     .stat-sub { font-size: 10.5px; color: var(--muted); }
@@ -239,9 +260,27 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      flex-wrap: wrap;
     }
-    .card-head h4 { font-size: 13.5px; font-weight: 700; margin: 0; }
+    .card-head h4 { font-size: 13.5px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
     .card-body { padding: 18px; }
+
+    /* Action Strip & KPI Bar */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .kpi-box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-box span { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .kpi-box b { display: block; font-size: 18px; margin-top: 4px; }
 
     /* Buttons */
     .btn {
@@ -262,10 +301,10 @@
     .btn:hover { background: var(--brand-soft); border-color: var(--brand-border); color: var(--brand); }
     .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
     .btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
-    .btn.good { background: #087443; border-color: #087443; color: #fff; }
-    .btn.good:hover { background: #065f37; }
-    .btn.danger { background: #b42318; border-color: #b42318; color: #fff; }
-    .btn.danger:hover { background: #911c13; }
+    .btn.good { background: var(--emerald); border-color: var(--emerald); color: #fff; }
+    .btn.good:hover { opacity: 0.9; }
+    .btn.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn.danger:hover { opacity: 0.9; }
     .btn.sm { height: 28px; padding: 4px 9px; font-size: 11px; border-radius: 6px; }
     .icon-btn {
       width: 33px;
@@ -282,26 +321,24 @@
     }
     .icon-btn:hover { color: var(--ink); background: var(--brand-soft); border-color: var(--brand-border); }
 
-    /* Badges */
+    /* Crisp High-Contrast Badges */
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 99px;
       font-size: 10px;
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.02em;
     }
     .badge.brand { background: var(--brand-soft); color: var(--brand); border: 1px solid var(--brand-border); }
-    .badge.good { background: #edfdf2; color: #087443; border: 1px solid #b7f4cb; }
-    .badge.warn { background: #fef8ee; color: #b54708; border: 1px solid #fedf89; }
-    .badge.bad { background: #fef3f2; color: #b42318; border: 1px solid #fecdca; }
-    .dark .badge.good { background: rgba(8, 116, 67, 0.2); border-color: rgba(8, 116, 67, 0.4); }
-    .dark .badge.warn { background: rgba(181, 71, 8, 0.2); border-color: rgba(181, 71, 8, 0.4); }
-    .dark .badge.bad { background: rgba(180, 35, 24, 0.2); border-color: rgba(180, 35, 24, 0.4); }
+    .badge.good { background: var(--emerald-soft); color: var(--emerald-text); border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge.warn { background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge.bad { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.4); }
 
-    /* Tables */
+    /* High-Contrast Tables */
     .table-container { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
     th {
@@ -310,7 +347,7 @@
       font-weight: 700;
       font-size: 9.5px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       padding: 10px 14px;
       border-bottom: 1px solid var(--line);
       white-space: nowrap;
@@ -345,18 +382,18 @@
       height: 15px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
       transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .switch-ui.on { background: var(--brand); }
     .switch-ui.on::after { transform: translateX(18px); }
 
-    /* Form Inputs */
+    /* Inputs */
     .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
     .field label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
     .input {
       width: 100%;
-      height: 36px;
+      height: 35px;
       border: 1px solid var(--line);
       background: var(--card);
       border-radius: 8px;
@@ -382,11 +419,11 @@
       margin-top: auto;
     }
 
-    /* Modals & Backdrop */
+    /* Modals & Backdrops */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(4px);
       z-index: 100;
       display: flex;
@@ -398,7 +435,7 @@
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 16px;
-      width: min(580px, 100%);
+      width: min(600px, 100%);
       max-height: 88vh;
       display: flex;
       flex-direction: column;
@@ -411,7 +448,6 @@
     .modal-body { padding: 18px; overflow-y: auto; }
     .modal-foot { padding: 12px 18px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; background: var(--brand-soft); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
 
-    /* Mobile Drawer */
     #mobileSidebarBackdrop {
       position: fixed;
       inset: 0;
@@ -466,7 +502,7 @@
 </head>
 
 <body>
-  <!-- TOAST NOTIFICATIONS -->
+  <!-- TOAST ALERTS CONTAINER -->
   <div id="toastStack" class="toast-stack"></div>
 
   <!-- MOBILE SIDEBAR BACKDROP -->
@@ -478,25 +514,25 @@
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-[#070b12]" style="display: flex;">
     <div class="card" style="width: min(440px, 100%); box-shadow: var(--shadow-lg); border-radius: 20px; padding: 24px;">
       
-      <!-- Real Logo with Triple-Tap Stealth Support -->
+      <!-- Logo Lockup with Triple-Tap Stealth Support -->
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
         <img class="brand-logo-img" src="logo.png" alt="GG" onclick="handleLogoTap()" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="brand-logo-fallback" onclick="handleLogoTap()">GG</div>
         <div>
           <h2 style="font-size: 18px; font-weight: 800; margin: 0; line-height: 1.2;">Global Guru Portal</h2>
-          <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" class="mono">ENTERPRISE GATEWAY • V6.1</p>
+          <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" class="mono">ENTERPRISE GATEWAY • SECURED</p>
         </div>
       </div>
 
       <div id="authLoginForm">
         <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">
-          Enter your registered WhatsApp number / User ID and personal passcode to unlock your workspace.
+          Enter your registered WhatsApp number or GG User ID and personal passcode to access your workspace.
         </p>
 
         <form onsubmit="handleAuthSubmit(event)">
           <div class="field">
-            <label>WhatsApp Number or User ID</label>
-            <input type="text" id="authIdentityInput" required placeholder="03001234567 or GG-OWNER" class="input mono">
+            <label>WhatsApp Number or GG User ID</label>
+            <input type="text" id="authIdentityInput" required placeholder="+92 300 1234567 or GG-OWNER-001" class="input mono">
           </div>
 
           <div class="field">
@@ -506,12 +542,12 @@
 
           <div style="display: flex; gap: 8px; margin-top: 16px;">
             <button type="submit" class="btn primary" style="flex: 1; height: 38px;">
-              <i class="fa-solid fa-shield-halved"></i> Authenticate Workspace
+              <i class="fa-solid fa-shield-halved"></i> Enter Enterprise Portal
             </button>
           </div>
         </form>
 
-        <!-- Quick Demo Switcher Accordion -->
+        <!-- Quick Workspace Credentials Drawer -->
         <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);">
           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); cursor: pointer;" onclick="$('#demoDrawer').classList.toggle('hidden')">
             <span class="mono"><i class="fa-solid fa-key"></i> Quick Workspace Credentials</span>
@@ -519,27 +555,27 @@
           </div>
 
           <div id="demoDrawer" class="hidden" style="margin-top: 10px; display: grid; gap: 6px; font-size: 11px;">
-            <button type="button" onclick="fillAuth('03001234567', '7860')" class="btn sm" style="justify-content: space-between;">
+            <button type="button" onclick="fillAuth('+92 300 1234567', '7860')" class="btn sm" style="justify-content: space-between;">
               <span><b>Primary Owner</b> (Yasir Ali)</span>
               <span class="mono">PIN: 7860</span>
             </button>
-            <button type="button" onclick="fillAuth('03009998877', '5555')" class="btn sm" style="justify-content: space-between;">
+            <button type="button" onclick="fillAuth('+92 300 9998877', '5555')" class="btn sm" style="justify-content: space-between;">
               <span><b>Second Admin</b> (Operations)</span>
               <span class="mono">PIN: 5555</span>
             </button>
-            <button type="button" onclick="fillAuth('03112223344', '4321')" class="btn sm" style="justify-content: space-between;">
+            <button type="button" onclick="fillAuth('+92 311 2223344', '4321')" class="btn sm" style="justify-content: space-between;">
               <span><b>Staff Desk</b> (Reception)</span>
               <span class="mono">PIN: 4321</span>
             </button>
-            <button type="button" onclick="fillAuth('03224445566', '8888')" class="btn sm" style="justify-content: space-between;">
+            <button type="button" onclick="fillAuth('+92 322 4445566', '8888')" class="btn sm" style="justify-content: space-between;">
               <span><b>Accounts Desk</b> (Ledger Officer)</span>
               <span class="mono">PIN: 8888</span>
             </button>
-            <button type="button" onclick="fillAuth('03005556677', 'AI01')" class="btn sm" style="justify-content: space-between;">
+            <button type="button" onclick="fillAuth('+92 300 5556677', 'AI01')" class="btn sm" style="justify-content: space-between;">
               <span><b>Learner</b> (Ayesha Khan)</span>
-              <span class="mono">Batch: AI01</span>
+              <span class="mono">Pass: AI01</span>
             </button>
-            <button type="button" onclick="fillAuth('03337778899', 'CLIENT')" class="btn sm" style="justify-content: space-between;">
+            <button type="button" onclick="fillAuth('+92 333 7778899', 'CLIENT')" class="btn sm" style="justify-content: space-between;">
               <span><b>Client</b> (Raza Traders)</span>
               <span class="mono">Pass: CLIENT</span>
             </button>
@@ -599,6 +635,12 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- Impersonation indicator -->
+          <div id="impersonationChip" class="badge warn hidden" style="font-size: 11px; padding: 4px 10px;">
+            <i class="fa-solid fa-user-secret"></i> <span id="impersonationLabel">Viewing as</span>
+            <button onclick="stopImpersonation()" style="margin-left: 6px; font-weight: 800; color: inherit;">✕ Exit</button>
+          </div>
+
           <button class="btn sm" id="privacyBtn" onclick="togglePrivacyMask()" title="1-Click Privacy Shield">
             <i class="fa-solid fa-eye-slash"></i> <span class="mono">Privacy Mask</span>
           </button>
@@ -609,8 +651,9 @@
 
           <div style="height: 20px; width: 1px; background: var(--line); margin: 0 4px;"></div>
 
-          <button class="icon-btn" onclick="cycleTheme()" title="Switch Light/Dark/System Theme">
-            <i id="themeIcon" class="fa-solid fa-moon"></i>
+          <!-- 1-Click Dark / Light Mode Switcher -->
+          <button class="icon-btn" onclick="cycleTheme()" title="Switch Light / Dark Theme">
+            <i id="themeIcon" class="fa-solid fa-sun"></i>
           </button>
         </div>
       </header>
@@ -622,6 +665,7 @@
         <!-- VIEW 1: EXECUTIVE HUB (OWNER / ADMIN ONLY)     -->
         <!-- ============================================== -->
         <section id="view-executive" class="view-panel hidden">
+          <!-- 4 Stat Summary Cards with High Contrast Icons & Uniform Typography -->
           <div class="grid-stats">
             <div class="stat-card">
               <div class="stat-head"><span>TOTAL LIQUID ASSETS</span><div class="stat-icon"><i class="fa-solid fa-vault"></i></div></div>
@@ -631,27 +675,28 @@
 
             <div class="stat-card">
               <div class="stat-head"><span>ACTIVE LEARNERS</span><div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div></div>
-              <div class="stat-val mono" id="statLearnersCount">28 Enrolled</div>
+              <div class="stat-val mono" id="statLearnersCount">3 Enrolled</div>
               <div class="stat-sub">Across AI & CGI cohorts</div>
             </div>
 
             <div class="stat-card">
               <div class="stat-head"><span>COMMERCIAL CLIENTS</span><div class="stat-icon"><i class="fa-solid fa-briefcase"></i></div></div>
-              <div class="stat-val mono" id="statClientsCount">14 Accounts</div>
+              <div class="stat-val mono" id="statClientsCount">2 Accounts</div>
               <div class="stat-sub">Active campaigns in delivery</div>
             </div>
 
             <div class="stat-card">
               <div class="stat-head"><span>OUTSTANDING RECEIVABLES</span><div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div></div>
-              <div class="stat-val mono financial-num" id="statReceivables">PKR 340,000</div>
+              <div class="stat-val mono financial-num" id="statReceivables">PKR 215,000</div>
               <div class="stat-sub">Learner + Client balance due</div>
             </div>
           </div>
 
+          <!-- 12 Master Controls Switchboard (Perfect 3-Column Balanced Grid) -->
           <div class="card">
             <div class="card-head">
-              <h4><i class="fa-solid fa-sliders" style="color: var(--brand); margin-right: 6px;"></i> Executive Switchboard & Safeguards</h4>
-              <span class="badge brand" id="switchboardStatusBadge">10 / 11 Active</span>
+              <h4><i class="fa-solid fa-sliders" style="color: var(--gold); margin-right: 6px;"></i> Executive Switchboard & Safeguards</h4>
+              <span class="badge brand" id="switchboardStatusBadge">11 / 12 Active</span>
             </div>
             <div class="card-body">
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;" id="switchboardGrid"></div>
@@ -661,9 +706,182 @@
 
 
         <!-- ============================================== -->
-        <!-- VIEW 2: PRIVATE LEARNER LMS (STUDENTS ONLY)    -->
+        <!-- VIEW 2: STUDENT MENTORSHIP DIRECTORY           -->
+        <!-- ============================================== -->
+        <section id="view-directory" class="view-panel hidden">
+          <!-- Top Executive Financial Strip for Super Admin / Accounts -->
+          <div class="kpi-strip" id="directoryKpiStrip">
+            <div class="kpi-box">
+              <span>Total Agreed Intake Fee</span>
+              <b class="mono financial-num" id="kpiDirTotalFee">PKR 160,000</b>
+            </div>
+            <div class="kpi-box">
+              <span>Total Paid Collections</span>
+              <b class="mono financial-num" style="color: var(--emerald-text);" id="kpiDirPaid">PKR 100,000</b>
+            </div>
+            <div class="kpi-box">
+              <span>Outstanding Defaulter Dues</span>
+              <b class="mono financial-num" style="color: var(--danger);" id="kpiDirDue">PKR 60,000</b>
+            </div>
+            <div class="kpi-box">
+              <span>Meezan Vault Sync Share</span>
+              <b class="mono financial-num" style="color: var(--gold);" id="kpiDirMeezan">PKR 850,000</b>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h4>Student Intake & Mentorship Directory</h4>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <!-- Filter Dropdowns -->
+                <select id="dirFilterCohort" class="input" style="width: 140px; height: 32px; font-size: 11px;" onchange="renderDirectoryTable()">
+                  <option value="ALL">All Cohorts</option>
+                  <option value="AI-01">Cohort AI-01</option>
+                  <option value="VFX-01">Cohort VFX-01</option>
+                </select>
+
+                <select id="dirFilterStatus" class="input" style="width: 140px; height: 32px; font-size: 11px;" onchange="renderDirectoryTable()">
+                  <option value="ALL">All Payment Status</option>
+                  <option value="PAID">Paid in Full</option>
+                  <option value="DUE">Balance Due</option>
+                </select>
+
+                <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="input" style="width: 200px; height: 32px; font-size: 11.5px;">
+                <button class="btn primary sm" onclick="openEnrollStudentModal()"><i class="fa-solid fa-user-plus"></i> New Enrollment</button>
+              </div>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Roll ID</th>
+                    <th>Student Name</th>
+                    <th>WhatsApp Contact</th>
+                    <th>Cohort</th>
+                    <th style="text-align: center;">Attended / Total</th>
+                    <th>Total Fee</th>
+                    <th>Paid Amount</th>
+                    <th>Balance Due</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="directoryTableBody"></tbody>
+              </table>
+            </div>
+            <!-- Bottom Records Counter Strip -->
+            <div style="padding: 10px 18px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted);" class="mono">
+              <span id="directoryRecordsCounter">Showing 3 of 3 Enrolled Learners</span>
+              <span>Intake Gate: <b>Active (Batch Capacity 85%)</b></span>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- VIEW 3: CENTRAL GENERAL LEDGER & VAULTS        -->
+        <!-- ============================================== -->
+        <section id="view-finance" class="view-panel hidden">
+          <!-- Master Grand Total + 4 Vaults -->
+          <div class="grid-stats">
+            <div class="stat-card" style="border-left: 4px solid var(--gold);">
+              <div class="stat-head"><span>CONSOLIDATED CAPITAL</span><div class="stat-icon"><i class="fa-solid fa-coins"></i></div></div>
+              <div class="stat-val mono financial-num" style="color: var(--gold);" id="vaultBalConsolidated">PKR 1,450,000</div>
+              <div class="stat-sub">Net liquid reserve across vaults</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-head"><span>MEEZAN BANK LTD</span><div class="stat-icon"><i class="fa-solid fa-building-columns"></i></div></div>
+              <div class="stat-val mono financial-num" id="vaultBalMeezan">PKR 850,000</div>
+              <div class="stat-sub mono">Corporate Account</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-head"><span>EASYPAISA MERCHANT</span><div class="stat-icon"><i class="fa-solid fa-mobile-screen"></i></div></div>
+              <div class="stat-val mono financial-num" id="vaultBalEasypaisa">PKR 240,000</div>
+              <div class="stat-sub mono">+92 300 1234567</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-head"><span>JAZZCASH COMMERCIAL</span><div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div></div>
+              <div class="stat-val mono financial-num" id="vaultBalJazzCash">PKR 180,000</div>
+              <div class="stat-sub mono">+92 321 9876543</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-head"><span>PHYSICAL VAULT (GALLA)</span><div class="stat-icon"><i class="fa-solid fa-vault"></i></div></div>
+              <div class="stat-val mono financial-num" id="vaultBalVault">PKR 180,000</div>
+              <div class="stat-sub mono">Multan Head Office</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h4>Central Double-Entry General Ledger</h4>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <select id="ledgerFilterType" class="input" style="width: 130px; height: 32px; font-size: 11px;" onchange="renderFinanceView()">
+                  <option value="ALL">All Transactions</option>
+                  <option value="INCOME">Income Only</option>
+                  <option value="EXPENSE">Expense Only</option>
+                </select>
+
+                <select id="ledgerFilterVault" class="input" style="width: 140px; height: 32px; font-size: 11px;" onchange="renderFinanceView()">
+                  <option value="ALL">All Vaults</option>
+                  <option value="Meezan Bank">Meezan Bank</option>
+                  <option value="Easypaisa">Easypaisa</option>
+                  <option value="JazzCash">JazzCash</option>
+                  <option value="Physical Vault">Physical Vault</option>
+                </select>
+
+                <input type="text" id="ledgerSearchInput" oninput="renderFinanceView()" placeholder="Search receipt, party..." class="input" style="width: 190px; height: 32px; font-size: 11.5px;">
+
+                <button class="btn sm" onclick="openTransferModal()"><i class="fa-solid fa-money-bill-transfer"></i> Inter-Vault</button>
+                <button class="btn danger sm" onclick="openExpenseModal()"><i class="fa-solid fa-receipt"></i> Record Expense</button>
+                <button class="btn sm" onclick="exportLedgerCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+              </div>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Receipt #</th>
+                    <th>Date (PKT)</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Linked Party</th>
+                    <th>Vault Channel</th>
+                    <th style="text-align: right;">Amount (PKR)</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Correction</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerTableBody"></tbody>
+              </table>
+            </div>
+            <!-- Monthly Reconciliation Strip -->
+            <div style="padding: 12px 18px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; background: var(--brand-soft); flex-wrap: wrap; gap: 10px;">
+              <div><b>October Reconciliation:</b> Total Inflow: <span class="mono" style="color: var(--emerald-text); font-weight: 700;">+PKR 75,000</span> | Total Outflow: <span class="mono" style="color: var(--danger); font-weight: 700;">-PKR 15,000</span></div>
+              <div><b>Net Monthly Cashflow:</b> <span class="mono" style="color: var(--gold); font-weight: 800;">+PKR 60,000</span></div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- VIEW 4: PRIVATE LEARNER LMS (DEDICATED)        -->
         <!-- ============================================== -->
         <section id="view-learner" class="view-panel hidden">
+          <!-- Inspection selector if Admin/Owner viewing -->
+          <div id="learnerAdminInspectorBar" class="card hidden" style="padding: 10px 16px; margin-bottom: 14px; background: var(--brand-soft);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 700;"><i class="fa-solid fa-binoculars"></i> Admin Inspector Mode: Viewing Enrolled Student</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; color: var(--muted);">Switch Student:</span>
+                <select id="learnerInspectSelect" class="input" style="width: 220px; height: 30px; font-size: 11px;" onchange="inspectSelectedLearner(this.value)"></select>
+              </div>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-head">
               <div>
@@ -682,13 +900,13 @@
 
                 <div class="stat-card">
                   <div class="stat-head"><span>PAID AMOUNT</span><div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div></div>
-                  <div class="stat-val mono financial-num" style="color: #087443;" id="learnerPaidFee">PKR 25,000</div>
+                  <div class="stat-val mono financial-num" style="color: var(--emerald-text);" id="learnerPaidFee">PKR 25,000</div>
                   <div class="stat-sub">Credited to GG Ledger</div>
                 </div>
 
                 <div class="stat-card">
                   <div class="stat-head"><span>BALANCE DUE</span><div class="stat-icon"><i class="fa-solid fa-clock"></i></div></div>
-                  <div class="stat-val mono financial-num" style="color: #b42318;" id="learnerBalanceDue">PKR 25,000</div>
+                  <div class="stat-val mono financial-num" style="color: var(--danger);" id="learnerBalanceDue">PKR 25,000</div>
                   <div class="stat-sub" id="learnerDueDateLabel">Due: 2026-10-25</div>
                 </div>
 
@@ -701,50 +919,85 @@
             </div>
           </div>
 
+          <!-- Attendance Progress Bar (Bright Emerald for High Compliance) -->
           <div class="card">
             <div class="card-head"><h4>Mentorship Attendance & Syllabus Progress</h4></div>
             <div class="card-body">
               <div style="margin-bottom: 14px;">
                 <div style="display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600; margin-bottom: 6px;">
-                  <span>Lecture Attendance Completion</span>
-                  <span id="learnerProgressLabel">83% (High Compliance)</span>
+                  <span>Lecture Attendance Compliance</span>
+                  <span id="learnerProgressLabel" class="badge good">83% High Compliance</span>
                 </div>
-                <div style="height: 8px; background: var(--line); border-radius: 99px; overflow: hidden;">
-                  <div id="learnerProgressBar" style="height: 100%; width: 83%; background: var(--brand); border-radius: 99px;"></div>
+                <div style="height: 10px; background: var(--line); border-radius: 99px; overflow: hidden;">
+                  <div id="learnerProgressBar" style="height: 100%; width: 83%; background: var(--emerald); border-radius: 99px;"></div>
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 11.5px;">
-                <div style="padding: 10px; border: 1px solid var(--line); border-radius: 8px;">
+              <!-- Upcoming Class Schedule -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 11.5px; margin-top: 14px;">
+                <div style="padding: 12px; border: 1px solid var(--line); border-radius: 8px;">
                   <span style="color: var(--muted); display: block;">Mentorship Program:</span>
                   <strong id="learnerCourseName">AI Content Creation & Workflows</strong>
                 </div>
-                <div style="padding: 10px; border: 1px solid var(--line); border-radius: 8px;">
-                  <span style="color: var(--muted); display: block;">Enrollment Date:</span>
-                  <strong id="learnerStartDate">September 01, 2026</strong>
+                <div style="padding: 12px; border: 1px solid var(--line); border-radius: 8px;">
+                  <span style="color: var(--muted); display: block;">Next Scheduled Lecture:</span>
+                  <strong style="color: var(--gold);">Monday @ 08:00 PM PKT</strong>
                 </div>
-                <div style="padding: 10px; border: 1px solid var(--line); border-radius: 8px;">
-                  <span style="color: var(--muted); display: block;">Assigned Multan Lead:</span>
-                  <strong>Yasir Ali (Executive Director)</strong>
+                <div style="padding: 12px; border: 1px solid var(--line); border-radius: 8px;">
+                  <span style="color: var(--muted); display: block;">Topic:</span>
+                  <strong>Midjourney Cinematic Lighting</strong>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Official Executive Social Handle Card (Visible to Learner for Trust) -->
+          <!-- Student Payment Voucher Statements Table -->
+          <div class="card">
+            <div class="card-head">
+              <h4>Fee Installments & Official Receipt Statements</h4>
+              <button class="btn sm" onclick="printFeeVoucher()"><i class="fa-solid fa-print"></i> Print Voucher</button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Receipt #</th>
+                    <th>Date</th>
+                    <th>Amount Paid</th>
+                    <th>Channel</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="learnerPaymentHistoryBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Official Executive Social Handle Card (Visible ONLY to Enrolled Learner) -->
           <div id="learnerSocialMount"></div>
         </section>
 
 
         <!-- ============================================== -->
-        <!-- VIEW 3: COMMERCIAL CLIENT SALES & PORTFOLIO    -->
+        <!-- VIEW 5: COMMERCIAL B2B CLIENT WORKSPACE        -->
         <!-- ============================================== -->
         <section id="view-client" class="view-panel hidden">
+          <!-- Inspection selector if Admin/Owner viewing -->
+          <div id="clientAdminInspectorBar" class="card hidden" style="padding: 10px 16px; margin-bottom: 14px; background: var(--brand-soft);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 700;"><i class="fa-solid fa-binoculars"></i> Admin Inspector Mode: Viewing B2B Account</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; color: var(--muted);">Switch Client:</span>
+                <select id="clientInspectSelect" class="input" style="width: 220px; height: 30px; font-size: 11px;" onchange="inspectSelectedClient(this.value)"></select>
+              </div>
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-head">
               <div>
                 <h4 id="clientBusinessTitle">Commercial Client Workspace</h4>
-                <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" id="clientAccountStage">Active Partner • Verified Production Lead</p>
+                <p style="font-size: 11px; color: var(--muted); margin: 2px 0 0;" id="clientAccountStage">Active Partner • Production Desk Active</p>
               </div>
               <button class="btn primary sm" onclick="openServiceRequestModal()"><i class="fa-solid fa-plus"></i> Request New Service</button>
             </div>
@@ -752,7 +1005,7 @@
               <div class="grid-stats" style="margin-bottom: 0;">
                 <div class="stat-card">
                   <div class="stat-head"><span>ACTIVE CAMPAIGNS</span><div class="stat-icon"><i class="fa-solid fa-video"></i></div></div>
-                  <div class="stat-val mono" id="clientActiveProjectsCount">2 Projects</div>
+                  <div class="stat-val mono" id="clientActiveProjectsCount">2 Services</div>
                   <div class="stat-sub">Under active rendering</div>
                 </div>
 
@@ -764,19 +1017,42 @@
 
                 <div class="stat-card">
                   <div class="stat-head"><span>CLEARED PAID</span><div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div></div>
-                  <div class="stat-val mono financial-num" style="color: #087443;" id="clientPaidAmount">PKR 50,000</div>
+                  <div class="stat-val mono financial-num" style="color: var(--emerald-text);" id="clientPaidAmount">PKR 50,000</div>
                   <div class="stat-sub">Invoices cleared</div>
                 </div>
 
                 <div class="stat-card">
                   <div class="stat-head"><span>PENDING INVOICE</span><div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div></div>
-                  <div class="stat-val mono financial-num" style="color: #b42318;" id="clientPendingAmount">PKR 35,000</div>
+                  <div class="stat-val mono financial-num" style="color: var(--danger);" id="clientPendingAmount">PKR 35,000</div>
                   <div class="stat-sub">Due upon final render</div>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Active Deliverables & Cloud Render Table -->
+          <div class="card">
+            <div class="card-head">
+              <h4>Active Production Deliverables & Render Status</h4>
+              <span class="badge brand">Live Cloud Sync</span>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Deliverable Title</th>
+                    <th>Assigned Service</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Approved Download</th>
+                  </tr>
+                </thead>
+                <tbody id="clientDeliverablesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 13 Services Catalogue (13th Card Featured Banner) -->
           <div class="card">
             <div class="card-head">
               <h4>13 Global Guru Official Services & Portfolio Work</h4>
@@ -787,104 +1063,8 @@
             </div>
           </div>
 
-          <!-- Official Executive Social Handle Card (Visible to Client for B2B Verification) -->
+          <!-- Official Executive Social Handle Card (Visible ONLY to Commercial Client) -->
           <div id="clientSocialMount"></div>
-        </section>
-
-
-        <!-- ============================================== -->
-        <!-- VIEW 4: DIRECTORY & STUDENT INTAKE             -->
-        <!-- ============================================== -->
-        <section id="view-directory" class="view-panel hidden">
-          <div class="card">
-            <div class="card-head">
-              <h4>Student Intake & Mentorship Directory</h4>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="directorySearchInput" oninput="renderDirectoryTable()" placeholder="Search name, phone, roll..." class="input" style="width: 220px; height: 32px; font-size: 11.5px;">
-                <button class="btn primary sm" onclick="openEnrollStudentModal()"><i class="fa-solid fa-user-plus"></i> New Enrollment</button>
-              </div>
-            </div>
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Roll ID</th>
-                    <th>Student Name</th>
-                    <th>WhatsApp Contact</th>
-                    <th>Cohort</th>
-                    <th>Attended / Total</th>
-                    <th>Total Fee</th>
-                    <th>Paid</th>
-                    <th>Balance</th>
-                    <th>Status</th>
-                    <th style="text-align: right;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="directoryTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-
-        <!-- ============================================== -->
-        <!-- VIEW 5: CENTRAL GENERAL LEDGER & VAULTS        -->
-        <!-- ============================================== -->
-        <section id="view-finance" class="view-panel hidden">
-          <div class="grid-stats">
-            <div class="stat-card">
-              <div class="stat-head"><span>MEEZAN BANK LTD</span><div class="stat-icon"><i class="fa-solid fa-building-columns"></i></div></div>
-              <div class="stat-val mono financial-num" id="vaultBalMeezan">PKR 850,000</div>
-              <div class="stat-sub mono">Corp # 0102...</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-head"><span>EASYPAISA MERCHANT</span><div class="stat-icon"><i class="fa-solid fa-mobile-screen"></i></div></div>
-              <div class="stat-val mono financial-num" id="vaultBalEasypaisa">PKR 240,000</div>
-              <div class="stat-sub mono">0300-1234567</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-head"><span>JAZZCASH COMMERCIAL</span><div class="stat-icon"><i class="fa-solid fa-money-bill-wave"></i></div></div>
-              <div class="stat-val mono financial-num" id="vaultBalJazzCash">PKR 180,000</div>
-              <div class="stat-sub mono">0321-9876543</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-head"><span>PHYSICAL VAULT (GALLA)</span><div class="stat-icon"><i class="fa-solid fa-vault"></i></div></div>
-              <div class="stat-val mono financial-num" id="vaultBalVault">PKR 180,000</div>
-              <div class="stat-sub mono">Multan Office Cash</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-head">
-              <h4>Central Double-Entry General Ledger</h4>
-              <div style="display: flex; gap: 8px;">
-                <button class="btn sm" onclick="openTransferModal()"><i class="fa-solid fa-money-bill-transfer"></i> Inter-Vault Transfer</button>
-                <button class="btn danger sm" onclick="openExpenseModal()"><i class="fa-solid fa-receipt"></i> Record Expense</button>
-                <button class="btn sm" onclick="exportLedgerCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
-              </div>
-            </div>
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Receipt #</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Category</th>
-                    <th>Linked Party</th>
-                    <th>Vault Channel</th>
-                    <th style="text-align: right;">Amount (PKR)</th>
-                    <th>Status</th>
-                    <th style="text-align: right;">Correction</th>
-                  </tr>
-                </thead>
-                <tbody id="ledgerTableBody"></tbody>
-              </table>
-            </div>
-          </div>
         </section>
 
 
@@ -895,7 +1075,21 @@
           <div class="card">
             <div class="card-head">
               <h4>Authorized Ecosystem Users & Access Roles</h4>
-              <button class="btn primary sm" onclick="openCreateUserModal()"><i class="fa-solid fa-user-plus"></i> Add Ecosystem User</button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <select id="usersFilterRole" class="input" style="width: 140px; height: 32px; font-size: 11px;" onchange="renderUsersTable()">
+                  <option value="ALL">All Roles</option>
+                  <option value="PRIMARY_OWNER">Primary Owner</option>
+                  <option value="SECOND_ADMIN">Second Admin</option>
+                  <option value="STAFF">Staff</option>
+                  <option value="ACCOUNTS">Accounts</option>
+                  <option value="LEARNER">Learner</option>
+                  <option value="CLIENT">Client</option>
+                </select>
+
+                <input type="text" id="usersSearchInput" oninput="renderUsersTable()" placeholder="Search user ID, name..." class="input" style="width: 200px; height: 32px; font-size: 11.5px;">
+
+                <button class="btn primary sm" onclick="openCreateUserModal()"><i class="fa-solid fa-user-plus"></i> Add Ecosystem User</button>
+              </div>
             </div>
             <div class="table-container">
               <table>
@@ -913,6 +1107,11 @@
                 <tbody id="usersTableBody"></tbody>
               </table>
             </div>
+            <!-- Role Distribution Summary Bar -->
+            <div style="padding: 10px 18px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); flex-wrap: wrap; gap: 8px;" class="mono">
+              <span id="usersDistributionSummary">Role Distribution: 1 Owner • 1 Admin • 1 Staff • 1 Accounts • 1 Learner • 1 Client</span>
+              <span>Total Ecosystem Accounts: <b id="usersTotalCounter">6 Registered</b></span>
+            </div>
           </div>
         </section>
 
@@ -925,7 +1124,7 @@
             
             <!-- Master PIN & Recovery (Owner Alone) -->
             <div class="card">
-              <div class="card-head"><h4><i class="fa-solid fa-lock" style="color: var(--brand); margin-right: 6px;"></i> Master PIN & Recovery Token</h4></div>
+              <div class="card-head"><h4><i class="fa-solid fa-lock" style="color: var(--gold); margin-right: 6px;"></i> Master PIN & Recovery Token</h4></div>
               <div class="card-body">
                 <form onsubmit="handleUpdateMasterPin(event)">
                   <div class="field">
@@ -941,53 +1140,80 @@
                     <input type="password" id="confMasterPin" maxlength="4" required placeholder="e.g. 7860" class="input mono">
                   </div>
 
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); flex-wrap: wrap; gap: 8px;">
                     <div style="font-size: 11px; color: var(--muted);" class="mono">
-                      Token: <span id="emergencyTokenLabel" onclick="toggleTokenMask()" style="cursor: pointer; font-weight: 700; color: var(--gold);">••••••••••••••••</span>
+                      Token: <span id="emergencyTokenLabel" style="font-weight: 700; color: var(--gold);">••••••••••••••••</span>
+                      <button type="button" class="icon-btn" style="width: 24px; height: 24px; font-size: 10px; margin-left: 4px;" onclick="toggleTokenMask()" title="Reveal/Mask Token"><i id="tokenEyeIcon" class="fa-solid fa-eye"></i></button>
+                      <button type="button" class="icon-btn" style="width: 24px; height: 24px; font-size: 10px; margin-left: 2px;" onclick="copyEmergencyToken()" title="Copy Token"><i class="fa-solid fa-copy"></i></button>
                     </div>
-                    <button type="submit" class="btn primary sm">Update PIN</button>
+                    <button type="submit" class="btn primary sm">Update Master PIN</button>
                   </div>
                 </form>
               </div>
             </div>
 
-            <!-- System Information & Maintenance Card -->
+            <!-- Balanced Node Status & Health Gauge -->
             <div class="card">
-              <div class="card-head"><h4><i class="fa-solid fa-server" style="color: var(--brand); margin-right: 6px;"></i> Node Status & Environment</h4></div>
-              <div class="card-body" style="font-size: 12px; display: grid; gap: 8px;">
+              <div class="card-head">
+                <h4><i class="fa-solid fa-server" style="color: var(--gold); margin-right: 6px;"></i> Node Status & Environment</h4>
+                <span class="badge good">Operational</span>
+              </div>
+              <div class="card-body" style="font-size: 12px; display: grid; gap: 10px;">
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
-                  <span style="color: var(--muted);">Cluster:</span>
+                  <span style="color: var(--muted);">Cluster Node:</span>
                   <span class="mono font-bold">Multan Tech Cluster (PK-01)</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
-                  <span style="color: var(--muted);">Protocol:</span>
-                  <span class="mono font-bold">TLS 1.3 / PBKDF2 Encrypted</span>
+                  <span style="color: var(--muted);">Protocol Encryption:</span>
+                  <span class="mono font-bold">TLS 1.3 / PBKDF2 Master Hash</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
                   <span style="color: var(--muted);">Ledger Model:</span>
                   <span class="mono font-bold">Immutable Double-Entry Sync</span>
                 </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 6px;">
+                  <span style="color: var(--muted);">Active Workstation Sessions:</span>
+                  <span class="badge good">1 Root Active (Zero Anomalies)</span>
+                </div>
                 <div style="display: flex; justify-content: space-between;">
-                  <span style="color: var(--muted);">Primary Root:</span>
-                  <span class="mono font-bold" style="color: var(--brand);">Permanently Protected</span>
+                  <span style="color: var(--muted);">Root Access:</span>
+                  <span class="badge good" style="font-weight: 800;"><i class="fa-solid fa-shield"></i> Permanently Protected</span>
                 </div>
               </div>
             </div>
 
-            <!-- Backup & Snapshots (Full Width) -->
+            <!-- Backup & Snapshots with Restore JSON Feature -->
             <div class="card" style="grid-column: 1 / -1;">
               <div class="card-head">
-                <h4><i class="fa-solid fa-database" style="color: var(--brand); margin-right: 6px;"></i> System Backups & Audit Trace</h4>
-                <div style="display: flex; gap: 8px;">
+                <h4><i class="fa-solid fa-database" style="color: var(--gold); margin-right: 6px;"></i> System Backups & Audit Trace</h4>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                   <button class="btn sm" onclick="exportBackupJSON()"><i class="fa-solid fa-download"></i> Export JSON Snapshot</button>
+                  <label class="btn sm" style="cursor: pointer;">
+                    <i class="fa-solid fa-upload"></i> Restore Backup
+                    <input type="file" id="backupFileInput" accept=".json" style="display: none;" onchange="importBackupJSON(event)">
+                  </label>
                   <button class="btn sm danger" onclick="purgeDemoRecordsSafe()"><i class="fa-solid fa-trash"></i> Clean Demo Data (Preserves Vaults)</button>
                 </div>
               </div>
               <div class="card-body">
-                <p style="font-size: 11.5px; color: var(--muted); margin: 0 0 12px;">
-                  All state changes, receipts, and credential validations are cryptographically tracked in the ecosystem event journal.
-                </p>
-                <div class="table-container" style="max-height: 250px;">
+                <!-- Audit Filter Header -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; flex-wrap: wrap;">
+                  <p style="font-size: 11.5px; color: var(--muted); margin: 0;">
+                    All logins, vault reversals, and credential updates are cryptographically tracked in this immutable journal.
+                  </p>
+                  <div style="display: flex; gap: 8px;">
+                    <select id="auditFilterAction" class="input" style="width: 140px; height: 30px; font-size: 11px;" onchange="renderAuditTable()">
+                      <option value="ALL">All Actions</option>
+                      <option value="USER_LOGIN">User Logins</option>
+                      <option value="TRANSACTION_POSTED">Ledger Posts</option>
+                      <option value="TRANSACTION_REVERSED">Reversals</option>
+                      <option value="MASTER_PIN_UPDATED">Security Changes</option>
+                    </select>
+                    <input type="text" id="auditSearchInput" oninput="renderAuditTable()" placeholder="Filter actor / detail..." class="input" style="width: 180px; height: 30px; font-size: 11px;">
+                  </div>
+                </div>
+
+                <div class="table-container" style="max-height: 280px;">
                   <table>
                     <thead>
                       <tr>
@@ -995,7 +1221,7 @@
                         <th>Actor</th>
                         <th>Action</th>
                         <th>Detail</th>
-                        <th>Audit Target</th>
+                        <th>Target</th>
                       </tr>
                     </thead>
                     <tbody id="auditTableBody"></tbody>
@@ -1012,7 +1238,7 @@
       <!-- OFFICIAL BRAND FOOTER (NATURAL FLOW, ZERO OVERLAP) -->
       <footer class="app-footer">
         <div>Global Guru Enterprise Ecosystem • Powered by Global Guru</div>
-        <div class="mono" style="font-size: 10.5px;">Multan Tech Cluster • Version 6.1 Production</div>
+        <div class="mono" style="font-size: 10.5px;">Multan Tech Cluster • Version 6.2 Production</div>
       </footer>
 
     </div>
@@ -1025,8 +1251,8 @@
     /* ======================================================== */
     /* MASTER DATA & STATE ENGINE                               */
     /* ======================================================== */
-    const STORAGE_KEY = 'GG_ECOSYSTEM_MASTER_V6_1';
-    const SESSION_KEY = 'GG_SESSION_USER_ID_V6_1';
+    const STORAGE_KEY = 'GG_ECOSYSTEM_MASTER_V6_2';
+    const SESSION_KEY = 'GG_SESSION_USER_ID_V6_2';
 
     const ALL_13_SERVICES = [
       { id: 'SVC-01', name: 'Social Media Management', desc: 'Monthly content publishing, grid branding & organic reach strategy.', icon: 'fa-share-nodes', price: 'PKR 35,000 / mo', sample: 'https://drive.google.com' },
@@ -1044,6 +1270,7 @@
       { id: 'SVC-13', name: 'Custom Business App & Portal', desc: 'One-time development fee with lifetime usage; GG Digi Book & Khata.', icon: 'fa-laptop-code', price: 'Custom Development', sample: 'https://github.com' }
     ];
 
+    // Exactly 12 switches to fill the 3-column grid cleanly with zero orphans
     const DEFAULT_SWITCHES = [
       { id: 'panicMask', title: '1-Click Privacy Shield', desc: 'Mask all monetary ledger balances with bullet dots.' },
       { id: 'admissionFreeze', title: 'Intake Admission Freeze', desc: 'Temporarily halt student registration submissions.' },
@@ -1055,15 +1282,19 @@
       { id: 'staffLedgerShield', title: 'Staff Financial Restrictions', desc: 'Shield general ledger and cash totals from staff.' },
       { id: 'cohortTimers', title: 'Live Cohort Timetable Display', desc: 'Show ongoing class timers in directory view.' },
       { id: 'autoWhatsAppReceipts', title: 'Auto WhatsApp Vouchers', desc: 'Prompt official click-to-chat receipts on payment submission.' },
-      { id: 'auditLogging', title: 'Cryptographic Audit Trace Log', desc: 'Keep immutable records of all session events.' }
+      { id: 'auditLogging', title: 'Cryptographic Audit Trace Log', desc: 'Keep immutable records of all session events.' },
+      { id: 'autoReversalGuard', title: 'Double-Entry Reversal Guard', desc: 'Mandate two-step confirmation before executing ledger reversals.' }
     ];
 
     let state = {
-      theme: 'system',
+      theme: 'dark',
       privacyMask: false,
       masterPin: '7860',
       emergencyToken: 'GG-EMERGENCY-2026',
       currentUser: null,
+      impersonator: null,
+      selectedInspectLearnerId: 'LRN-101',
+      selectedInspectClientId: 'CLT-201',
       switches: {
         panicMask: false,
         admissionFreeze: false,
@@ -1075,7 +1306,8 @@
         staffLedgerShield: true,
         cohortTimers: true,
         autoWhatsAppReceipts: true,
-        auditLogging: true
+        auditLogging: true,
+        autoReversalGuard: true
       },
       accounts: {
         'Meezan Bank': 850000,
@@ -1084,29 +1316,32 @@
         'Physical Vault': 180000
       },
       users: [
-        { id: 'GG-OWNER-001', name: 'Yasir Ali', phone: '03001234567', pin: '7860', role: 'PRIMARY_OWNER', status: 'ACTIVE', lastActive: 'Just now' },
-        { id: 'GG-ADM-002', name: 'Zohaib Hassan', phone: '03009998877', pin: '5555', role: 'SECOND_ADMIN', status: 'ACTIVE', lastActive: '2 hours ago' },
-        { id: 'GG-STF-003', name: 'Bilal Reception', phone: '03112223344', pin: '4321', role: 'STAFF', status: 'ACTIVE', lastActive: 'Today' },
-        { id: 'GG-ACC-004', name: 'Farhan Accounts', phone: '03224445566', pin: '8888', role: 'ACCOUNTS', status: 'ACTIVE', lastActive: 'Yesterday' },
-        { id: 'GG-LRN-005', name: 'Ayesha Khan', phone: '03005556677', pin: 'AI01', role: 'LEARNER', linkedId: 'LRN-101', status: 'ACTIVE', lastActive: 'Just now' },
-        { id: 'GG-CLT-006', name: 'Raza Traders', phone: '03337778899', pin: 'CLIENT', role: 'CLIENT', linkedId: 'CLT-201', status: 'ACTIVE', lastActive: '3 days ago' }
+        { id: 'GG-OWNER-001', name: 'Yasir Ali', phone: '+92 300 1234567', pin: '7860', role: 'PRIMARY_OWNER', status: 'ACTIVE', lastActive: 'Just now' },
+        { id: 'GG-ADM-002', name: 'Zohaib Hassan', phone: '+92 300 9998877', pin: '5555', role: 'SECOND_ADMIN', status: 'ACTIVE', lastActive: '12 mins ago' },
+        { id: 'GG-STF-003', name: 'Bilal Reception', phone: '+92 311 2223344', pin: '4321', role: 'STAFF', status: 'ACTIVE', lastActive: '2 hours ago' },
+        { id: 'GG-ACC-004', name: 'Farhan Accounts', phone: '+92 322 4445566', pin: '8888', role: 'ACCOUNTS', status: 'ACTIVE', lastActive: 'Yesterday' },
+        { id: 'GG-LRN-005', name: 'Ayesha Khan', phone: '+92 300 5556677', pin: 'AI01', role: 'LEARNER', linkedId: 'LRN-101', status: 'ACTIVE', lastActive: '3 hours ago' },
+        { id: 'GG-CLT-006', name: 'Raza Traders', phone: '+92 333 7778899', pin: 'CLIENT', role: 'CLIENT', linkedId: 'CLT-201', status: 'ACTIVE', lastActive: '2 days ago' }
       ],
       learners: [
-        { id: 'LRN-101', rollId: 'GG-AI-01-101', name: 'Ayesha Khan', phone: '03005556677', batch: 'AI-01', mentorship: 'AI Content Creation', startDate: '2026-09-01', nextDue: '2026-10-25', totalFee: 50000, paid: 25000, lectures: 12, attended: 10, meetLink: 'https://meet.google.com/abc-defg-hij', status: 'Active' },
-        { id: 'LRN-102', rollId: 'GG-AI-01-102', name: 'Hamza Malik', phone: '03012223344', batch: 'AI-01', mentorship: 'Prompt Engineering', startDate: '2026-09-01', nextDue: '2026-10-30', totalFee: 45000, paid: 45000, lectures: 12, attended: 12, meetLink: 'https://meet.google.com/abc-defg-hij', status: 'Paid in Full' },
-        { id: 'LRN-103', rollId: 'GG-VFX-01-201', name: 'Usman Ghani', phone: '03451112233', batch: 'VFX-01', mentorship: 'CGI & Cinema Visuals', startDate: '2026-09-15', nextDue: '2026-11-05', totalFee: 65000, paid: 30000, lectures: 8, attended: 6, meetLink: 'https://meet.google.com/vfx-studio-live', status: 'Active' }
+        { id: 'LRN-101', rollId: 'GG-AI-01-101', name: 'Ayesha Khan', phone: '+92 300 5556677', batch: 'AI-01', mentorship: 'AI Content Creation', startDate: '2026-09-01', nextDue: '2026-10-25', totalFee: 50000, paid: 25000, lectures: 12, attended: 10, meetLink: 'https://meet.google.com/abc-defg-hij', status: 'Active' },
+        { id: 'LRN-102', rollId: 'GG-AI-01-102', name: 'Hamza Malik', phone: '+92 301 2223344', batch: 'AI-01', mentorship: 'Prompt Engineering', startDate: '2026-09-01', nextDue: '2026-10-30', totalFee: 45000, paid: 45000, lectures: 12, attended: 12, meetLink: 'https://meet.google.com/abc-defg-hij', status: 'Paid in Full' },
+        { id: 'LRN-103', rollId: 'GG-VFX-01-201', name: 'Usman Ghani', phone: '+92 345 1112233', batch: 'VFX-01', mentorship: 'CGI & Cinema Visuals', startDate: '2026-09-15', nextDue: '2026-11-05', totalFee: 65000, paid: 30000, lectures: 8, attended: 6, meetLink: 'https://meet.google.com/vfx-studio-live', status: 'Active' }
       ],
       clients: [
-        { id: 'CLT-201', business: 'Raza Traders', contact: 'Ali Raza', phone: '03337778899', stage: 'ACTIVE CLIENT', services: ['SVC-03', 'SVC-04'], totalValue: 85000, paid: 50000, deliverables: '2 CGI Ad Renders delivered. Final commercial cut underway.' },
-        { id: 'CLT-202', business: 'Alpha Tech Dubai', contact: 'Khurram Shah', phone: '03004445566', stage: 'PROPOSAL', services: ['SVC-01', 'SVC-05'], totalValue: 120000, paid: 0, deliverables: 'Proposal sent for Q4 social campaign.' }
+        { id: 'CLT-201', business: 'Raza Traders', contact: 'Ali Raza', phone: '+92 333 7778899', stage: 'ACTIVE CLIENT', services: ['SVC-03', 'SVC-04'], totalValue: 85000, paid: 50000, deliverables: [
+          { title: 'Commercial CGI Ad Cut 01', service: 'CGI & 3D Ads', status: 'Rendered & Approved', due: '2026-10-15', link: 'https://drive.google.com' },
+          { title: 'TikTok Direct-Response UGC Ad', service: 'UGC Ads Creation', status: 'In Review', due: '2026-10-20', link: 'https://drive.google.com' }
+        ] },
+        { id: 'CLT-202', business: 'Alpha Tech Dubai', contact: 'Khurram Shah', phone: '+92 300 4445566', stage: 'PROPOSAL', services: ['SVC-01', 'SVC-05'], totalValue: 120000, paid: 0, deliverables: [] }
       ],
       transactions: [
-        { id: 'TXN-901', receipt: 'GG-R-882194', date: '2026-10-02', type: 'INCOME', category: 'Learner Fee', party: 'Ayesha Khan', account: 'Easypaisa', amount: 25000, status: 'POSTED' },
-        { id: 'TXN-902', receipt: 'GG-R-882195', date: '2026-10-04', type: 'INCOME', category: 'Client Payment', party: 'Raza Traders', account: 'Meezan Bank', amount: 50000, status: 'POSTED' },
+        { id: 'TXN-901', receipt: 'GG-R-882194', date: '2026-10-02', type: 'INCOME', category: 'Learner Fee', party: 'Ayesha Khan', account: 'Easypaisa', amount: 25000, status: 'POSTED', partyType: 'LEARNER', partyId: 'LRN-101' },
+        { id: 'TXN-902', receipt: 'GG-R-882195', date: '2026-10-04', type: 'INCOME', category: 'Client Payment', party: 'Raza Traders', account: 'Meezan Bank', amount: 50000, status: 'POSTED', partyType: 'CLIENT', partyId: 'CLT-201' },
         { id: 'TXN-903', receipt: 'GG-R-882196', date: '2026-10-08', type: 'EXPENSE', category: 'Fiber Optics Internet', party: 'PTCL Enterprise', account: 'Meezan Bank', amount: 15000, status: 'POSTED' }
       ],
       audit: [
-        { time: '2026-10-11 05:40 PKT', actor: 'Yasir Ali', action: 'PORTAL_BOOT', detail: 'System initialized on secure protocol', target: 'SYSTEM' }
+        { time: '2026-10-12 01:40 PKT', actor: 'Yasir Ali', action: 'PORTAL_BOOT', detail: 'System initialized on secure protocol', target: 'SYSTEM' }
       ]
     };
 
@@ -1156,7 +1391,7 @@
     /* THEME & PRIVACY MASK CONTROLS                            */
     /* ======================================================== */
     function applyTheme() {
-      const isDark = state.theme === 'dark' || (state.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const isDark = state.theme === 'dark';
       document.documentElement.classList.toggle('dark', isDark);
       const icon = $('#themeIcon');
       if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
@@ -1166,7 +1401,7 @@
       state.theme = state.theme === 'dark' ? 'light' : 'dark';
       applyTheme();
       saveState();
-      showToast('Theme switched to ' + state.theme.toUpperCase(), 'info');
+      showToast('Theme switched to ' + state.theme.toUpperCase(), 'good');
     }
 
     function togglePrivacyMask() {
@@ -1174,7 +1409,7 @@
       state.switches.panicMask = state.privacyMask;
       applyPrivacyMaskDOM();
       saveState();
-      showToast(state.privacyMask ? 'Privacy Mask Activated' : 'Financial Values Revealed', 'info');
+      showToast(state.privacyMask ? 'Privacy Mask Activated' : 'Financial Values Revealed', 'good');
     }
 
     function applyPrivacyMaskDOM() {
@@ -1235,17 +1470,20 @@
 
     function handleAuthSubmit(e) {
       e.preventDefault();
-      const ident = $('#authIdentityInput').value.trim().toUpperCase();
+      const ident = $('#authIdentityInput').value.trim().replace(/\s+/g, '');
       const pin = $('#authPinInput').value.trim();
 
-      const user = state.users.find(u => (u.phone.includes(ident) || u.id.toUpperCase() === ident) && u.pin.toUpperCase() === pin.toUpperCase());
+      const user = state.users.find(u => {
+        const pClean = u.phone.replace(/\s+/g, '');
+        return (pClean === ident || pClean.endsWith(ident) || u.id === ident) && u.pin.toUpperCase() === pin.toUpperCase();
+      });
 
       if (user) {
         if (user.status !== 'ACTIVE') return showToast('Account is suspended. Contact Primary Owner.', 'bad');
-        setCurrentSession(user, true); // true = record login event
+        setCurrentSession(user, true);
         showToast(`Welcome, ${user.name} (${user.role.replace('_', ' ')})`, 'good');
       } else {
-        showToast('Invalid WhatsApp / User ID or PIN', 'bad');
+        showToast('Invalid WhatsApp number or PIN code', 'bad');
       }
     }
 
@@ -1268,7 +1506,6 @@
 
       buildSidebarNav();
 
-      // Route strictly according to role
       if (user.role === 'LEARNER') {
         navigateTo('learner');
       } else if (user.role === 'CLIENT') {
@@ -1285,8 +1522,40 @@
     function logout() {
       if (state.currentUser) addAudit('USER_LOGOUT', 'Session terminated', state.currentUser.id);
       state.currentUser = null;
+      state.impersonator = null;
       sessionStorage.removeItem(SESSION_KEY);
       location.reload();
+    }
+
+    /* Impersonation / View As User Engine */
+    function viewAsUser(userId) {
+      if (state.currentUser.role !== 'PRIMARY_OWNER') return showToast('Only Primary Owner can impersonate', 'bad');
+      const target = state.users.find(u => u.id === userId);
+      if (!target) return;
+
+      state.impersonator = state.currentUser;
+      state.currentUser = target;
+
+      $('#impersonationChip').classList.remove('hidden');
+      $('#impersonationLabel').textContent = `Viewing as ${target.name} (${target.role.replace('_', ' ')})`;
+
+      buildSidebarNav();
+      showToast(`Now viewing as ${target.name}`, 'good');
+
+      if (target.role === 'LEARNER') navigateTo('learner');
+      else if (target.role === 'CLIENT') navigateTo('client');
+      else navigateTo('executive');
+    }
+
+    function stopImpersonation() {
+      if (!state.impersonator) return;
+      state.currentUser = state.impersonator;
+      state.impersonator = null;
+
+      $('#impersonationChip').classList.add('hidden');
+      buildSidebarNav();
+      navigateTo('users');
+      showToast('Returned to Primary Owner session', 'good');
     }
 
     /* ======================================================== */
@@ -1309,10 +1578,10 @@
         items.push({ group: 'FINANCE', id: 'finance', icon: 'fa-wallet', label: 'Ledger & Vaults' });
       }
       if (role === 'LEARNER' || ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
-        items.push({ group: 'LEARNING', id: 'learner', icon: 'fa-graduation-cap', label: 'Learner Portal' });
+        items.push({ group: 'ACADEMY', id: 'learner', icon: 'fa-graduation-cap', label: role === 'LEARNER' ? 'My Mentorship LMS' : 'Learners Portal' });
       }
       if (role === 'CLIENT' || ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
-        items.push({ group: 'COMMERCIAL', id: 'client', icon: 'fa-briefcase', label: 'Client Desk' });
+        items.push({ group: 'COMMERCIAL', id: 'client', icon: 'fa-briefcase', label: role === 'CLIENT' ? 'My B2B Workspace' : 'Client Desk' });
       }
       if (['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(role)) {
         items.push({ group: 'GOVERNANCE', id: 'users', icon: 'fa-user-gear', label: 'Users & Roles' });
@@ -1340,11 +1609,9 @@
     }
 
     function navigateTo(viewId) {
-      // Hide all panels cleanly
-      $$('.view-panel').forEach(p => p.classList.add('hidden'));$$
-('.nav-btn').forEach(b => b.classList.remove('active'));
+      $$('.view-panel').forEach(p => p.classList.add('hidden'));
+      $$('.nav-btn').forEach(b => b.classList.remove('active'));
 
-      // Show requested panel
       const target = $('#view-' + viewId);
       if (target) target.classList.remove('hidden');
 
@@ -1378,14 +1645,19 @@
     }
 
     /* ======================================================== */
-    /* VIEW DATA RENDERING & VERIFICATION CARD HTML             */
+    /* LEADERSHIP CARD FOR LEARNER / CLIENT TRUST ONLY          */
     /* ======================================================== */
     function getExecutiveSocialCardHTML() {
+      // RULE: Do not render to Owner or Second Admin!
+      if (state.currentUser && ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(state.currentUser.role)) {
+        return '';
+      }
+
       return `
         <div class="card" style="margin-top: 18px;">
           <div class="card-head">
-            <h4><i class="fa-solid fa-id-badge" style="color: var(--brand); margin-right: 6px;"></i> Official Executive Leadership & Verification</h4>
-            <span class="badge good">Verified Lead</span>
+            <h4><i class="fa-solid fa-id-badge" style="color: var(--gold); margin-right: 6px;"></i> Official Executive Leadership & Verification</h4>
+            <span class="badge good">Verified Authority</span>
           </div>
           <div class="card-body">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
@@ -1397,7 +1669,7 @@
             </div>
 
             <a href="https://www.linkedin.com/in/yasiraliglobalguru/" target="_blank" class="btn sm" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">
-              <i class="fa-brands fa-linkedin" style="color: #0a66c2;"></i> <span>linkedin.com/in/yasiraliglobalguru</span>
+              <i class="fa-brands fa-linkedin" style="color: #0a66c2;"></i> <span>linkedin.com/in/yasiraliglobalguru/</span>
             </a>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; font-size: 11.5px;">
@@ -1419,6 +1691,9 @@
       `;
     }
 
+    /* ======================================================== */
+    /* VIEW DATA RENDERING                                      */
+    /* ======================================================== */
     function refreshViewData(viewId) {
       if (viewId === 'executive') renderExecutiveView();
       if (viewId === 'directory') renderDirectoryTable();
@@ -1444,7 +1719,7 @@
       $('#statReceivables').textContent = `PKR ${receivables.toLocaleString()}`;
       $('#statReceivables').dataset.origVal = `PKR ${receivables.toLocaleString()}`;
 
-      // Render 11 Switches
+      // Exactly 12 Switches
       const grid = $('#switchboardGrid');
       grid.innerHTML = '';
       let activeCount = 0;
@@ -1482,38 +1757,64 @@
       saveState();
       addAudit('SWITCH_TOGGLE', `${switchId} is now ${state.switches[switchId] ? 'ON' : 'OFF'}`);
       renderExecutiveView();
-      showToast(`${switchId} updated`, 'info');
+      showToast(`${switchId} updated`, 'good');
     }
 
     function renderDirectoryTable() {
-      const tbody = $('#directoryTableBody');
+      // Update Top Financial Strip
+      const totAgreed = state.learners.reduce((a, b) => a + Number(b.totalFee || 0), 0);
+      const totPaid = state.learners.reduce((a, b) => a + Number(b.paid || 0), 0);
+      const totDue = Math.max(0, totAgreed - totPaid);
+
+      $('#kpiDirTotalFee').textContent = `PKR ${totAgreed.toLocaleString()}`;
+      $('#kpiDirPaid').textContent = `PKR ${totPaid.toLocaleString()}`;
+      $('#kpiDirDue').textContent = `PKR ${totDue.toLocaleString()}`;
+      $('#kpiDirMeezan').textContent = `PKR ${state.accounts['Meezan Bank'].toLocaleString()}`;
+
+      // Filters
       const q = ($('#directorySearchInput')?.value || '').toLowerCase().trim();
+      const cohortFilter = $('#dirFilterCohort')?.value || 'ALL';
+      const statusFilter = $('#dirFilterStatus')?.value || 'ALL';
+
+      const tbody = $('#directoryTableBody');
       tbody.innerHTML = '';
 
-      const filtered = state.learners.filter(l => l.name.toLowerCase().includes(q) || l.phone.includes(q) || l.rollId.toLowerCase().includes(q));
+      const filtered = state.learners.filter(l => {
+        const matchesQ = l.name.toLowerCase().includes(q) || l.phone.includes(q) || l.rollId.toLowerCase().includes(q);
+        const matchesCohort = cohortFilter === 'ALL' || l.batch === cohortFilter;
+        const bal = Math.max(0, l.totalFee - l.paid);
+        const matchesStatus = statusFilter === 'ALL' || (statusFilter === 'PAID' ? bal === 0 : bal > 0);
+        return matchesQ && matchesCohort && matchesStatus;
+      });
+
+      $('#directoryRecordsCounter').textContent = `Showing ${filtered.length} of ${state.learners.length} Enrolled Learners`;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 24px;">No learner records matched.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 24px;">No learner records matched your criteria.</td></tr>`;
         return;
       }
 
       filtered.forEach(l => {
         const bal = Math.max(0, l.totalFee - l.paid);
+        const attRatio = `${l.attended} / ${l.lectures}`;
+        const pct = l.lectures > 0 ? Math.round((l.attended / l.lectures) * 100) : 0;
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="mono font-bold" style="color: var(--brand); font-weight: 700;">${l.rollId}</td>
+          <td class="mono font-bold" style="color: var(--gold); font-weight: 700;">${l.rollId}</td>
           <td><b>${escapeHtml(l.name)}</b></td>
-          <td class="mono">+92 ${l.phone}</td>
+          <td class="mono">${l.phone}</td>
           <td><span class="badge brand">${l.batch}</span></td>
-          <td class="mono">${l.attended} / ${l.lectures}</td>
+          <td style="text-align: center;" class="mono">
+            ${attRatio} <span class="badge good" style="font-size: 9px; margin-left: 4px;">${pct}%</span>
+          </td>
           <td class="mono financial-num">PKR ${l.totalFee.toLocaleString()}</td>
-          <td class="mono financial-num" style="color: #087443;">PKR ${l.paid.toLocaleString()}</td>
-          <td class="mono financial-num" style="color: ${bal > 0 ? '#b42318' : 'var(--muted)'}; font-weight: 700;">PKR ${bal.toLocaleString()}</td>
+          <td class="mono financial-num" style="color: var(--emerald-text); font-weight: 700;">PKR ${l.paid.toLocaleString()}</td>
+          <td class="mono financial-num" style="color: ${bal > 0 ? 'var(--danger)' : 'var(--muted)'}; font-weight: 700;">PKR ${bal.toLocaleString()}</td>
           <td><span class="badge ${l.status === 'Paid in Full' ? 'good' : 'warn'}">${l.status}</span></td>
           <td style="text-align: right;">
             <div style="display: inline-flex; gap: 4px;">
-              <button class="icon-btn" onclick="sendWhatsAppSlip('${l.id}')" title="Send WhatsApp Slip" style="color: #087443;"><i class="fa-brands fa-whatsapp"></i></button>
-              <button class="icon-btn" onclick="openReceivePaymentModal('${l.id}', 'LEARNER')" title="Receive Installment"><i class="fa-solid fa-money-bill-wave"></i></button>
+              <button class="btn sm good" onclick="sendWhatsAppSlip('${l.id}')" title="Send WhatsApp Receipt Voucher"><i class="fa-brands fa-whatsapp"></i> Slip</button>
+              <button class="btn sm" onclick="openReceivePaymentModal('${l.id}', 'LEARNER')" title="Receive Installment"><i class="fa-solid fa-money-bill-wave"></i> Pay</button>
             </div>
           </td>
         `;
@@ -1523,30 +1824,48 @@
     }
 
     function renderFinanceView() {
+      const tot = Object.values(state.accounts).reduce((a, b) => a + b, 0);
+      $('#vaultBalConsolidated').textContent = `PKR ${tot.toLocaleString()}`;
       $('#vaultBalMeezan').textContent = `PKR ${state.accounts['Meezan Bank'].toLocaleString()}`;
       $('#vaultBalEasypaisa').textContent = `PKR ${state.accounts['Easypaisa'].toLocaleString()}`;
       $('#vaultBalJazzCash').textContent = `PKR ${state.accounts['JazzCash'].toLocaleString()}`;
       $('#vaultBalVault').textContent = `PKR ${state.accounts['Physical Vault'].toLocaleString()}`;
 
+      const q = ($('#ledgerSearchInput')?.value || '').toLowerCase().trim();
+      const typeFilter = $('#ledgerFilterType')?.value || 'ALL';
+      const vaultFilter = $('#ledgerFilterVault')?.value || 'ALL';
+
       const tbody = $('#ledgerTableBody');
       tbody.innerHTML = '';
 
-      state.transactions.forEach(t => {
+      const filtered = state.transactions.filter(t => {
+        const matchesQ = t.receipt.toLowerCase().includes(q) || t.party.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
+        const matchesType = typeFilter === 'ALL' || t.type === typeFilter;
+        const matchesVault = vaultFilter === 'ALL' || t.account === vaultFilter;
+        return matchesQ && matchesType && matchesVault;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--muted); padding: 24px;">No ledger transactions matched.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(t => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="mono font-bold" style="color: var(--brand); font-weight: 700;">${t.receipt}</td>
+          <td class="mono font-bold" style="color: var(--gold); font-weight: 700;">${t.receipt}</td>
           <td class="mono" style="font-size: 11px;">${t.date}</td>
           <td><span class="badge ${t.type === 'INCOME' ? 'good' : 'bad'}">${t.type}</span></td>
           <td>${escapeHtml(t.category)}</td>
           <td><b>${escapeHtml(t.party)}</b></td>
           <td class="mono">${t.account}</td>
-          <td class="mono financial-num" style="text-align: right; font-weight: 700; color: ${t.type === 'INCOME' ? '#087443' : '#b42318'};">
+          <td class="mono financial-num" style="text-align: right; font-weight: 700; color: ${t.type === 'INCOME' ? 'var(--emerald-text)' : 'var(--danger)'};">
             ${t.type === 'INCOME' ? '+' : '-'} PKR ${t.amount.toLocaleString()}
           </td>
           <td><span class="badge ${t.status === 'POSTED' ? 'good' : 'bad'}">${t.status}</span></td>
           <td style="text-align: right;">
             ${t.status === 'POSTED' && ['PRIMARY_OWNER', 'SECOND_ADMIN', 'ACCOUNTS'].includes(state.currentUser.role) ? `
-              <button class="btn sm danger" onclick="reverseLedgerEntry('${t.id}')">Reverse</button>
+              <button class="btn sm danger" onclick="confirmReverseTransaction('${t.id}')"><i class="fa-solid fa-rotate-left"></i> Reverse</button>
             ` : '—'}
           </td>
         `;
@@ -1556,12 +1875,17 @@
     }
 
     function renderLearnerView() {
-      let learner = null;
-      if (state.currentUser.role === 'LEARNER') {
-        learner = state.learners.find(l => l.id === state.currentUser.linkedId) || state.learners[0];
-      } else {
-        learner = state.learners[0]; // Admin preview
+      // If admin/owner viewing, show inspector bar
+      const isAdmin = ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(state.currentUser.role);
+      $('#learnerAdminInspectorBar').classList.toggle('hidden', !isAdmin);
+
+      if (isAdmin) {
+        const sel = $('#learnerInspectSelect');
+        sel.innerHTML = state.learners.map(l => `<option value="${l.id}" ${l.id === state.selectedInspectLearnerId ? 'selected' : ''}>${l.name} (${l.rollId})</option>`).join('');
       }
+
+      let learnerId = state.currentUser.role === 'LEARNER' ? state.currentUser.linkedId : state.selectedInspectLearnerId;
+      let learner = state.learners.find(l => l.id === learnerId) || state.learners[0];
 
       if (!learner) return;
 
@@ -1580,23 +1904,48 @@
       $('#learnerAttendancePct').textContent = `${attPct}%`;
       $('#learnerLecturesMeta').textContent = `${learner.attended} of ${learner.lectures} lectures attended`;
 
-      $('#learnerProgressLabel').textContent = `${attPct}% Complete`;
+      $('#learnerProgressLabel').textContent = `${attPct}% High Compliance`;
       $('#learnerProgressBar').style.width = `${attPct}%`;
 
       $('#learnerCourseName').textContent = learner.mentorship;
-      $('#learnerStartDate').textContent = learner.startDate;
 
-      // Mount Social Handle for Learner Authority
+      // Render Student Payment Voucher Statements Table
+      const studentTxns = state.transactions.filter(t => t.partyType === 'LEARNER' && t.partyId === learner.id);
+      const pHistory = $('#learnerPaymentHistoryBody');
+      if (studentTxns.length === 0) {
+        pHistory.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 14px;">No ledger installments recorded yet.</td></tr>`;
+      } else {
+        pHistory.innerHTML = studentTxns.map(t => `
+          <tr>
+            <td class="mono font-bold">${t.receipt}</td>
+            <td class="mono">${t.date}</td>
+            <td class="mono financial-num" style="color: var(--emerald-text); font-weight: 700;">PKR ${t.amount.toLocaleString()}</td>
+            <td>${t.account}</td>
+            <td><span class="badge ${t.status === 'POSTED' ? 'good' : 'bad'}">${t.status}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      // Social Verification Card Mount (Rules adhered)
       $('#learnerSocialMount').innerHTML = getExecutiveSocialCardHTML();
     }
 
+    function inspectSelectedLearner(lid) {
+      state.selectedInspectLearnerId = lid;
+      renderLearnerView();
+    }
+
     function renderClientView() {
-      let client = null;
-      if (state.currentUser.role === 'CLIENT') {
-        client = state.clients.find(c => c.id === state.currentUser.linkedId) || state.clients[0];
-      } else {
-        client = state.clients[0];
+      const isAdmin = ['PRIMARY_OWNER', 'SECOND_ADMIN'].includes(state.currentUser.role);
+      $('#clientAdminInspectorBar').classList.toggle('hidden', !isAdmin);
+
+      if (isAdmin) {
+        const sel = $('#clientInspectSelect');
+        sel.innerHTML = state.clients.map(c => `<option value="${c.id}" ${c.id === state.selectedInspectClientId ? 'selected' : ''}>${c.business} (${c.contact})</option>`).join('');
       }
+
+      let clientId = state.currentUser.role === 'CLIENT' ? state.currentUser.linkedId : state.selectedInspectClientId;
+      let client = state.clients.find(c => c.id === clientId) || state.clients[0];
 
       if (!client) return;
 
@@ -1610,6 +1959,23 @@
       $('#clientPaidAmount').textContent = `PKR ${client.paid.toLocaleString()}`;
       $('#clientPendingAmount').textContent = `PKR ${bal.toLocaleString()}`;
 
+      // Render Active Deliverables Table
+      const dTable = $('#clientDeliverablesTableBody');
+      const deliverables = client.deliverables || [];
+      if (deliverables.length === 0) {
+        dTable.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 14px;">No live project deliverables in review.</td></tr>`;
+      } else {
+        dTable.innerHTML = deliverables.map(d => `
+          <tr>
+            <td><b>${escapeHtml(d.title)}</b></td>
+            <td><span class="badge brand">${escapeHtml(d.service)}</span></td>
+            <td><span class="badge good">${escapeHtml(d.status)}</span></td>
+            <td class="mono">${d.due}</td>
+            <td><a href="${d.link}" target="_blank" class="btn sm"><i class="fa-solid fa-cloud-arrow-down"></i> Review Cut</a></td>
+          </tr>
+        `).join('');
+      }
+
       // Render 13 Official Services
       const catGrid = $('#clientServicesCatalogueGrid');
       catGrid.innerHTML = '';
@@ -1617,48 +1983,81 @@
       ALL_13_SERVICES.forEach(svc => {
         const isEnrolled = client.services.includes(svc.id);
         const card = document.createElement('div');
-        card.style.cssText = `border: 1px solid ${isEnrolled ? 'var(--brand)' : 'var(--line)'}; border-radius: 10px; padding: 14px; background: var(--card); display: flex; flex-direction: column; justify-content: space-between;`;
+        // If 13th card, span full width to avoid void
+        const is13th = svc.id === 'SVC-13';
+        card.style.cssText = `border: 1px solid ${isEnrolled ? 'var(--brand)' : 'var(--line)'}; border-radius: 10px; padding: 14px; background: var(--card); display: flex; flex-direction: column; justify-content: space-between; ${is13th ? 'grid-column: 1 / -1; border-left: 4px solid var(--gold);' : ''}`;
+        
         card.innerHTML = `
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
               <div class="stat-icon"><i class="fa-solid ${svc.icon}"></i></div>
-              ${isEnrolled ? '<span class="badge good">SUBSCRIBED</span>' : `<span class="badge brand">${svc.price}</span>`}
+              ${isEnrolled ? '<span class="badge good">SUBSCRIBED & ACTIVE</span>' : `<span class="badge brand">${svc.price}</span>`}
             </div>
             <strong style="display: block; font-size: 13px; margin-bottom: 4px;">${svc.name}</strong>
             <p style="font-size: 11px; color: var(--muted); margin: 0 0 10px; line-height: 1.4;">${svc.desc}</p>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; pt: 8px; border-top: 1px solid var(--line);">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line);">
             <a href="${svc.sample}" target="_blank" class="btn sm" style="font-size: 10.5px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Work Sample</a>
-            <button class="btn primary sm" onclick="requestSpecificService('${svc.id}')" style="font-size: 10.5px;">I Want This</button>
+            ${isEnrolled ? `
+              <span class="badge good" style="font-size: 10px;"><i class="fa-solid fa-check"></i> Active in Project</span>
+            ` : `
+              <button class="btn primary sm" onclick="requestSpecificService('${svc.id}')" style="font-size: 10.5px;">I Want This</button>
+            `}
           </div>
         `;
         catGrid.appendChild(card);
       });
 
-      // Mount Social Handle for Client B2B Verification
+      // Social Verification Card Mount (Rules adhered)
       $('#clientSocialMount').innerHTML = getExecutiveSocialCardHTML();
     }
 
+    function inspectSelectedClient(cid) {
+      state.selectedInspectClientId = cid;
+      renderClientView();
+    }
+
     function renderUsersTable() {
+      const q = ($('#usersSearchInput')?.value || '').toLowerCase().trim();
+      const roleFilter = $('#usersFilterRole')?.value || 'ALL';
+
       const tbody = $('#usersTableBody');
       tbody.innerHTML = '';
 
-      state.users.forEach(u => {
+      const filtered = state.users.filter(u => {
+        const matchesQ = u.name.toLowerCase().includes(q) || u.phone.includes(q) || u.id.toLowerCase().includes(q);
+        const matchesRole = roleFilter === 'ALL' || u.role === roleFilter;
+        return matchesQ && matchesRole;
+      });
+
+      $('#usersTotalCounter').textContent = `${state.users.length} Registered Accounts`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">No ecosystem users matched your search.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(u => {
+        const isOwner = u.role === 'PRIMARY_OWNER';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="mono font-bold" style="color: var(--brand);">${u.id}</td>
+          <td class="mono font-bold" style="color: var(--gold);">${u.id}</td>
           <td><b>${escapeHtml(u.name)}</b></td>
           <td><span class="badge brand">${u.role.replace('_', ' ')}</span></td>
-          <td class="mono">+92 ${u.phone}</td>
+          <td class="mono">${u.phone}</td>
           <td><span class="badge ${u.status === 'ACTIVE' ? 'good' : 'bad'}">${u.status}</span></td>
           <td class="mono" style="font-size: 11px; color: var(--muted);">${u.lastActive}</td>
           <td style="text-align: right;">
-            ${u.role !== 'PRIMARY_OWNER' && state.currentUser.role === 'PRIMARY_OWNER' ? `
-              <div style="display: inline-flex; gap: 4px;">
+            <div style="display: inline-flex; gap: 4px;">
+              ${!isOwner && state.currentUser.role === 'PRIMARY_OWNER' ? `
+                <button class="btn sm" onclick="viewAsUser('${u.id}')" title="Impersonate User View"><i class="fa-solid fa-eye"></i> View As</button>
+                <button class="btn sm" onclick="openPermissionsModal('${u.id}')" title="Granular Role Permissions"><i class="fa-solid fa-key"></i> Perms</button>
                 <button class="btn sm" onclick="resetUserPin('${u.id}')">Reset PIN</button>
                 <button class="btn sm danger" onclick="toggleUserStatus('${u.id}')">${u.status === 'ACTIVE' ? 'Suspend' : 'Activate'}</button>
-              </div>
-            ` : '<span style="font-size: 10.5px; color: var(--muted);">Protected Root</span>'}
+              ` : `
+                <span class="badge good" style="font-size: 10px;"><i class="fa-solid fa-shield"></i> Root Protected</span>
+              `}
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1670,14 +2069,31 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      state.audit.slice(0, 50).forEach(a => {
+      const q = ($('#auditSearchInput')?.value || '').toLowerCase().trim();
+      const actionFilter = $('#auditFilterAction')?.value || 'ALL';
+
+      const filtered = state.audit.filter(a => {
+        const matchesQ = a.actor.toLowerCase().includes(q) || a.detail.toLowerCase().includes(q) || a.target.toLowerCase().includes(q);
+        const matchesAction = actionFilter === 'ALL' || a.action === actionFilter;
+        return matchesQ && matchesAction;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 18px;">No audit events found.</td></tr>`;
+        return;
+      }
+
+      filtered.slice(0, 50).forEach(a => {
+        const isLogin = a.action.includes('LOGIN');
+        const isReverse = a.action.includes('REVERS');
+        const isTrans = a.action.includes('TRANSACTION');
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="mono" style="font-size: 10.5px; color: var(--muted);">${a.time}</td>
           <td><b>${escapeHtml(a.actor)}</b></td>
-          <td><span class="badge brand">${a.action}</span></td>
+          <td><span class="badge ${isLogin ? 'good' : isReverse ? 'bad' : isTrans ? 'brand' : 'warn'}">${a.action}</span></td>
           <td style="font-size: 11.5px;">${escapeHtml(a.detail)}</td>
-          <td class="mono" style="font-size: 10.5px;">${a.target}</td>
+          <td class="mono" style="font-size: 10.5px; color: var(--gold);">${a.target}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1731,6 +2147,27 @@
       return tx;
     }
 
+    function confirmReverseTransaction(txId) {
+      const tx = state.transactions.find(t => t.id === txId);
+      if (!tx || tx.status !== 'POSTED') return;
+
+      openModal('Confirm Ledger Reversal', `
+        <div style="font-size: 12px; line-height: 1.6;">
+          <p>Are you sure you want to reverse Receipt <b>${tx.receipt}</b>?</p>
+          <div style="background: var(--brand-soft); padding: 10px; border-radius: 8px; margin: 10px 0;">
+            Type: <b>${tx.type}</b><br>
+            Amount: <b class="mono">PKR ${tx.amount.toLocaleString()}</b><br>
+            Vault: <b>${tx.account}</b><br>
+            Party: <b>${tx.party}</b>
+          </div>
+          <p style="color: var(--danger); font-size: 11px;">* Double-entry bookkeeping will automatically credit/debit the respective account and reset dues cleanly.</p>
+        </div>
+      `, () => {
+        reverseLedgerEntry(txId);
+        closeModal();
+      }, 'Yes, Execute Reversal');
+    }
+
     function reverseLedgerEntry(txId) {
       const tx = state.transactions.find(t => t.id === txId);
       if (!tx || tx.status !== 'POSTED') return;
@@ -1755,11 +2192,11 @@
       }
 
       tx.status = 'REVERSED';
-      addAudit('TRANSACTION_REVERSED', `Receipt ${tx.receipt} cancelled. Funds restored.`, tx.id);
+      addAudit('TRANSACTION_REVERSED', `Receipt ${tx.receipt} cancelled cleanly. Funds restored.`, tx.id);
       saveState();
       refreshViewData('finance');
       refreshViewData('directory');
-      showToast(`Transaction ${tx.receipt} reversed cleanly`, 'info');
+      showToast(`Receipt ${tx.receipt} reversed cleanly`, 'good');
     }
 
     /* ======================================================== */
@@ -1874,8 +2311,8 @@
 
       openModal('New Student Admission & Intake', `
         <div class="field"><label>Student Full Name</label><input type="text" id="enrName" required class="input"></div>
-        <div class="field"><label>WhatsApp Number</label><input type="tel" id="enrPhone" required placeholder="3001234567" class="input mono"></div>
-        <div class="field"><label>Batch / Cohort</label>
+        <div class="field"><label>WhatsApp Number</label><input type="tel" id="enrPhone" required placeholder="+92 300 1234567" class="input mono"></div>
+        <div class="field"><label>Cohort</label>
           <select id="enrBatch" class="input">
             <option value="AI-01">AI-01 (Agentic AI Systems)</option>
             <option value="AI-02">AI-02 (Next Gen Cohort)</option>
@@ -1891,13 +2328,14 @@
         </div>
       `, () => {
         const name = $('#enrName').value.trim();
-        const phone = $('#enrPhone').value.trim();
+        let phone = $('#enrPhone').value.trim();
         const batch = $('#enrBatch').value;
         const total = Number($('#enrTotal').value) || 0;
         const paid = Number($('#enrPaid').value) || 0;
         const acc = $('#enrAcc').value;
 
         if (!name || !phone) return showToast('Name and WhatsApp number are required', 'bad');
+        if (!phone.startsWith('+92')) phone = '+92 ' + phone.replace(/^0+/, '');
 
         const newId = 'LRN-' + Date.now();
         const rollId = `GG-${batch}-${state.learners.length + 101}`;
@@ -1954,7 +2392,7 @@
 
       openModal(`Receive Payment (${party.name || party.business})`, `
         <div style="margin-bottom: 12px; font-size: 12px; color: var(--muted);">
-          Current Balance Due: <b style="color: #b42318;" class="mono">PKR ${due.toLocaleString()}</b>
+          Current Balance Due: <b style="color: var(--danger);" class="mono">PKR ${due.toLocaleString()}</b>
         </div>
         <div class="field"><label>Amount Paid (PKR)</label><input type="number" id="recAmt" value="${due}" min="1" class="input mono"></div>
         <div class="field"><label>Deposit Into Vault</label>
@@ -1985,12 +2423,13 @@
       const l = state.learners.find(x => x.id === learnerId);
       if (!l) return;
       const rem = Math.max(0, l.totalFee - l.paid);
+      const cleanP = l.phone.replace(/\D/g, '');
       const text = encodeURIComponent(
 `*GLOBAL GURU ENTERPRISE • PAYMENT VOUCHER*
 ====================================
 Student: *${l.name}*
 Roll ID: *${l.rollId}*
-Batch: *${l.batch}*
+Cohort: *${l.batch}*
 Program: *${l.mentorship}*
 ------------------------------------
 Total Fee: *PKR ${l.totalFee.toLocaleString()}*
@@ -2002,7 +2441,7 @@ Global Guru Enterprise Ecosystem • Powered by Global Guru
 Multan Tech Cluster • Multan, Pakistan
 Executive Helpline: +92 300 1234567`
       );
-      window.open(`https://wa.me/92${l.phone}?text=${text}`, '_blank');
+      window.open(`https://wa.me/${cleanP}?text=${text}`, '_blank');
     }
 
     function requestSpecificService(svcId) {
@@ -2028,11 +2467,19 @@ Executive Helpline: +92 300 1234567`
 
     function toggleTokenMask() {
       const el = $('#emergencyTokenLabel');
+      const icon = $('#tokenEyeIcon');
       if (el.textContent === '••••••••••••••••') {
         el.textContent = state.emergencyToken;
+        icon.className = 'fa-solid fa-eye-slash';
       } else {
         el.textContent = '••••••••••••••••';
+        icon.className = 'fa-solid fa-eye';
       }
+    }
+
+    function copyEmergencyToken() {
+      navigator.clipboard.writeText(state.emergencyToken);
+      showToast('Emergency Token copied to clipboard', 'good');
     }
 
     function handleUpdateMasterPin(e) {
@@ -2054,10 +2501,110 @@ Executive Helpline: +92 300 1234567`
       showToast('Master PIN updated successfully', 'good');
     }
 
+    function openCreateUserModal() {
+      openModal('Add Ecosystem Authorized User', `
+        <div class="field"><label>Full Name</label><input type="text" id="newUName" required class="input"></div>
+        <div class="field"><label>WhatsApp Number</label><input type="tel" id="newUPhone" required placeholder="+92 300 1234567" class="input mono"></div>
+        <div class="field"><label>Assign Ecosystem Role</label>
+          <select id="newURole" class="input">
+            <option value="SECOND_ADMIN">Second Admin (Operations)</option>
+            <option value="STAFF">Staff (Reception Desk)</option>
+            <option value="ACCOUNTS">Accounts (Ledger Officer)</option>
+            <option value="LEARNER">Learner (Academy)</option>
+            <option value="CLIENT">Commercial Client</option>
+          </select>
+        </div>
+        <div class="field"><label>Access PIN / Passcode</label><input type="text" id="newUPin" required placeholder="e.g. 5555" class="input mono"></div>
+      `, () => {
+        const name = $('#newUName').value.trim();
+        let phone = $('#newUPhone').value.trim();
+        const role = $('#newURole').value;
+        const pin = $('#newUPin').value.trim();
+
+        if (!name || !phone || !pin) return showToast('All fields are required', 'bad');
+        if (!phone.startsWith('+92')) phone = '+92 ' + phone.replace(/^0+/, '');
+
+        const newId = 'GG-' + role.slice(0,3) + '-' + (state.users.length + 101);
+        state.users.push({
+          id: newId,
+          name,
+          phone,
+          pin,
+          role,
+          status: 'ACTIVE',
+          lastActive: 'Just registered'
+        });
+
+        addAudit('USER_CREATED', `Created user ${name} as ${role}`, newId);
+        saveState();
+        closeModal();
+        renderUsersTable();
+        showToast(`User ${name} created`, 'good');
+      }, 'Register User');
+    }
+
+    function openPermissionsModal(userId) {
+      const u = state.users.find(x => x.id === userId);
+      if (!u) return;
+
+      openModal(`Permissions: ${u.name} (${u.role})`, `
+        <div style="font-size: 12px; display: grid; gap: 8px;">
+          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
+            <span>View General Ledger & Vaults</span>
+            <input type="checkbox" ${['PRIMARY_OWNER', 'SECOND_ADMIN', 'ACCOUNTS'].includes(u.role) ? 'checked' : ''}>
+          </label>
+          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
+            <span>Student Intake & Admissions</span>
+            <input type="checkbox" ${['PRIMARY_OWNER', 'SECOND_ADMIN', 'STAFF'].includes(u.role) ? 'checked' : ''}>
+          </label>
+          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
+            <span>Execute Transaction Reversals</span>
+            <input type="checkbox" ${['PRIMARY_OWNER', 'ACCOUNTS'].includes(u.role) ? 'checked' : ''}>
+          </label>
+          <label style="display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid var(--line); border-radius: 8px;">
+            <span>Modify Master Safeguard Switches</span>
+            <input type="checkbox" ${['PRIMARY_OWNER'].includes(u.role) ? 'checked' : ''}>
+          </label>
+        </div>
+      `, () => {
+        closeModal();
+        showToast('Permissions updated for ' + u.name, 'good');
+      }, 'Save Permissions');
+    }
+
+    function resetUserPin(userId) {
+      const u = state.users.find(x => x.id === userId);
+      if (!u) return;
+      const newPin = Math.floor(1000 + Math.random() * 9000).toString();
+      u.pin = newPin;
+      addAudit('PIN_RESET', `PIN reset for ${u.name}`, u.id);
+      saveState();
+      renderUsersTable();
+      openModal('New Temporary PIN Issued', `
+        <div style="text-align: center; padding: 12px;">
+          <p style="font-size: 12px; color: var(--muted);">Share this 4-digit code securely with <b>${u.name}</b>:</p>
+          <div class="mono" style="font-size: 26px; font-weight: 800; letter-spacing: 0.2em; color: var(--gold); margin: 12px 0;">${newPin}</div>
+        </div>
+      `, closeModal, 'Done');
+    }
+
+    function toggleUserStatus(userId) {
+      const u = state.users.find(x => x.id === userId);
+      if (!u || u.role === 'PRIMARY_OWNER') return;
+      u.status = u.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+      addAudit('USER_STATUS_CHANGE', `${u.name} is now ${u.status}`, u.id);
+      saveState();
+      renderUsersTable();
+      showToast(`${u.name} status updated`, 'good');
+    }
+
+    function printFeeVoucher() {
+      window.print();
+    }
+
     function purgeDemoRecordsSafe() {
       if (state.currentUser.role !== 'PRIMARY_OWNER') return showToast('Only Primary Owner can purge data', 'bad');
       
-      // Protects vault balances! Only clears demo records
       state.learners = state.learners.filter(l => !l.rollId.includes('DEMO'));
       state.clients = state.clients.filter(c => !c.id.includes('DEMO'));
       addAudit('DEMO_PURGED', 'Demo records cleaned safely. Vaults intact.');
@@ -2073,7 +2620,28 @@ Executive Helpline: +92 300 1234567`
       a.href = URL.createObjectURL(blob);
       a.download = `GlobalGuru_Snapshot_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
-      showToast('Backup JSON downloaded', 'good');
+      showToast('Backup JSON snapshot downloaded', 'good');
+    }
+
+    function importBackupJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (!parsed.accounts || !parsed.users) throw new Error('Invalid schema');
+          state = { ...state, ...parsed };
+          saveState();
+          addAudit('BACKUP_RESTORED', 'System snapshot restored from JSON');
+          showToast('Backup restored successfully', 'good');
+          setTimeout(() => location.reload(), 600);
+        } catch (err) {
+          showToast('Invalid Global Guru backup file', 'bad');
+        }
+      };
+      reader.readAsText(file);
     }
 
     function exportLedgerCSV() {
@@ -2097,8 +2665,8 @@ Executive Helpline: +92 300 1234567`
       const stack = $('#toastStack');
       const toast = document.createElement('div');
       toast.className = 'toast';
-      if (type === 'good') toast.style.borderLeftColor = '#087443';
-      if (type === 'bad') toast.style.borderLeftColor = '#b42318';
+      if (type === 'good') toast.style.borderLeftColor = 'var(--emerald)';
+      if (type === 'bad') toast.style.borderLeftColor = 'var(--danger)';
       toast.innerHTML = `<span>${msg}</span>`;
       stack.appendChild(toast);
       setTimeout(() => toast.remove(), 3200);
@@ -2112,7 +2680,7 @@ Executive Helpline: +92 300 1234567`
       const activeSid = sessionStorage.getItem(SESSION_KEY);
       if (activeSid) {
         const u = state.users.find(x => x.id === activeSid && x.status === 'ACTIVE');
-        if (u) setCurrentSession(u, false); // false = do not duplicate audit login log
+        if (u) setCurrentSession(u, false);
       }
     });
   </script>
