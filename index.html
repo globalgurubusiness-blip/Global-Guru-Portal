@@ -342,8 +342,27 @@
     .table-container { width: 100%; overflow-x: auto; }
     .table-scroll { max-height: 420px; overflow: auto; scrollbar-gutter: stable; }
     .table-scroll thead th { position: sticky; top: 0; z-index: 2; }
-    .role-scope { display:flex; flex-wrap:wrap; gap:4px; margin-top:7px; }
+    .role-scope { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:7px; }
     .role-chip { font:700 8.5px 'JetBrains Mono',monospace; padding:2px 6px; border-radius:99px; color:var(--gold); border:1px solid rgba(245,158,11,.35); background:var(--gold-soft); }
+    .role-chip.empty { color:var(--muted); border-style:dashed; border-color:var(--line); background:transparent; }
+    .access-edit { border:0; background:transparent; color:var(--brand-2); cursor:pointer; font:700 9px 'JetBrains Mono',monospace; padding:2px 4px; }
+    .access-edit:hover { color:var(--gold); }
+    .access-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 12px; border:1px solid var(--line); border-radius:9px; background:var(--card); }
+    .access-row + .access-row { margin-top:7px; }
+    .switch-card-top { width:100%; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+    .switch-controls { display:flex; align-items:center; gap:7px; flex:0 0 auto; }
+    .switch-arrow { width:28px; height:28px; border:1px solid var(--line); border-radius:7px; background:var(--card); color:var(--muted); cursor:pointer; transition:.2s; }
+    .switch-arrow:hover, .switch-arrow.open { color:var(--gold); border-color:rgba(245,158,11,.45); background:var(--gold-soft); }
+    .switch-arrow.open i { transform:rotate(180deg); }
+    .switch-arrow i { transition:transform .2s; }
+    .switch-access-panel { width:100%; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); display:grid; gap:6px; }
+    .switch-access-panel.hidden { display:none; }
+    .switch-role-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:10.5px; color:var(--muted); }
+    .mini-switch { width:34px; height:19px; border-radius:99px; background:#354052; border:1px solid var(--line); position:relative; cursor:pointer; transition:.2s; }
+    .mini-switch::after { content:''; width:13px; height:13px; border-radius:50%; background:#fff; position:absolute; left:2px; top:2px; transition:.2s; }
+    .mini-switch.on { background:var(--brand); border-color:var(--brand-2); }
+    .mini-switch.on::after { left:17px; }
+    .mini-switch[aria-disabled="true"] { opacity:.45; cursor:not-allowed; }
     .btn.disabled, .btn[aria-disabled="true"] { opacity:.45; pointer-events:none; filter:grayscale(.35); }
     .overdue { color:var(--danger)!important; font-weight:800; }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
@@ -1361,19 +1380,21 @@
 
     // Exactly 12 switches to fill the 3-column grid cleanly with zero orphans
     const DEFAULT_SWITCHES = [
-      { id: 'panicMask', title: '1-Click Privacy Shield', desc: 'Mask all monetary ledger balances with bullet dots.', roles:['Second Super Admin','Second Admin','Staff'] },
-      { id: 'admissionFreeze', title: 'Intake Admission Freeze', desc: 'Temporarily halt student registration submissions.', roles:['Second Admin','Staff'] },
-      { id: 'khataMaintenance', title: 'Khata Month-End Lockdown', desc: 'Lock ledger entries during executive financial reconciliation.', roles:['Second Super Admin','Second Admin'] },
-      { id: 'whatsappChannel', title: 'WhatsApp Desk Logs Channel', desc: 'Keep direct click-to-chat header actions visible.', roles:['Staff','Learner','Client'] },
-      { id: 'studioPortalDesk', title: 'Commercial Client Portal Access', desc: 'Permit B2B client workspace logins and requests.', roles:['Client'] },
-      { id: 'backupClearance', title: 'Encrypted Snapshot Clearance', desc: 'Enable password-encrypted local snapshot exports.', roles:['Second Super Admin'] },
-      { id: 'vaultSync', title: 'Vault Ledger Posting', desc: 'Post approved payments automatically to the selected local vault.', roles:['Second Super Admin','Second Admin'] },
-      { id: 'staffLedgerShield', title: 'Staff Financial Restrictions', desc: 'Shield general ledger and cash totals from staff.', roles:['Staff'] },
-      { id: 'cohortTimers', title: 'Live Cohort Timetable Display', desc: 'Show assigned lecture schedule and countdown status.', roles:['Staff','Learner'] },
-      { id: 'autoWhatsAppReceipts', title: 'Auto WhatsApp Vouchers', desc: 'Prompt official click-to-chat receipts on every payment.', roles:['Second Admin','Staff'] },
-      { id: 'auditLogging', title: 'Local Audit Trace Log', desc: 'Record local session events; production needs an append-only server.', roles:['Second Super Admin','Second Admin'] },
-      { id: 'autoReversalGuard', title: 'Double-Entry Reversal Guard', desc: 'Mandate confirmation and a reason before ledger reversals.', roles:['Second Super Admin','Second Admin'] }
+      { id: 'panicMask', title: '1-Click Privacy Shield', desc: 'Mask all monetary ledger balances with bullet dots.' },
+      { id: 'admissionFreeze', title: 'Intake Admission Freeze', desc: 'Temporarily halt student registration submissions.' },
+      { id: 'khataMaintenance', title: 'Khata Month-End Lockdown', desc: 'Lock ledger entries during executive financial reconciliation.' },
+      { id: 'whatsappChannel', title: 'WhatsApp Desk Logs Channel', desc: 'Keep direct click-to-chat header actions visible.' },
+      { id: 'studioPortalDesk', title: 'Commercial Client Portal Access', desc: 'Permit B2B client workspace logins and requests.' },
+      { id: 'backupClearance', title: 'Encrypted Snapshot Clearance', desc: 'Enable password-encrypted local snapshot exports.' },
+      { id: 'vaultSync', title: 'Vault Ledger Posting', desc: 'Post approved payments automatically to the selected local vault.' },
+      { id: 'staffLedgerShield', title: 'Staff Financial Restrictions', desc: 'Shield general ledger and cash totals from staff.' },
+      { id: 'cohortTimers', title: 'Live Cohort Timetable Display', desc: 'Show assigned lecture schedule and countdown status.' },
+      { id: 'autoWhatsAppReceipts', title: 'Auto WhatsApp Vouchers', desc: 'Prompt official click-to-chat receipts on every payment.' },
+      { id: 'auditLogging', title: 'Local Audit Trace Log', desc: 'Record local session events; production needs an append-only server.' },
+      { id: 'autoReversalGuard', title: 'Double-Entry Reversal Guard', desc: 'Mandate confirmation and a reason before ledger reversals.' }
     ];
+
+    const ASSIGNABLE_SWITCH_ROLES = ['SUPER_ADMIN','SECOND_SUPER_ADMIN','SECOND_ADMIN','STAFF','LEARNER','CLIENT'];
 
     let state = {
       theme: 'dark',
@@ -1399,6 +1420,7 @@
         auditLogging: true,
         autoReversalGuard: true
       },
+      switchManagers: {},
       accounts: {
         'Meezan Bank': 850000,
         'Easypaisa': 240000,
@@ -1513,7 +1535,8 @@
             switches: { ...state.switches, ...(parsed.switches || {}) },
             failedLogins: parsed.failedLogins || {},
             serviceRequests: Array.isArray(parsed.serviceRequests) ? parsed.serviceRequests : [],
-            journals: Array.isArray(parsed.journals) ? parsed.journals : []
+            journals: Array.isArray(parsed.journals) ? parsed.journals : [],
+            switchManagers: parsed.switchManagers && typeof parsed.switchManagers === 'object' ? parsed.switchManagers : {}
           };
           if (!currentStored) saveState();
         }
@@ -1920,6 +1943,8 @@
       applyPrivacyMaskDOM();
     }
 
+    let expandedSwitchAccessId = null;
+
     function renderExecutiveView() {
       const totalLiquid = Object.values(state.accounts).reduce((a, b) => a + b, 0);
       const receivables = state.learners.reduce((a, l) => a + Math.max(0, l.totalFee - l.paid), 0) +
@@ -1941,16 +1966,30 @@
 
       DEFAULT_SWITCHES.forEach(sw => {
         const isChecked = !!state.switches[sw.id];
+        const assignedRoles = Array.isArray(state.switchManagers?.[sw.id]) ? state.switchManagers[sw.id] : [];
+        const isExpanded = expandedSwitchAccessId === sw.id;
+        const canEditAssignments = state.currentUser.role === 'SUPER_ADMIN';
         if (isChecked) activeCount++;
         const card = document.createElement('div');
-        card.style.cssText = 'border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--card); display: flex; align-items: center; justify-content: space-between; gap: 10px;';
+        card.style.cssText = 'border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--card); display: flex; flex-direction:column; align-items: stretch; gap: 0;';
         card.innerHTML = `
-          <div>
-            <strong style="display: block; font-size: 12px;">${sw.title}</strong>
-            <span style="font-size: 10.5px; color: var(--muted);">${sw.desc}</span>
-            <div class="role-scope">${(sw.roles || []).map(role => `<span class="role-chip">${friendlyRole(role)}</span>`).join('')}</div>
+          <div class="switch-card-top">
+            <div style="min-width:0">
+              <strong style="display: block; font-size: 12px;">${escapeHtml(sw.title)}</strong>
+              <span style="font-size: 10.5px; color: var(--muted);">${escapeHtml(sw.desc)}</span>
+              <div class="role-scope">${assignedRoles.length ? `<span class="role-chip">${assignedRoles.length} role${assignedRoles.length === 1 ? '' : 's'} assigned</span>` : '<span class="role-chip empty">No roles assigned</span>'}</div>
+            </div>
+            <div class="switch-controls">
+              <div class="switch-ui ${isChecked ? 'on' : ''}" role="switch" aria-checked="${isChecked}" onclick="toggleSwitchState('${sw.id}', this)" title="Turn feature ON/OFF"></div>
+              ${canEditAssignments ? `<button class="switch-arrow ${isExpanded ? 'open' : ''}" onclick="toggleSwitchAccessPanel('${sw.id}')" title="Assign role access" aria-label="Assign role access" aria-expanded="${isExpanded}"><i class="fa-solid fa-chevron-down"></i></button>` : ''}
+            </div>
           </div>
-          <div class="switch-ui ${isChecked ? 'on' : ''}" onclick="toggleSwitchState('${sw.id}', this)"></div>
+          <div class="switch-access-panel ${isExpanded ? '' : 'hidden'}">
+            ${ASSIGNABLE_SWITCH_ROLES.map(role => {
+              const enabled = assignedRoles.includes(role);
+              return `<div class="switch-role-row"><span><i class="fa-solid ${enabled ? 'fa-circle-check' : 'fa-circle-xmark'}" style="color:${enabled ? 'var(--emerald-text)' : 'var(--muted)'};margin-right:6px"></i>${friendlyRole(role)}</span><button class="mini-switch ${enabled ? 'on' : ''}" role="switch" aria-checked="${enabled}" onclick="setSwitchRoleAccess('${sw.id}','${role}',${!enabled})" title="${enabled ? 'Disable' : 'Enable'} for ${friendlyRole(role)}"></button></div>`;
+            }).join('')}
+          </div>
         `;
         grid.appendChild(card);
       });
@@ -1958,10 +1997,27 @@
       $('#switchboardStatusBadge').textContent = `${activeCount} / ${DEFAULT_SWITCHES.length} Active`;
     }
 
+    function toggleSwitchAccessPanel(switchId) {
+      if (state.currentUser.role !== 'SUPER_ADMIN') return showToast('Role assignment sirf Super Admin kar sakta hai.', 'bad');
+      expandedSwitchAccessId = expandedSwitchAccessId === switchId ? null : switchId;
+      renderExecutiveView();
+    }
+
+    function setSwitchRoleAccess(switchId, role, enabled) {
+      if (state.currentUser.role !== 'SUPER_ADMIN') return showToast('Role assignment sirf Super Admin kar sakta hai.', 'bad');
+      if (!DEFAULT_SWITCHES.some(sw => sw.id === switchId) || !ASSIGNABLE_SWITCH_ROLES.includes(role)) return;
+      const current = new Set(Array.isArray(state.switchManagers?.[switchId]) ? state.switchManagers[switchId] : []);
+      enabled ? current.add(role) : current.delete(role);
+      state.switchManagers[switchId] = [...current];
+      saveState();
+      addAudit('SWITCH_ACCESS_UPDATED', `${friendlyRole(role)} access ${enabled ? 'enabled' : 'disabled'} for ${switchId}`, switchId);
+      expandedSwitchAccessId = switchId;
+      renderExecutiveView();
+    }
+
     function toggleSwitchState(switchId, el) {
-      if (!['SUPER_ADMIN','SECOND_SUPER_ADMIN'].includes(state.currentUser.role)) {
-        return showToast('Access Restricted to Executive Admins', 'bad');
-      }
+      const assigned = Array.isArray(state.switchManagers?.[switchId]) && state.switchManagers[switchId].includes(state.currentUser.role);
+      if (state.currentUser.role !== 'SUPER_ADMIN' && !assigned) return showToast('Super Admin ne is toggle ka access assign nahi kiya.', 'bad');
       state.switches[switchId] = !state.switches[switchId];
       el.classList.toggle('on', state.switches[switchId]);
 
